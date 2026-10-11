@@ -603,6 +603,20 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 .sy-qr{width:232px;max-width:100%;padding:8px;background:#fff;border-radius:14px;border:1px solid var(--line);margin:4px 0 6px}
 .sy-qr svg{display:block;width:100%;height:auto}
 
+/* окно входа по паролю */
+#sy-dlg{position:fixed;inset:0;z-index:900;background:color-mix(in oklab,var(--ink) 38%,transparent);display:grid;place-items:center;padding:20px 16px;overflow:auto}
+.sy-db{width:min(400px,100%);background:var(--surface);border-radius:20px;padding:18px 18px 16px;display:grid;gap:10px;box-shadow:0 24px 60px -24px var(--shadow)}
+.sy-db p{margin:0;color:var(--muted);font-size:calc(13px*var(--fz));line-height:1.45}
+.sy-db .inp{width:100%;font-size:16px}
+.sy-db{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto}
+.sy-db p.sy-warn{color:var(--ink)}
+.sy-dmsg{min-height:1.4em;color:var(--danger)!important}
+.sy-dmsg.soft{color:var(--muted)!important}
+#sy-in{padding:7px 14px}
+
+.sy-alt{border:0;background:none;padding:2px 0;justify-self:start;color:var(--muted);font-size:calc(12px*var(--fz));text-decoration:underline;text-underline-offset:2px}
+.sy-db a.btn{font-size:calc(13px*var(--fz))}
+
 @media (max-width:1100px){
   .lower{grid-template-columns:1fr}
   #view-report{grid-template-columns:minmax(0,1fr)}
@@ -685,6 +699,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       <button class="pill" id="demo-pill" hidden>Это пример</button>
       <div class="mswitch" id="mswitch"><button class="ib" id="m-prev" aria-label="Предыдущий месяц">‹</button><b id="m-label"></b><button class="ib" id="m-next" aria-label="Следующий месяц">›</button></div>
       <button class="fact" id="save-pill" title="Автосохранение: открыть настройки данных"></button>
+      <button type="button" class="btn ghost" id="sy-in" hidden>Войти</button>
       <button class="fact" id="sync-pill" hidden></button>
       <button type="button" class="pill" id="set-btn" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Настройки</button>
     </div>
@@ -2327,9 +2342,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   var menu=$('menu'),brand=$('brand'),brT=0;
   function hostOf(u){try{return new URL(u).host.replace(/^www\./,'')}catch(_){return u}}
   function renderMenu(){
-    var h='<div class="lab">Мои сайты</div>';
+    var h='<div class="lab">Мои сайты</div>'+(inClaude?'':'<ul class="sites"><li><a href="finansy.html">Финансы<small>траты по дням, накопления, долги</small></a></li></ul>');
     h+=sites.length?'<ul class="sites">'+sites.map(function(x,i){return '<li><a href="'+esc(x.u)+'" target="_blank" rel="noopener">'+esc(x.n||hostOf(x.u))+'<small>'+esc(hostOf(x.u))+' ↗</small></a><button type="button" data-sx="'+i+'" aria-label="Убрать сайт" title="Убрать">×</button></li>'}).join('')+'</ul>'
-      :'<p class="note">Пока пусто. Добавь сюда сайт со сделками и другие свои страницы.</p>';
+      :(inClaude?'<p class="note">Пока пусто. Добавь сюда сайт со сделками и другие свои страницы.</p>':'');
     h+=siteForm?'<div class="hform"><input class="inp" id="st-n" maxlength="40" placeholder="Название, например: сделки"><input class="inp" id="st-u" type="url" placeholder="https://адрес сайта"><div class="row"><button type="button" class="btn" id="st-ok">Добавить</button><button type="button" class="btn ghost" id="st-no">Отмена</button></div></div>'
       :'<div><button type="button" class="btn ghost" id="st-add">+ Добавить сайт</button></div>';
     h+='<p class="note">Двойной клик по логотипу возвращает на главную.</p>';
@@ -2540,9 +2555,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   var sy=null,syKeyP=null,syBusy=false,syT=0,syState='',syMsg='',syAt=0,syLastPush=0,syFail=0,syQrOn=false,syAskOver=false;
   function syCan(){return !inClaude&&!EXAMPLE&&!!(window.crypto&&crypto.subtle&&window.fetch&&window.TextEncoder)}
   function syOn(){return !!(sy&&sy.tok)&&syCan()}
-  function syLoad(){try{var o=JSON.parse(localStorage.getItem(SYK)||'null');if(o&&o.tok){o.rh=o.rh||{};o.lh=o.lh||{};o.base=o.base||{};sy=o}}catch(_){}}
+  function syLoad(){try{var o=JSON.parse(localStorage.getItem(SYK)||'null');if(o&&o.tok){o.rh=o.rh||{};o.lh=o.lh||{};o.base=o.base||{};o.pa=o.pa||{};o.prev=o.prev||{};o.prevH=o.prevH||{};sy=o}}catch(_){}}
   function sySave(){try{if(sy)localStorage.setItem(SYK,JSON.stringify(sy));else localStorage.removeItem(SYK);return true}catch(_){return false}}
-  function syNew(tok){return{tok:tok,id:'',etag:'',rh:{},lh:{},base:{}}}
+  function syNew(tok){return{tok:tok,id:'',etag:'',rh:{},lh:{},base:{},pa:{},prev:{},prevH:{}}}
   /* одинаковая запись даёт одинаковую строку на любом устройстве: ключи идут по алфавиту */
   function syStr(v){
     if(v===undefined)return 'undefined';
@@ -2606,9 +2621,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       return crypto.subtle.deriveKey({name:'PBKDF2',salt:syU8('koleso-zhizni-sync-v1'),iterations:100000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])});
     return syKeyP;
   }
-  function syEnc(str){
+  function syEnc(str,pa){
     var iv=crypto.getRandomValues(new Uint8Array(12));
-    return syKey().then(function(k){return crypto.subtle.encrypt({name:'AES-GCM',iv:iv},k,syU8(str))}).then(function(buf){return JSON.stringify({v:1,h:syHash(str),iv:syB64(iv),ct:syB64(new Uint8Array(buf))})});
+    return syKey().then(function(k){return crypto.subtle.encrypt({name:'AES-GCM',iv:iv},k,syU8(str))}).then(function(buf){return JSON.stringify({v:1,h:syHash(str),pa:pa||[],iv:syB64(iv),ct:syB64(new Uint8Array(buf))})});
   }
   function syDec(env){return syKey().then(function(k){return crypto.subtle.decrypt({name:'AES-GCM',iv:syUB64(env.iv)},k,syUB64(env.ct))}).then(function(buf){return new TextDecoder().decode(buf)})}
 
@@ -2640,7 +2655,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   }
   function syFind(){
     return syApi('GET','/gists?per_page=100').then(function(r){
-      var best=null;(r.data||[]).forEach(function(g){if(g&&g.files&&g.files[SYF]&&(!best||g.updated_at>best.updated_at))best=g});
+      var best=null;(r.data||[]).forEach(function(g){if(g&&g.files&&g.files[SYV]){sy.vid=g.id;syVhSeen=true}if(g&&g.files&&g.files[SYF]&&(!best||g.updated_at>best.updated_at))best=g});
       if(best){sy.id=best.id;sy.etag='';return syPull(true)}
       return syCreate();
     });
@@ -2652,7 +2667,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       files[SYF]={content:JSON.stringify({app:'koleso-zhizni',v:1,chk:JSON.parse(a[0])})};
       return syApi('POST','/gists',{description:'Колесо жизни: записи сайта (зашифрованы). Не удалять: это хранилище синхронизации.',public:false,files:files});
     }).then(function(r){
-      sy.id=r.data.id;sy.etag='';sy.rh={};sy.lh={};sy.base={};
+      sy.id=r.data.id;sy.etag='';sy.rh={};sy.lh={};sy.base={};sy.pa={};sy.prev={};sy.prevH={};
       Object.keys(strs).forEach(function(k){sy.rh[syFile(k)]=syHash(strs[k]);syMark(k,strs[k])});
       syLastPush=Date.now();sySave();syDC=null;
       toast('Синхронизация включена: записи этого устройства отправлены в хранилище.');
@@ -2679,7 +2694,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
         return Promise.all(todo.map(function(x){
           return syText(x.f).then(function(t){
             var e=syEnv(t);if(!e){x.skip=1;return}
-            x.h=e.h;if(e.h===sy.rh[x.name]){x.skip=1;return}
+            x.h=e.h;x.pa=Array.isArray(e.pa)?e.pa:[];if(e.h===sy.rh[x.name]){x.skip=1;return}
             return syDec(e).then(function(s){x.str=s;x.obj=JSON.parse(s)},function(){throw{code:'key'}});
           });
         }));
@@ -2690,9 +2705,13 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
         todo.sort(function(a,b){return(a.k==='set'?0:1)-(b.k==='set'?0:1)}).forEach(function(x){
           if(x.skip)return;
           var k=x.k,ls=syStr(syGet(k)),known=sy.lh[k]!=null,dirty=known?syHash(ls)!==sy.lh[k]:k==='set'?keepSet:!SY_EMPTY[ls];
-          sy.rh[x.name]=x.h;
-          if(!dirty){syApply(k,x.obj);syMark(k,syStr(syGet(k)));ch++;return}
-          var res=k.charAt(0)==='d'?syDishMerge(known?sy.base[k]:{},syGet(k),x.obj):merge3(known&&sy.base[k]?JSON.parse(sy.base[k]):{},syGet(k),x.obj,0);
+          /* два устройства отправили одну часть почти одновременно, и чужая отправка легла поверх моей:
+             пришедшая версия построена на той, что была до моей отправки, а моей в её родословной нет. Тогда версии сводятся от общей прежней */
+          var was=sy.rh[x.name],ph=sy.prevH[x.name],lost=known&&!dirty&&!!ph&&x.pa.indexOf(ph)>=0&&x.pa.indexOf(was)<0&&sy.prev[k]!=null;
+          sy.rh[x.name]=x.h;sy.pa[x.name]=x.pa;
+          if(!dirty&&!lost){syApply(k,x.obj);syMark(k,syStr(syGet(k)));ch++;return}
+          var bs=lost?sy.prev[k]:known?sy.base[k]:null;
+          var res=k.charAt(0)==='d'?syDishMerge(bs||{},syGet(k),x.obj):merge3(bs?JSON.parse(bs):{},syGet(k),x.obj,0);
           syApply(k,res);ch++;merged++;
           /* сведённая версия отличается от пришедшей: она уйдёт на сервер следующим шагом */
           sy.base[k]=k.charAt(0)==='d'?syDishBase(x.obj):x.str;sy.lh[k]=syStr(syGet(k))===x.str?syHash(x.str):'*';
@@ -2714,11 +2733,12 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function syPush(){
     var d=syDirty();if(!d.length)return;
     if(Date.now()-syLastPush<2500)return 'later';
-    var files={};
-    return Promise.all(d.map(function(x){return syEnc(x.s).then(function(c){files[syFile(x.k)]={content:c}})})).then(function(){
+    var files={},pas={};
+    d.forEach(function(x){var f=syFile(x.k);pas[f]=[sy.rh[f]].concat(sy.pa[f]||[]).filter(Boolean).slice(0,8)});
+    return Promise.all(d.map(function(x){return syEnc(x.s,pas[syFile(x.k)]).then(function(c){files[syFile(x.k)]={content:c}})})).then(function(){
       return syApi('PATCH','/gists/'+sy.id,{files:files});
     }).then(function(){
-      d.forEach(function(x){sy.rh[syFile(x.k)]=syHash(x.s);syMark(x.k,x.s)});
+      d.forEach(function(x){var f=syFile(x.k);sy.prevH[f]=sy.rh[f]||'';sy.prev[x.k]=sy.base[x.k];sy.pa[f]=pas[f];sy.rh[f]=syHash(x.s);syMark(x.k,x.s)});
       syLastPush=Date.now();sySave();syDC=null;
     });
   }
@@ -2734,10 +2754,12 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var later=false;
     Promise.resolve().then(function(){return sy.id?syPull(false):syFind()}).then(function(){return syPush()}).then(function(r){
       later=r==='later';syFail=0;syBusy=false;sySet(syDirty().length?'wait':'ok');
+      /* пароль, заданный вместе с ключом, включается сразу после первого удачного обмена */
+      if(syPend){var pp=syPend;syPend='';syVhSet(pp)}else syDlgDone(true);
       if(later||syDirty().length)sySoon(Math.max(500,2600-(Date.now()-syLastPush)));else if(!document.hidden)sySoon(sy.etag&&!sy.nc?4000:9000);
     },function(e){
       var c=(e&&e.code)||'err';syBusy=false;syFail++;
-      if(c==='gone'){sy.id='';sy.etag='';sy.rh={};sy.lh={};sy.base={};syDC=null;sySave();sySet('busy');sySoon(800);return}
+      if(c==='gone'){sy.id='';sy.etag='';sy.rh={};sy.lh={};sy.base={};sy.pa={};sy.prev={};sy.prevH={};syDC=null;sySave();sySet('busy');sySoon(800);return}
       sySet(c==='tok'||c==='key'||c==='deny'?c:'err',SYERR[c]||SYERR.err);
       if(c==='tok'||c==='key'||c==='deny')return;
       sySoon(c==='limit'?Math.max(60,e.retry||0)*1000:Math.min(60000,4000*Math.pow(2,Math.min(syFail,4))));
@@ -2745,13 +2767,14 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   }
   /* правка на этом устройстве: отправка через долю секунды, чтобы несколько правок подряд ушли одним разом */
   function syTouch(){syDC=null;if(syOn()&&syState!=='tok'&&syState!=='key'&&syState!=='deny'){if(syState==='ok')sySet('wait');sySoon(700)}}
-  function syConnect(tok){
-    tok=String(tok||'').trim();
-    if(!/^[A-Za-z0-9_]{20,255}$/.test(tok)){toast('Это не похоже на ключ GitHub: он начинается с ghp_ или github_pat_.');return}
+  var syPend='';
+  function syConnect(tok,pw){
+    tok=String(tok||'').trim();pw=syPw(pw);
+    if(!/^[A-Za-z0-9_]{20,255}$/.test(tok)){syDlgDone(false,'Это не похоже на ключ GitHub: он начинается с ghp_ или github_pat_.');toast('Это не похоже на ключ GitHub: он начинается с ghp_ или github_pat_.');return}
     if(!syCan()){toast('В этом окне синхронизация не работает: нужен сайт по адресу https или файл, открытый в обычном браузере.');return}
-    clearTimeout(syT);sy=syNew(tok);syKeyP=null;syFail=0;syState='';syQrOn=false;syDC=null;syBusy=false;
+    clearTimeout(syT);sy=syNew(tok);syKeyP=null;syFail=0;syState='';syQrOn=false;syDC=null;syBusy=false;syPend=pw;
     if(!sySave()){toast('Не получилось сохранить ключ в памяти браузера.');sy=null;return}
-    sySet('busy');
+    sySet('busy');syInShow();
     /* сначала проверка самого ключа, чтобы ошибка была понятной */
     syApi('GET','/gists?per_page=1').then(function(r){
       if(r.scopes!=null&&r.scopes!==''&&!/(^|,\s*)gist(,|$)/.test(r.scopes))throw{code:'deny'};
@@ -2759,24 +2782,25 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       syCycle();
     },function(e){throw e}).catch(function(e){
       var c=(e&&e.code)||'err';
-      if(c==='tok'||c==='deny'){sy=null;sySave();syState='';syMsg='';saveShow();toast(c==='tok'?'GitHub не принял ключ. Проверь, что он скопирован целиком.':SYERR.deny+'.');renderAll();return}
-      sySet('err',SYERR[c]||SYERR.err);sySoon(5000);
+      if(c==='tok'||c==='deny'){sy=null;sySave();syState='';syMsg='';syPend='';saveShow();syInShow();var em=c==='tok'?'GitHub не принял ключ. Проверь, что он скопирован целиком.':SYERR.deny+'.';syDlgDone(false,em);toast(em);renderAll();return}
+      sySet('err',SYERR[c]||SYERR.err);syDlgDone(false,SYERR[c]||SYERR.err);sySoon(5000);
     });
   }
-  function syOff(){clearTimeout(syT);sy=null;syKeyP=null;sySave();syQrOn=false;syState='';syMsg='';saveShow();renderAll();toast('Синхронизация на этом устройстве выключена. Записи остались здесь и в хранилище.')}
+  function syOff(){clearTimeout(syT);sy=null;syKeyP=null;sySave();syQrOn=false;syState='';syMsg='';saveShow();syInShow();renderAll();toast('Синхронизация на этом устройстве выключена. Записи остались здесь и в хранилище.')}
   /* записи в хранилище зашифрованы другим ключом (ключ GitHub пересоздан): их можно заменить записями этого устройства */
   function syOverwrite(){
     if(!syOn()||!sy.id)return;
     syBusy=true;sySet('busy');
     syApi('GET','/gists/'+sy.id).then(function(r){
-      var del={};Object.keys((r.data&&r.data.files)||{}).forEach(function(n){del[n]=null});
+      /* чужие файлы в хранилище (например, записи сайта «Финансы») не трогаются */
+      var del={};Object.keys((r.data&&r.data.files)||{}).forEach(function(n){if(syDoc(n)||n===SYF)del[n]=null});
       var docs=syDocs(),strs={},files={};
       docs.forEach(function(k){var s=syStr(syGet(k));if(k==='set'||!SY_EMPTY[s])strs[k]=s});
       return Promise.all([syEnc('koleso')].concat(Object.keys(strs).map(function(k){return syEnc(strs[k]).then(function(c){files[syFile(k)]={content:c}})}))).then(function(a){
         files[SYF]={content:JSON.stringify({app:'koleso-zhizni',v:1,chk:JSON.parse(a[0])})};
         Object.keys(del).forEach(function(n){if(!files[n])files[n]=null});
         return syApi('PATCH','/gists/'+sy.id,{files:files});
-      }).then(function(){sy.etag='';sy.rh={};sy.lh={};sy.base={};Object.keys(strs).forEach(function(k){sy.rh[syFile(k)]=syHash(strs[k]);syMark(k,strs[k])});syLastPush=Date.now();syDC=null;sySave()});
+      }).then(function(){sy.etag='';sy.rh={};sy.lh={};sy.base={};sy.pa={};sy.prev={};sy.prevH={};Object.keys(strs).forEach(function(k){sy.rh[syFile(k)]=syHash(strs[k]);syMark(k,strs[k])});syLastPush=Date.now();syDC=null;sySave()});
     }).then(function(){syBusy=false;syFail=0;sySet('ok');sySoon(4000);toast('Хранилище заменено записями этого устройства.')},function(e){syBusy=false;sySet('err',SYERR[(e&&e.code)]||SYERR.err);sySoon(8000)});
   }
   function syBoot(){
@@ -2784,6 +2808,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     syLoad();
     if(SY_HASH&&(!sy||sy.tok!==SY_HASH)){syConnect(SY_HASH);return}
     if(syOn())syCycle();
+    syInBoot();
   }
   /* ссылка с ключом, открытая в уже открытой вкладке сайта: страница не перезагружается, поэтому ключ ловится здесь */
   window.addEventListener('hashchange',function(){
@@ -2808,21 +2833,212 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(inClaude||EXAMPLE)return '';
     var H='<h2>Синхронизация между устройствами</h2>';
     if(!syCan())return '<div class="s-g">'+H+'<p>В этом браузере синхронизация не работает: ему не хватает встроенного шифрования. Открой сайт по адресу https в свежем Chrome, Safari или Firefox.</p></div>';
-    if(!syOn())return '<div class="s-g wide">'+H+'<p>Сейчас записи живут только в этом браузере, поэтому на другом устройстве сайт пустой. С синхронизацией записи лежат ещё и в твоём аккаунте GitHub, в зашифрованном виде, и сами появляются на компьютере и телефоне.</p>'+
+    if(!syOn())return '<div class="s-g wide">'+H+'<p>Сейчас записи живут только в этом браузере. С синхронизацией они лежат ещё и в твоём аккаунте GitHub, в зашифрованном виде, и сами появляются на всех твоих устройствах.</p>'+
+      srow('Уже включал синхронизацию на другом устройстве?','войди по своему паролю, и записи загрузятся сюда','<button type="button" class="btn" id="sy-open">Войти по паролю</button>')+
+      '<h3>Первое подключение</h3>'+
       '<ol class="g-steps"><li><a class="btn ghost" href="https://github.com/settings/tokens/new?scopes=gist&description=Koleso%20zhizni" target="_blank" rel="noopener">Получить ключ на GitHub</a><small>Откроется страница создания ключа, галочка «gist» уже стоит. В поле Expiration выбери «No expiration», внизу нажми «Generate token» и скопируй ключ: он начинается с ghp_.</small></li>'+
-      '<li><div class="row"><input class="inp g-url" id="sy-tok" type="password" autocomplete="off" spellcheck="false" placeholder="ghp_…" aria-label="Ключ GitHub"><button type="button" class="btn" id="sy-go">Включить синхронизацию</button></div><small>Ключ даёт доступ только к твоим gist, к репозиториям он не подходит. Он хранится в памяти этого браузера и в экспорт не попадает.</small></li></ol></div>';
+      '<li><div class="row"><input class="inp g-url" id="sy-tok" type="password" autocomplete="off" spellcheck="false" placeholder="Ключ GitHub: ghp_…" aria-label="Ключ GitHub"></div><small>Ключ даёт доступ только к твоим gist, к репозиториям он не подходит. Он хранится в памяти этого браузера и в экспорт не попадает.</small></li>'+
+      '<li><div class="row"><input class="inp g-url" id="sy-pw0" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Придумай пароль" aria-label="Пароль для входа с других устройств"><button type="button" class="btn" id="sy-go">Включить</button></div><small>По этому паролю ты потом входишь с любого телефона: открыл сайт, ввёл пароль, записи на месте. Ключ на других устройствах не нужен.</small></li></ol></div>';
     var st=syState==='ok'?'записи сверены в '+hm(syAt)+'. Изменения уходят сами через секунду и приходят на другие устройства за несколько секунд':syState==='key'||syState==='tok'||syState==='deny'||syState==='err'?esc(syMsg):'сверяю записи…';
     var web=/^https?:$/.test(location.protocol),h='<div class="s-g">'+H+
       srow(syBad()?'Синхронизация остановилась':'Синхронизация включена',st,(syState==='key'?'<button type="button" class="btn ghost" id="sy-over">'+(syAskOver?'Точно заменить хранилище?':'Заменить записями этого устройства')+'</button>':'<button type="button" class="btn" id="sy-now"'+(syBusy?' disabled':'')+'>Сверить сейчас</button>')+'<button type="button" class="btn ghost" id="sy-off">Выключить здесь</button>')+
-      srow('Подключить телефон или другой компьютер',web?'на телефоне наведи камеру на код: сайт откроется уже подключённым. Код и ссылка открывают все записи, не показывай их никому':'другому устройству нужен сайт по адресу в интернете. Там открой Настройки → Данные и вставь тот же ключ GitHub',
-        web?'<button type="button" class="btn" id="sy-qr">'+(syQrOn?'Спрятать код':'Показать код')+'</button><button type="button" class="btn ghost" id="sy-copy">Скопировать ссылку</button>':'')+
-      (syQrOn&&web?'<div class="sy-qr">'+syQR(syLink())+'</div>':'')+'</div>';
+      syVhHTML()+
+      srow('Или без пароля: код и ссылка',web?'на телефоне наведи камеру на код: сайт откроется уже подключённым. Код и ссылка открывают все записи, не показывай их никому':'другому устройству нужен сайт по адресу в интернете. Там открой Настройки → Данные и вставь тот же ключ GitHub',
+        web?'<button type="button" class="btn ghost" id="sy-qr">'+(syQrOn?'Спрятать код':'Показать код')+'</button><button type="button" class="btn ghost" id="sy-copy">Скопировать ссылку</button>':'')+
+      (syQrOn&&web?'<div class="sy-qr">'+syQR(syLink())+'</div>':'')+
+      srow('Чужое устройство','выход стирает записи из этого браузера. В хранилище и на других устройствах они остаются','<button type="button" class="btn ghost" id="sy-wipe">'+(syAskWipe?'Точно стереть здесь?':'Выйти и стереть здесь')+'</button>')+'</div>';
+    syVhCheck();
     return h;
   }
   function syCopy(){
     var t=syLink(),ok=function(){toast('Ссылка скопирована. Открой её на другом устройстве и никому не пересылай.')};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,function(){toast('Не получилось скопировать. Покажи код и наведи на него камеру телефона.')});
     else toast('Этот браузер не даёт копировать. Покажи код и наведи на него камеру телефона.');
+  }
+  /* ---------- вход по паролю с любого устройства ----------
+     Ключ GitHub длинный, его не наберёшь на чужом телефоне. Поэтому он один раз шифруется паролем владельца и кладётся в открытый gist
+     его аккаунта. Сайт на адресе имя.github.io знает имя аккаунта, находит этот gist без входа, а пароль превращает шифр обратно в ключ.
+     Без пароля из шифра ничего не достать; стойкость равна стойкости пароля, поэтому он не короче 8 знаков. */
+  var SYV='koleso-zhizni-vhod.json',SYVIT=600000,syDlg=null,syVhBusy=false,syVhSeen=false,syAskWipe=false,syVhForm=false;
+  function syUser(){var m=/^([a-z0-9][a-z0-9-]*)\.github\.io$/i.exec(location.hostname||'');return m?m[1]:String((SEED&&SEED.ghu)||'')}
+  function syPw(pw){pw=String(pw||'').trim();try{pw=pw.normalize('NFC')}catch(_){}return pw}
+  function syPwKey(pw,salt,it){
+    return crypto.subtle.importKey('raw',syU8(pw),'PBKDF2',false,['deriveKey']).then(function(k){
+      return crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:it,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])});
+  }
+  function syVhMake(pw){
+    var salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+    return syPwKey(pw,salt,SYVIT).then(function(k){return crypto.subtle.encrypt({name:'AES-GCM',iv:iv},k,syU8(sy.tok))}).then(function(buf){
+      return{app:'koleso-zhizni-vhod',v:1,it:SYVIT,salt:syB64(salt),iv:syB64(iv),ct:syB64(new Uint8Array(buf))}});
+  }
+  function syVhOpen(b,pw){
+    return syPwKey(pw,syUB64(b.salt),Math.min(5000000,Math.max(1000,+b.it||SYVIT))).then(function(k){return crypto.subtle.decrypt({name:'AES-GCM',iv:syUB64(b.iv)},k,syUB64(b.ct))}).then(function(buf){return new TextDecoder().decode(buf)},function(){throw{code:'pw'}});
+  }
+  function syVhOk(b){return !!b&&b.app==='koleso-zhizni-vhod'&&!!b.salt&&!!b.iv&&!!b.ct}
+  /* запрос к GitHub без ключа: так читается только открытое */
+  function syPub(path){
+    return fetch('https://api.github.com'+path,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'}).then(function(r){
+      return r.text().then(function(t){
+        var d=null;try{d=JSON.parse(t)}catch(_){}
+        if(r.ok)return d;
+        throw{code:r.status===404?'nouser':r.status===403||r.status===429?'limit':'err'};
+      });
+    },function(){throw{code:'net'}});
+  }
+  /* где лежит шифр ключа: сначала файл рядом с сайтом (если владелец его туда положил), потом открытый gist аккаунта */
+  var syVhMem=null;
+  function syVhFind(user){
+    /* повторная попытка после неверного пароля не ходит за шифром заново */
+    if(syVhMem&&syVhMem.u===user)return Promise.resolve(syVhMem.b);
+    return syVhGet(user).then(function(b){syVhMem={u:user,b:b};return b});
+  }
+  function syVhGet(user){
+    return fetch('koleso-vhod.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null}).then(function(b){
+      if(syVhOk(b))return b;
+      if(!user)throw{code:'nouser'};
+      return syPub('/users/'+encodeURIComponent(user)+'/gists?per_page=100').then(function(l){
+        var g=null;(l||[]).forEach(function(x){if(x&&x.files&&x.files[SYV]&&(!g||x.updated_at>g.updated_at))g=x});
+        if(!g)throw{code:'none'};
+        return syPub('/gists/'+g.id);
+      }).then(function(g){
+        var f=g&&g.files&&g.files[SYV],b2=null;try{b2=JSON.parse(f.content)}catch(_){}
+        if(!syVhOk(b2))throw{code:'none'};
+        return b2;
+      });
+    });
+  }
+  var SYVERR={pw:'Пароль не подошёл.',none:'Вход по паролю ещё не включён. Включи его на устройстве, где есть записи: Настройки → Данные.',nouser:'Не нашёл аккаунт GitHub с таким именем.',
+    limit:'GitHub временно не отвечает из этой сети: слишком много запросов. Попробуй через несколько минут или с другого интернета.',net:'Нет связи с GitHub. Проверь интернет.',err:'GitHub ответил ошибкой. Попробуй ещё раз.'};
+  function syLogin(pw,user){
+    pw=syPw(pw);user=String(user||syUser()).trim().replace(/^@/,'');
+    if(!pw){syDlgMsg('Введи пароль.');return}
+    if(!user){syDlgMsg('Введи имя своего аккаунта GitHub.');return}
+    if(syVhBusy)return;syVhBusy=true;syDlgMsg('Проверяю…',1);
+    var was=!!(syVhMem&&syVhMem.u===user);
+    syVhFind(user).then(function(b){return syVhOpen(b,pw)}).catch(function(e){
+      /* пароль могли сменить, пока шифр лежал в памяти страницы: тогда он берётся заново */
+      if(!was||!e||e.code!=='pw')throw e;
+      syVhMem=null;return syVhFind(user).then(function(b){return syVhOpen(b,pw)});
+    }).then(function(tok){
+      syVhBusy=false;syDlgClose();syConnect(tok);
+    },function(e){syVhBusy=false;syDlgMsg(SYVERR[(e&&e.code)]||SYVERR.err)});
+  }
+  /* окно входа. У него два вида: «войти» (пароль уже задан) и «задать пароль» (первый раз: пароль и ключ GitHub).
+     Какой вид нужен, сайт выясняет сам: смотрит, лежит ли в аккаунте шифр ключа. */
+  var syDlgMode='login',syDlgAuto=false;
+  function syDlgMsg(m,soft){var el=$('sy-dmsg');if(el){el.textContent=m||'';el.classList.toggle('soft',!!soft)}var b=$('sy-dgo');if(b)b.disabled=!!soft}
+  function syDlgClose(){if(syDlg)syDlg.hidden=true}
+  function syDlgShown(){return !!syDlg&&!syDlg.hidden}
+  function syDlgGo(){
+    if(syDlgMode==='setup'){
+      var pw=syPw($('sy-dpw').value),tok=String($('sy-dtok').value||'').trim();
+      if(!pw){syDlgMsg('Придумай пароль: хватит и одного знака.');return}
+      if(!/^[A-Za-z0-9_]{20,255}$/.test(tok)){syDlgMsg('Вставь ключ GitHub: он начинается с ghp_ или github_pat_.');return}
+      syDlgMsg('Подключаю…',1);syConnect(tok,pw);return;
+    }
+    syLogin($('sy-dpw').value,$('sy-duser')?$('sy-duser').value:'');
+  }
+  function syDlgDraw(){
+    var u=syUser(),set=syDlgMode==='setup',keep=$('sy-dpw')?$('sy-dpw').value:'';
+    syDlg.innerHTML='<div class="sy-db"><div class="box-h"><span>'+(set?'Задать пароль':'Вход')+'</span><button type="button" class="ib" data-syx aria-label="Закрыть">×</button></div>'+
+      (set?'<p>Пароль задаётся один раз. Потом на любом устройстве: открыл сайт, ввёл пароль, и записи на месте. Записи с этого устройства никуда не денутся.</p>'+
+        (syHasData()?'':'<p class="sy-warn">На этом устройстве записей пока нет. Если они лежат в файле, который сделал «Экспорт», сначала загрузи его.</p><div><button type="button" class="btn ghost" data-syimp>Загрузить записи из файла</button><input type="file" id="sy-dfile" accept=".html,.htm,.json,text/html,application/json" hidden></div>')+
+        '<input class="inp" id="sy-dpw" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Придумай пароль" aria-label="Новый пароль">'+
+        '<p>Записям нужно место, где лежать: это твой аккаунт GitHub. Для него один раз нужен ключ, больше он нигде не вводится.</p>'+
+        '<div><a class="btn ghost" href="https://github.com/settings/tokens/new?scopes=gist&description=Koleso%20zhizni" target="_blank" rel="noopener">Получить ключ на GitHub</a></div>'+
+        '<p>На открывшейся странице галочка «gist» уже стоит. Выбери срок «No expiration», внизу нажми «Generate token», скопируй ключ и вставь сюда.</p>'+
+        '<input class="inp" id="sy-dtok" type="password" autocomplete="off" spellcheck="false" placeholder="Ключ GitHub: ghp_…" aria-label="Ключ GitHub">'
+       :'<p>Введи свой пароль, и записи загрузятся на это устройство. Дальше они обновляются сами.</p>'+
+        (u?'':'<input class="inp" id="sy-duser" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Имя аккаунта GitHub" aria-label="Имя аккаунта GitHub">')+
+        '<input class="inp" id="sy-dpw" type="password" autocomplete="current-password" placeholder="Пароль" aria-label="Пароль">')+
+      '<p class="sy-dmsg" id="sy-dmsg" role="status"></p>'+
+      '<div class="row"><button type="button" class="btn" id="sy-dgo">'+(set?'Включить':'Войти')+'</button><button type="button" class="btn ghost" data-syx>Закрыть</button></div>'+
+      '<button type="button" class="sy-alt" data-symode="'+(set?'login':'setup')+'">'+(set?'Пароль уже задан: войти':'Пароль ещё не задан: задать')+'</button></div>';
+    if(keep&&$('sy-dpw'))$('sy-dpw').value=keep;
+  }
+  function syDlgOpen(auto,mode){
+    if(!syCan()||syOn())return;
+    if(!syDlg){
+      syDlg=document.createElement('div');syDlg.id='sy-dlg';syDlg.setAttribute('role','dialog');syDlg.setAttribute('aria-label','Вход по паролю');document.body.appendChild(syDlg);
+      syDlg.addEventListener('click',function(e){
+        var t=e.target,m;
+        if(t===syDlg||t.closest('[data-syx]')){try{localStorage.setItem(LSK+'-vx','1')}catch(_){}syDlgClose();return}
+        if((m=t.closest('[data-symode]'))){syDlgMode=m.dataset.symode;syDlgDraw();var f=$('sy-dpw');if(f)f.focus();return}
+        if(t.closest('[data-syimp]')){$('sy-dfile').click();return}
+        if(t.closest('#sy-dgo'))syDlgGo();
+      });
+      syDlg.addEventListener('change',function(e){
+        var t=e.target;if(t.id!=='sy-dfile'||!t.files[0])return;
+        importFile(t.files[0]);t.value='';
+        /* файл читается не мгновенно: окно перерисовывается, когда записи появились */
+        var n=0,iv=setInterval(function(){if(syHasData()||++n>20){clearInterval(iv);if(syDlgShown()&&syDlgMode==='setup'){var tk=$('sy-dtok')?$('sy-dtok').value:'';syDlgDraw();if($('sy-dtok'))$('sy-dtok').value=tk}}},150);
+      });
+      syDlg.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();syDlgGo()}else if(e.key==='Escape')syDlgClose()});
+    }
+    syDlgAuto=!!auto;syDlgMode=mode||'login';syDlgDraw();syDlg.hidden=false;
+    if(!auto)setTimeout(function(){var i=$('sy-duser')||$('sy-dpw');if(i)i.focus()},30);
+    /* пароль ещё ни разу не задавали: вместо входа сразу показывается «задать пароль» */
+    var u=syUser();
+    if(!mode&&u)syVhFind(u).catch(function(e){if(e&&e.code==='none'&&syDlgShown()&&syDlgMode==='login'&&!($('sy-dpw')&&$('sy-dpw').value)){syDlgMode='setup';syDlgDraw();var f=$('sy-dpw');if(f&&!auto)f.focus()}});
+  }
+  /* итог подключения из окна «задать пароль» */
+  function syDlgDone(ok,msg){if(!syDlgShown()||syDlgMode!=='setup')return;if(ok)syDlgClose();else syDlgMsg(msg||'')}
+  /* кнопка «Войти» справа сверху. На пустом устройстве окно входа открывается само, если пароль уже задан */
+  function syInShow(){var b=$('sy-in');if(b)b.hidden=!(syCan()&&!syOn()&&/^https?:$/.test(location.protocol))}
+  function syInBoot(){
+    syInShow();
+    var seenX=false,u=syUser();try{seenX=!!localStorage.getItem(LSK+'-vx')}catch(_){}
+    if(syCan()&&!syOn()&&!SY_HASH&&!seenX&&!syHasData()&&!!u&&location.protocol==='https:')syVhFind(u).then(function(){if(!syOn()&&!syDlgShown())syDlgOpen(true,'login')},function(){});
+  }
+  /* включение и смена пароля: шифр ключа кладётся в открытый gist аккаунта */
+  function syVhSet(pw){
+    pw=syPw(pw);
+    if(!pw){toast('Введи пароль: хватит и одного знака.');return}
+    if(!syOn()||syVhBusy)return;syVhBusy=true;renderData();
+    var blob;
+    syVhMake(pw).then(function(b){blob=b;return syApi('GET','/gists?per_page=100')}).then(function(r){
+      var g=null;(r.data||[]).forEach(function(x){if(x&&x.files&&x.files[SYV])g=x});
+      var files={};files[SYV]={content:JSON.stringify(blob)};
+      return g?syApi('PATCH','/gists/'+g.id,{files:files}):syApi('POST','/gists',{description:'Колесо жизни: вход по паролю. Здесь только ключ, зашифрованный паролем. Не удалять.',public:true,files:files});
+    }).then(function(r){
+      syVhBusy=false;sy.vid=r.data.id;sySave();syVhForm=false;syVhMem=null;renderData();
+      syDlgDone(true);toast('Пароль задан. На любом устройстве: открой сайт, нажми «Войти» и введи пароль.'+(pw.length<8?' Пароль короткий, его легко подобрать: длинный надёжнее.':''));
+    },function(e){syVhBusy=false;renderData();syDlgDone(false,SYERR[(e&&e.code)]||SYERR.err);toast(SYERR[(e&&e.code)]||SYERR.err)});
+  }
+  /* файл входа: тот же шифр ключа. Если положить его рядом с index.html, новому устройству не нужен запрос к GitHub без ключа */
+  function syVhFile(){
+    if(!syOn()||!sy.vid)return;
+    syApi('GET','/gists/'+sy.vid).then(function(r){
+      var f=r.data&&r.data.files&&r.data.files[SYV];if(!f||!f.content)throw{code:'err'};
+      download('koleso-vhod.json',f.content,'application/json','Файл входа готов: положи его рядом с index.html');
+    }).catch(function(e){toast(SYERR[(e&&e.code)]||SYERR.err)});
+  }
+  function syVhOff(){
+    if(!syOn()||!sy.vid||syVhBusy)return;syVhBusy=true;renderData();
+    syApi('DELETE','/gists/'+sy.vid).catch(function(e){if(!e||e.code!=='gone')throw e}).then(function(){
+      syVhBusy=false;sy.vid='';sySave();renderData();toast('Вход по паролю выключен. Уже подключённые устройства продолжают работать.');
+    },function(e){syVhBusy=false;renderData();toast(SYERR[(e&&e.code)]||SYERR.err)});
+  }
+  /* включён ли вход по паролю, знает только GitHub: спрашивается один раз, когда открыты настройки */
+  function syVhCheck(){
+    if(!syOn()||syVhSeen||syVhBusy)return;syVhSeen=true;
+    syApi('GET','/gists?per_page=100').then(function(r){
+      var id='';(r.data||[]).forEach(function(x){if(x&&x.files&&x.files[SYV])id=x.id});
+      if(id!==(sy.vid||'')){sy.vid=id;sySave();if(tab==='settings'&&setSec==='data'&&!typingIn(sv))renderData()}
+    },function(){syVhSeen=false});
+  }
+  /* выход на чужом устройстве: записи стираются из этого браузера, в хранилище они остаются */
+  function syWipe(){
+    if(syDirty().length){toast('Подожди пару секунд: последние правки ещё уходят в хранилище.');sySoon(0);return}
+    clearTimeout(syT);
+    try{[LSK,SYK,LSK+'-g',LSK+'-vx'].forEach(function(k){localStorage.removeItem(k)});sessionStorage.removeItem(LSK+'-gt')}catch(_){}
+    location.reload();
+  }
+  function syVhHTML(){
+    var on=!!sy.vid,u=syUser(),where=u?esc(u)+'.github.io':'сайт';
+    return srow('Вход по паролю с любого устройства',on?'включён. На новом устройстве: открой '+where+', нажми «Войти» и введи пароль. Ни кода, ни ключа там не нужно. После смены пароля файл входа, если он выложен, нужно выложить заново':'придумай пароль один раз. Потом на любом телефоне достаточно открыть сайт, нажать «Войти» и ввести его',
+      syVhForm?'<input class="inp" id="sy-pw" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Новый пароль" aria-label="Новый пароль"><button type="button" class="btn" id="sy-pwgo"'+(syVhBusy?' disabled':'')+'>'+(syVhBusy?'Сохраняю…':'Сохранить')+'</button><button type="button" class="btn ghost" id="sy-pwx">Отмена</button>':
+      on?'<button type="button" class="btn ghost" id="sy-pwfile" title="Необязательно: положи файл рядом с index.html, и вход не будет зависеть от ограничений GitHub на запросы без ключа">Файл входа</button><button type="button" class="btn ghost" id="sy-pwset">Сменить пароль</button><button type="button" class="btn ghost" id="sy-pwoff"'+(syVhBusy?' disabled':'')+'>Выключить</button>':'<button type="button" class="btn" id="sy-pwset">Задать пароль</button>');
   }
   /* ---------- Google Календарь: события из аккаунта ----------
      Три способа получить события, слой в календаре один и тот же:
@@ -3520,7 +3736,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function saveHab(){persist('@set');refresh()}
   sv.addEventListener('click',function(e){
     var t=e.target,b=t.closest('[data-sec],[data-open]');
-    if(b){setSec=b.dataset.sec||b.dataset.open;askImp=askOld=gAskTake=false;spDel=false;hbDel=null;renderAll();navPush();return}
+    if(b){setSec=b.dataset.sec||b.dataset.open;askImp=askOld=gAskTake=syAskWipe=syAskOver=false;spDel=false;hbDel=null;renderAll();navPush();return}
     b=t.closest('.seg[data-seg] button');
     if(b){var a=b.parentNode.dataset.seg.split('.');OBJ[a[0]]()[a[1]]=parseV(b.dataset.v);if(a[0]==='rep'&&a[1]==='mode')repMode=repS.mode;if(a[0]==='cal'&&a[1]==='view')applyDefView();saveUI();return}
     b=t.closest('[data-sw]');
@@ -3555,7 +3771,14 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else if(t.id==='fs-pick')filePick();
     else if(t.id==='fs-resume')fileResume();
     else if(t.id==='fs-off')fileOff();
-    else if(t.id==='sy-go')syConnect($('sy-tok').value);
+    else if(t.id==='sy-go')syConnect($('sy-tok').value,$('sy-pw0')?$('sy-pw0').value:'');
+    else if(t.id==='sy-open')syDlgOpen(false);
+    else if(t.id==='sy-pwset'){syVhForm=true;renderData();var pi=$('sy-pw');if(pi)pi.focus()}
+    else if(t.id==='sy-pwx'){syVhForm=false;renderData()}
+    else if(t.id==='sy-pwgo')syVhSet($('sy-pw').value);
+    else if(t.id==='sy-pwoff')syVhOff();
+    else if(t.id==='sy-pwfile')syVhFile();
+    else if(t.id==='sy-wipe'){if(!syAskWipe){syAskWipe=true;renderData();return}syAskWipe=false;syWipe()}
     else if(t.id==='sy-now'){syFail=0;sySoon(0)}
     else if(t.id==='sy-off')syOff();
     else if(t.id==='sy-qr'){syQrOn=!syQrOn;renderData()}
@@ -3636,6 +3859,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var n=sv.querySelector('[data-'+key+'="'+id+'"] [data-grip]');if(n)n.focus();
   });
   $('set-btn').onclick=function(){setTab('settings')};
+  $('sy-in').onclick=function(){syDlgOpen(false)};
   $('save-pill').onclick=function(){if(fhWait){fileResume();return}setSec='data';setTab('settings')};
 
   /* ---------- кнопки браузера «назад» и «вперёд»: каждый переход по сайту становится шагом истории ---------- */
