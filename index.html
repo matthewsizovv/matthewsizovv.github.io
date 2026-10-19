@@ -948,7 +948,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   var habits=[SLEEP_H,{id:'h1',n:'Лёг до 23:00',s:'sleep',type:'check'},{id:'h2',n:'Заполнил КБЖУ',s:'other',type:'check'},{id:'h3',n:'Откладывал дела',s:'other',type:'count'}];
   /* настройки по умолчанию; всё, что меняется в «Настройках», лежит в этих объектах и сохраняется вместе с записями */
   var UI0={theme:'light',accent:'ink',sat:1,font:'onest',dfont:'unbounded',fz:1};
-  var CAL0={hh:46,start:7.5,snap:15,view:'week',dur:30,side:1,chips:1,we:1,info:1,tick:1};
+  var CAL0={hh:46,start:7.5,snap:15,view:'week',dur:30,side:1,chips:1,we:1,info:1,tick:1,ding:1,dvol:2};
   var REP0={mode:'month',months:6,wheel:1,empty:1,autoW:0,autoM:1,s1:1,s2:1,s3:1,s4:1,s5:1};
   var SEC0={habits:1,goals:1,diary:1,report:1},FEAT0={gh:'off',links:1},GS0={url:'',key:'',on:0,show:1,cals:{},hid:{},src:'',cid:''};
   var FOOD0={on:1,inHabits:1,c:'#B9C45E',rk:1,rp:1,rf:1,rc:1,rm:1,nk:0,np:0,nf:0,nc:0,mfix:0,meals:['Завтрак','Обед','Перекус','Ужин']};
@@ -2225,7 +2225,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var dn=past?dim:future?0:Math.min(dim,now.getDate());
     if(mkeys.indexOf(curM)<0)mkeys=curM<mkeys[0]?[curM].concat(mkeys).slice(0,repS.months):mkeys.concat([curM]).slice(-repS.months);
     function cellHtml(s,i,k,c,g,on){var q=g?c/g:0;return '<button type="button" class="cell sph'+(q>=1?' full':'')+(on?' on':'')+'" style="--h:'+s.h+'" data-s="'+i+'" data-m="'+k+'" title="'+s.n+', '+mSpan(k)+': '+hrs(c)+' из '+hrs(g)+' '+U(s.id)+'"><i style="width:'+pc(q)+'%"></i><span>'+hrs(c)+' <small>/ '+hrs(g)+(isD(s.id)?' дн.':'')+'</small></span></button>'}
-    var head='<div class="hdc"></div>'+mkeys.map(function(k){return '<button type="button" class="hdc'+(k===curM?' on':'')+'" data-m="'+k+'">'+mName(k,1)+' '+String(mStart(k).getFullYear()).slice(2)+'<small>1–'+daysIn(k)+'</small></button>'}).join('');
+    var head='<div class="hdc"></div>'+mkeys.map(function(k){return '<button type="button" class="hdc'+(k===curM?' on':'')+'" data-m="'+k+'">'+MN[mStart(k).getMonth()]+(mStart(k).getFullYear()!==now.getFullYear()?' '+mStart(k).getFullYear():'')+'<small>1–'+daysIn(k)+'</small></button>'}).join('');
     var body='',R=104,g='';
     [.25,.5,.75,1].forEach(function(q){g+='<circle class="ring" r="'+(R*q)+'"/>'});
     var FW=SP.filter(function(x){return x.free!==false&&!x.off}),ang=360/Math.max(1,FW.length);
@@ -3671,7 +3671,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       srow('Вид при открытии','',seg('cal.view',[['day','День'],['week','Неделя'],['month','Месяц']],calS.view))+
       srow('Размер календаря','сколько места занимает один час в сетке',seg('cal.hh',[[36,'Компактно'],[46,'Обычно'],[60,'Просторно']],calS.hh))+
       srow('С какого часа открывать день','сетка прокручивается к этому времени','<select class="inp" id="cal-start" aria-label="Начало дня">'+st+'</select>')+'</div>'+
-      '<div class="s-g"><h2>Что показывать</h2>'+sw2([['cal.chips',calS.chips,'Привычки дня под датой'],['cal.tick',calS.tick,'Галочка у прошедших событий']])+'</div>';
+      '<div class="s-g"><h2>Что показывать</h2>'+sw2([['cal.chips',calS.chips,'Привычки дня под датой'],['cal.tick',calS.tick,'Галочка у прошедших событий']])+'</div>'+
+      '<div class="s-g"><h2>Звук</h2>'+srow('Звук в начале события','тихая капелька, когда начинается запланированное событие. Звучит, пока сайт открыт на этом устройстве (можно в фоновой вкладке)',swt('cal.ding',calS.ding,'Звук в начале события'))+
+      (calS.ding?srow('Громкость','',seg('cal.dvol',[[1,'Тише'],[2,'Обычно'],[3,'Громче']],calS.dvol)+'<button type="button" class="btn ghost" id="ding-test">Прослушать</button>'):'')+'</div>';
   }
   function renderHabSet(){
     $('set-habits').innerHTML='<div class="s-g"><h2>Привычки</h2>'+srow('Раздел «Привычки»','вкладка с отметками по дням',swt('sec.habits',sec.habits,'Раздел «Привычки»'))+'</div>'+
@@ -3741,11 +3743,11 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var t=e.target,b=t.closest('[data-sec],[data-open]');
     if(b){setSec=b.dataset.sec||b.dataset.open;askImp=askOld=gAskTake=syAskWipe=syAskOver=false;spDel=false;hbDel=null;renderAll();navPush();return}
     b=t.closest('.seg[data-seg] button');
-    if(b){var a=b.parentNode.dataset.seg.split('.');OBJ[a[0]]()[a[1]]=parseV(b.dataset.v);if(a[0]==='cal'&&a[1]==='view')applyDefView();saveUI();return}
+    if(b){var a=b.parentNode.dataset.seg.split('.');OBJ[a[0]]()[a[1]]=parseV(b.dataset.v);if(a[0]==='cal'&&a[1]==='view')applyDefView();if(a[0]==='cal'&&a[1]==='dvol')ding();saveUI();return}
     b=t.closest('[data-sw]');
     if(b){
       var n=b.dataset.sw;
-      if(n==='gcal')gcalOn=!gcalOn;else{var p=n.split('.'),o=OBJ[p[0]]();o[p[1]]=o[p[1]]?0:1}
+      if(n==='gcal')gcalOn=!gcalOn;else{var p=n.split('.'),o=OBJ[p[0]]();o[p[1]]=o[p[1]]?0:1;if(n==='cal.ding'&&o.ding)ding()}
       saveUI();return;
     }
     if(t.closest('[data-exp]')){exportFile();return}
@@ -3769,6 +3771,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else if(t.id==='food-open'){if(!food.on){food.on=1;persist('@set')}setTab(foodInHabits()?'habits':'food')}
     else if(t.id==='acc-reset'){ui.accent='ink';colClose();saveUI()}
     else if(t.id==='ui-reset'){ui=clone(UI0);colClose();saveUI()}
+    else if(t.id==='ding-test'){if(!ding())toast('Браузер пока не дал включить звук. Нажми «Прослушать» ещё раз.')}
     else if(t.id==='dt-imp'){if(!askImp){askImp=true;renderData();return}askImp=false;renderData();$('dt-file').click()}
     else if(t.id==='dt-old'){if(!askOld){askOld=true;renderData();return}askOld=false;migrateOld()}
     else if(t.id==='fs-pick')filePick();
@@ -3950,6 +3953,52 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else return;
     e.preventDefault();
   });
+
+  /* ---------- звук в начале события: тихая «капелька» (19.10) ----------
+     Звук собирается в браузере (Web Audio), файлов нет. Браузер разрешает звук только после нажатия на страницу,
+     поэтому первое нажатие или клавиша его и включает. Проверка раз в 5 секунд; событие звенит один раз на устройстве. */
+  var dkAC=null,dkLast=Date.now(),dkDone={},DKK=LSK+'-ding',DKV=[0,.06,.12,.22];
+  try{dkDone=JSON.parse(localStorage.getItem(DKK)||'{}')||{}}catch(_){dkDone={}}
+  function dkCtx(){
+    var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
+    if(!dkAC){try{dkAC=new C()}catch(_){return null}}
+    if(dkAC.state==='suspended'){try{dkAC.resume().catch(function(){})}catch(_){}}
+    return dkAC;
+  }
+  ['pointerdown','keydown','touchend'].forEach(function(t){document.addEventListener(t,function(){if(calS.ding&&(!dkAC||dkAC.state!=='running'))dkCtx()},{capture:true,passive:true})});
+  /* одна капля: чистый тон, высота быстро растёт (так звучит капля, падающая в воду), мягкая атака, короткое затухание */
+  function dkDrop(ac,t,f0,f1,vol){
+    var o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
+    o.type='sine';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+.075);
+    lp.type='lowpass';lp.frequency.value=2400;lp.Q.value=.4;
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.3);
+    o.connect(lp);lp.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.32);
+  }
+  function dkPlay(ac){var v=DKV[calS.dvol]||DKV[2],t=ac.currentTime+.03;dkDrop(ac,t,480,1100,v);dkDrop(ac,t+.19,640,1480,v*.45)}
+  /* true: звук ушёл; false: браузер пока не дал звук (страницу ещё не нажимали) */
+  function ding(){
+    var ac=dkCtx();if(!ac)return false;
+    if(ac.state==='running'){dkPlay(ac);return true}
+    var t0=Date.now();try{ac.resume().then(function(){if(Date.now()-t0<1500)dkPlay(ac)},function(){})}catch(_){}
+    return false;
+  }
+  function dkCheck(){
+    var t=Date.now(),from=Math.max(dkLast,t-12e4);dkLast=t;
+    if(!calS.ding||!loaded||isDemo)return;
+    var hit=null,n=0,list=EV.concat(gOn()?gTakeList():[]);
+    list.forEach(function(e){
+      if(e.x||!(e.a>from&&e.a<=t))return;
+      var s=e.s!=null&&SPI[e.s]!=null?SP[SPI[e.s]]:null;if(s&&s.off)return;
+      var k=(e.id||e.t||'')+'@'+e.a;if(dkDone[k])return;dkDone[k]=t;n++;if(!hit)hit=e;
+    });
+    if(!hit)return;
+    Object.keys(dkDone).forEach(function(k){if(t-dkDone[k]>2*DAY)delete dkDone[k]});
+    try{localStorage.setItem(DKK,JSON.stringify(dkDone))}catch(_){}
+    ding();
+    toast('Начинается: '+(hit.t||'событие')+(n>1?' и ещё '+(n-1):'')+' · '+hm(hit.a));
+  }
+  setInterval(dkCheck,5000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)dkCheck()});
 
   /* сверка раз в 15 минут: по границам :00 :15 :30 :45 */
   function sync(){now=new Date();nowM=mk(now);syncAt=Date.now();nextSync=Math.floor(syncAt/9e5)*9e5+9e5;refresh();checkRecaps();gSync()}
