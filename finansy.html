@@ -246,6 +246,13 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   .bk-r{grid-template-columns:auto minmax(0,1fr) auto}
   .bk-r select{grid-column:2/-1;grid-row:2}
 }
+.bk-files{display:grid;gap:2px}
+.bk-files .bk-err{font-size:inherit}
+.bk-bank{font-style:normal;font-weight:600;color:var(--ink)}
+.bk-cov{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-size:calc(13px*var(--fz))}
+.bk-cb{white-space:normal}
+.bk-cb small{color:var(--muted)}
+.lnk.bad{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -643,10 +650,10 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
      в том числе выгрузка Дзен-мани. Всё читается в браузере, файл никуда не отправляется.
      Каждая операция получает постоянный номер из банка, даты и суммы, поэтому повторная загрузка того же файла ничего не дублирует. */
   var BK=null,bkHow=false,BKLIB={xlsx:'lib/xlsx.full.min.js',pdf:'lib/pdf.min.js',pdfw:'lib/pdf.worker.min.js'};
-  var bkInp=document.createElement('input');bkInp.type='file';bkInp.hidden=true;bkInp.id='bk-file';
+  var bkInp=document.createElement('input');bkInp.type='file';bkInp.hidden=true;bkInp.id='bk-file';bkInp.multiple=true;
   bkInp.accept='.csv,.txt,.xlsx,.xls,.ofx,.qfx,.pdf,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   document.body.appendChild(bkInp);
-  bkInp.addEventListener('change',function(){var f=bkInp.files&&bkInp.files[0];bkInp.value='';if(f)bkLoad(f)});
+  bkInp.addEventListener('change',function(){var f=[].slice.call(bkInp.files||[]);bkInp.value='';if(f.length)bkLoad(f)});
   function bkPick(){bkInp.click()}
   function bkScript(src,glob){
     return new Promise(function(ok,no){
@@ -921,16 +928,38 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       return bkTable(bkCsv(txt));
     });
   }
-  function bkLoad(file){
-    if(!window.TextDecoder||!file.arrayBuffer){toast(BKMSG.old);return}
+  /* можно выбрать или перетащить сразу несколько выписок из разных банков: они сводятся в одно окно */
+  function bkLoad(files){
+    files=[].slice.call(files||[]).filter(function(f){return f&&!/\.json$/i.test(f.name||'')});
+    if(!files.length)return;
+    if(!window.TextDecoder||!files[0].arrayBuffer){toast(BKMSG.old);return}
     if(tab!=='spend')setTab('spend');
-    bkShow('<p class="bk-wait">Читаю «'+esc(file.name)+'»…</p>');
-    bkRead(file).then(function(res){
-      if(!res||!res.rows.length)throw bkErr('none');
-      BK={file:file.name,bank:res.bank,warn:res.warn,src:(res.bank||'файл').toLowerCase().replace(/[^a-zа-яё]/g,'').slice(0,8),open:false};
-      BK.rows=bkRows(res.rows,BK.bank||file.name);
+    var res=[],i=0;
+    function next(){
+      if(i>=files.length){done();return}
+      var f=files[i++];
+      bkShow('<p class="bk-wait">Читаю «'+esc(f.name)+'»'+(files.length>1?' ('+i+' из '+files.length+')':'')+'…</p>');
+      bkRead(f).then(function(r){if(!r||!r.rows.length)throw bkErr('none');res.push({file:f.name,bank:r.bank||'',warn:r.warn||'',rows:r.rows})}).catch(function(e){res.push({file:f.name,err:e||bkErr('none')})}).then(next);
+    }
+    function done(){
+      var ok=res.filter(function(x){return !x.err});
+      if(!ok.length){
+        bkShow('<div class="box-h"><span>Выписка</span><button type="button" class="ib" data-bkx aria-label="Закрыть">×</button></div>'+res.map(function(x){var c=x.err&&x.err.code;return '<p class="bk-err">'+(res.length>1?'«'+esc(x.file)+'»: ':'')+esc(BKMSG[c]||BKMSG.none)+'</p>'+(c?'':'<p class="note">'+esc(String(x.err&&x.err.message||x.err).slice(0,140))+'</p>')}).join('')+'<div class="row"><button type="button" class="btn ghost" data-bkx>Закрыть</button></div>');
+        return;
+      }
+      var ids={};BK={files:res,open:false,rows:[]};
+      ok.forEach(function(x){
+        var src=bkSrc(x.bank||'Другой банк'),lo='',hi='';
+        bkRows(x.rows,x.bank||x.file).forEach(function(r){
+          if(!lo||r.d<lo)lo=r.d;if(!hi||r.d>hi)hi=r.d;
+          if(ids[r.id])return;ids[r.id]=1;r.bank=x.bank;r.src=src;BK.rows.push(r);
+        });
+        x.from=lo;x.to=hi;
+      });
+      bkMark(BK.rows);
       bkDraw();
-    }).catch(function(e){var c=e&&e.code;bkShow('<p class="bk-err">'+esc(BKMSG[c]||BKMSG.none)+'</p>'+(c||!e?'':'<p class="note">'+esc(String(e.message||e).slice(0,140))+'</p>')+'<div class="row"><button type="button" class="btn ghost" data-bkx>Закрыть</button></div>')});
+    }
+    next();
   }
   /* ---- строки окна: постоянный номер, категория, уже загружено, похоже на ручную запись ---- */
   function bkRows(raw,bank){
@@ -945,6 +974,22 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       row.have=!!(F.days[r.d]&&F.days[r.d][id]);
       rows.push(row);
     });
+    return rows;
+  }
+  function bkMark(rows){
+    var used={};
+    /* перевод между своими картами в разных банках: списание в одном и поступление в другом на ту же сумму в пределах двух дней.
+       Такая пара не трата, даже если банк записал списание как покупку (например, «пополнение карты другого банка») */
+    var ins=rows.filter(function(r){return r.kind==='in'});
+    rows.forEach(function(r){
+      if(r.have||(r.kind!=='move'&&r.kind!=='buy'))return;
+      var buy=r.kind==='buy',d0=dDate(r.d).getTime();
+      ins.some(function(x){
+        if(x.pair||x.bank===r.bank||Math.abs(x.a-r.a)>=0.01||Math.abs(dDate(x.d).getTime()-d0)>2*864e5)return false;
+        if(buy&&!/перевод|пополнен|зачислен|c2c|card2card|с карты/i.test(x.desc+' '+x.bcat))return false;
+        x.pair=r.bank||'выписка';r.pair=x.bank||'другой банк';if(buy)r.kind='move';return true;
+      });
+    });
     /* трата, которую ты уже вписал руками (тот же день и та же сумма), не отмечается, чтобы не задвоить */
     rows.forEach(function(row){
       if(row.have||row.kind!=='buy')return;
@@ -953,7 +998,6 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     });
     rows.forEach(function(row){row.on=!row.have&&!row.dup&&(row.kind==='buy'||row.kind==='refund')});
     rows.sort(function(x,y){return x.d<y.d?1:x.d>y.d?-1:(y.t||'').localeCompare(x.t||'')});
-    return rows;
   }
 
   /* ---- окно ---- */
@@ -967,12 +1011,13 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     bkDlg.innerHTML='<div class="bk-db">'+html+'</div>';bkDlg.hidden=false;document.documentElement.classList.add('bk-lock');
   }
   function bkClose(){BK=null;if(bkDlg)bkDlg.hidden=true;document.documentElement.classList.remove('bk-lock')}
-  function bkRange(rows){if(!rows.length)return '';var a=rows[rows.length-1].d,b=rows[0].d;return a===b?dLabel(a).replace(/^(Сегодня|Вчера), /,''):bkDm(a)+' – '+bkDm(b)}
+  function bkRange(rows){if(!rows.length)return '';return bkSpan(rows[rows.length-1].d,rows[0].d)}
+  function bkSpan(a,b){if(a===b)return bkDm(a);var x=dDate(a),y=dDate(b);return x.getFullYear()===y.getFullYear()&&x.getMonth()===y.getMonth()?x.getDate()+'–'+bkDm(b):bkDm(a)+' – '+bkDm(b)}
   function bkDm(dk){var d=dDate(dk);return d.getDate()+' '+MG[d.getMonth()]+(d.getFullYear()!==dDate(TODAY).getFullYear()?' '+d.getFullYear():'')}
   function bkCatSel(r){var cats=catList();if(cats.indexOf(r.cat)<0)cats=cats.concat([r.cat]);return '<select class="inp" data-bkcat="'+r.id+'" aria-label="Категория"'+(r.have?' disabled':'')+'>'+cats.map(function(c){return '<option'+(c===r.cat?' selected':'')+'>'+esc(c)+'</option>'}).join('')+'</select>'}
   function bkRowH(r){
-    var tag=r.have?'<span class="bk-tag">уже загружено</span>':r.dup?'<span class="bk-tag warn" title="'+esc(r.dup)+'">похоже, уже вписано вручную</span>':r.kind==='refund'?'<span class="bk-tag ok">возврат</span>':r.kind==='move'?'<span class="bk-tag">перевод</span>':r.kind==='cash'?'<span class="bk-tag">наличные</span>':'';
-    return '<div class="bk-r'+(r.on?'':' off')+'" data-bkrow="'+r.id+'"><input type="checkbox" data-bkon="'+r.id+'"'+(r.on?' checked':'')+(r.have?' disabled':'')+' aria-label="Добавить"><span class="bk-d"><b>'+esc(r.desc)+'</b><small>'+(r.t?r.t+' · ':'')+esc(r.bcat||'')+(r.mcc?' · MCC '+r.mcc:'')+' '+tag+'</small></span>'+bkCatSel(r)+'<span class="bk-a">'+(r.kind==='refund'?'−':'')+money(r.a)+'</span></div>';
+    var tag=r.have?'<span class="bk-tag">уже загружено</span>':r.dup?'<span class="bk-tag warn" title="'+esc(r.dup)+'">похоже, уже вписано вручную</span>':r.kind==='refund'?'<span class="bk-tag ok">возврат</span>':r.kind==='move'?'<span class="bk-tag">'+(r.pair?'перевод себе → '+esc(r.pair):'перевод')+'</span>':r.kind==='cash'?'<span class="bk-tag">наличные</span>':'';
+    return '<div class="bk-r'+(r.on?'':' off')+'" data-bkrow="'+r.id+'"><input type="checkbox" data-bkon="'+r.id+'"'+(r.on?' checked':'')+(r.have?' disabled':'')+' aria-label="Добавить"><span class="bk-d"><b>'+esc(r.desc)+'</b><small>'+(BK&&BK.many&&r.bank?'<i class="bk-bank">'+esc(r.bank)+'</i> ':'')+(r.t?r.t+' · ':'')+esc(r.bcat||'')+(r.mcc?' · MCC '+r.mcc:'')+' '+tag+'</small></span>'+bkCatSel(r)+'<span class="bk-a">'+(r.kind==='refund'?'−':'')+money(r.a)+'</span></div>';
   }
   function bkDraw(){
     if(!BK)return;
@@ -980,14 +1025,19 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     var on=BK.rows.filter(function(r){return r.on&&!r.have}),sum=0;on.forEach(function(r){sum+=r.kind==='refund'?-r.a:r.a});
     var have=BK.rows.filter(function(r){return r.have}).length,dup=BK.rows.filter(function(r){return r.dup&&!r.have}).length;
     var lst=bkDlg&&bkDlg.querySelector('.bk-list'),sc=lst?lst.scrollTop:0;
-    var h='<div class="box-h"><span>Выписка'+(BK.bank?': '+esc(BK.bank):'')+'</span><button type="button" class="ib" data-bkx aria-label="Закрыть">×</button></div>'+
-      '<p class="note">«'+esc(BK.file)+'» · '+bkRange(BK.rows)+' · трат '+main.length+(more.length?', переводов и снятий '+more.length:'')+(inc?', поступлений '+inc+' (их не добавляю)':'')+'</p>'+
-      (BK.warn?'<p class="banner">'+esc(BK.warn)+'</p>':'')+
+    var ok=BK.files.filter(function(x){return !x.err}),banks=[];ok.forEach(function(x){var b=x.bank||'Другой банк';if(banks.indexOf(b)<0)banks.push(b)});
+    BK.many=banks.length>1;
+    var pairs=BK.rows.filter(function(r){return r.pair&&r.kind==='move'}).length;
+    var h='<div class="box-h"><span>'+(ok.length>1?'Выписки':'Выписка')+(banks.length?': '+esc(banks.join(', ')):'')+'</span><button type="button" class="ib" data-bkx aria-label="Закрыть">×</button></div>'+
+      (ok.length>1?'<div class="bk-files">'+BK.files.map(function(x){return '<p class="note">«'+esc(x.file)+'»'+(x.err?' <span class="bk-err">'+esc(BKMSG[x.err.code]||BKMSG.none)+'</span>':' · '+esc(x.bank||'банк не узнан')+' · '+bkSpan(x.from,x.to))+'</p>'}).join('')+'</div>':'')+
+      '<p class="note">'+(ok.length>1?'Всего':'«'+esc(ok[0].file)+'» ·')+' '+bkRange(BK.rows)+' · трат '+main.length+(more.length?', переводов и снятий '+more.length:'')+(inc?', поступлений '+inc+' (их не добавляю)':'')+(pairs?'. Переводов между своими картами в разных банках: '+pairs+', они не траты':'')+'</p>'+
+      ok.filter(function(x){return x.warn}).map(function(x){return '<p class="banner">'+(ok.length>1?'«'+esc(x.file)+'»: ':'')+esc(x.warn)+'</p>'}).join('')+
+      (BK.files.some(function(x){return x.err})&&ok.length===1?'<p class="banner">'+BK.files.filter(function(x){return x.err}).map(function(x){return '«'+esc(x.file)+'»: '+esc(BKMSG[x.err.code]||BKMSG.none)}).join(' ')+'</p>':'')+
       (have||dup?'<p class="note">'+(have?'Уже загружено раньше: '+have+'. ':'')+(dup?'Похоже, уже вписано вручную: '+dup+' (галочки сняты, чтобы не задвоить).':'')+'</p>':'')+
       '<div class="bk-list">';
     var day='';
     main.forEach(function(r){if(r.d!==day){day=r.d;var ds=0;main.forEach(function(x){if(x.d===day&&(x.on||x.have))ds+=x.kind==='refund'?-x.a:x.a});h+='<div class="bk-day" data-bkd="'+day+'"><span>'+dLabel(day)+'</span><small>'+money(ds)+'</small></div>'}h+=bkRowH(r)});
-    if(!main.length)h+='<p class="note">Трат в файле нет.</p>';
+    if(!main.length)h+='<p class="note">Трат в '+(ok.length>1?'файлах':'файле')+' нет.</p>';
     if(more.length)h+='<button type="button" class="bk-more" data-bkmore aria-expanded="'+!!BK.open+'">'+(BK.open?'▾':'▸')+' Переводы и снятие наличных: '+more.length+'. Обычно это не траты, поэтому не отмечены</button>'+(BK.open?more.map(bkRowH).join(''):'');
     h+='</div><div class="row bk-foot"><button type="button" class="btn" data-bkgo'+(on.length?'':' disabled')+'>'+(on.length?'Добавить '+on.length+' '+plural(on.length,'трату','траты','трат')+' на '+money(sum):'Нечего добавлять')+'</button>'+
       '<button type="button" class="btn ghost" data-bkall="1">Отметить все траты</button><button type="button" class="btn ghost" data-bkall="0">Снять все</button></div>'+
@@ -1030,10 +1080,11 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     BK.rows.forEach(function(r){
       if(!r.on||r.have)return;
       var d=F.days[r.d]||(F.days[r.d]={}),a=r.kind==='refund'?-r.a:r.a;
-      d[r.id]={c:r.cat,a:a,n:((r.kind==='refund'?'возврат: ':'')+r.desc).slice(0,60),t:bkTs(r),bk:BK.src||'bank'};
+      d[r.id]={c:r.cat,a:a,n:((r.kind==='refund'?'возврат: ':'')+r.desc).slice(0,60),t:bkTs(r),bk:r.src||'bank'};
       n++;sum+=a;days[r.d]=1;
     });
     if(BK.chg){if(!isO(F.bkmap))F.bkmap={};Object.keys(BK.chg).forEach(function(k){F.bkmap[k]=BK.chg[k]})}
+    BK.files.forEach(function(x){if(!x.err&&x.from)bkCovAdd(x.bank||'Другой банк',x.from,x.to)});
     var last=Object.keys(days).sort().pop();
     save();bkClose();
     if(last&&last.slice(0,7)!==spD.slice(0,7))spD=last>TODAY?TODAY:last;
@@ -1046,14 +1097,41 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   document.addEventListener('dragover',function(e){if(e.dataTransfer&&[].indexOf.call(e.dataTransfer.types||[],'Files')>=0)e.preventDefault()});
   document.addEventListener('drop',function(e){
     bkDrag=0;document.documentElement.classList.remove('bk-drop');
-    var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(!f)return;e.preventDefault();
-    if(/\.json$/i.test(f.name))return;bkLoad(f);
+    var fs=[].slice.call(e.dataTransfer&&e.dataTransfer.files||[]).filter(function(f){return !/\.json$/i.test(f.name)});if(!fs.length)return;e.preventDefault();
+    bkLoad(fs);
   });
   function bkHowH(){
     return '<div class="bk-how"><p><b>Т-Банк</b> (с категориями): сайт tbank.ru с компьютера → «Операции» → выбери период → значок выгрузки справа → Excel или CSV. Подойдёт и выписка PDF из приложения.</p>'+
       '<p><b>Сбер</b>: СберБанк Онлайн → карта → «Выписки и справки» → «Выписка по счёту» → PDF.</p>'+
       '<p><b>Альфа</b>: Альфа-Онлайн → счёт карты → «Выписка» → PDF.</p>'+
-      '<p class="note">Файл читается прямо в браузере и никуда не отправляется. Одну и ту же выписку можно загружать сколько угодно раз: повторы не добавятся.</p></div>';
+      '<p class="note">Можно выбрать сразу несколько файлов из разных банков. Файлы читаются прямо в браузере и никуда не отправляются. Одну и ту же выписку можно загружать сколько угодно раз: повторы не добавятся. Переводы между своими картами в разных банках сайт узнаёт и не считает тратами.</p></div>';
+  }
+  /* какие периоды каких банков уже загружены: видно, где траты полные, а где только вписанные руками */
+  function bkCovAdd(bank,a,b){
+    if(!isO(F.bkcov))F.bkcov={};
+    var l=(Array.isArray(F.bkcov[bank])?F.bkcov[bank]:[]).concat([[a,b]]).filter(function(x){return Array.isArray(x)&&x[0]&&x[1]}).sort(function(x,y){return x[0]<y[0]?-1:1}),out=[];
+    l.forEach(function(x){var p=out[out.length-1];if(p&&x[0]<=dShift(p[1],1)){if(x[1]>p[1])p[1]=x[1]}else out.push([x[0],x[1]])});
+    F.bkcov[bank]=out;
+  }
+  function bkSrc(bank){return String(bank||'Другой банк').toLowerCase().replace(/[^a-zа-яё]/g,'').slice(0,8)}
+  function bkCount(bank){var src=bkSrc(bank),n=0;Object.keys(F.days).forEach(function(k){var o=F.days[k];Object.keys(o).forEach(function(id){if(o[id].bk===src)n++})});return n}
+  var bkAsk='';
+  function bkCovH(){
+    var cv=isO(F.bkcov)?F.bkcov:{},bs=Object.keys(cv).filter(function(b){return Array.isArray(cv[b])&&cv[b].length});
+    if(!bs.length)return '';
+    var last='';bs.forEach(function(b){var l=cv[b][cv[b].length-1][1];if(!last||l<last)last=l});
+    return '<div class="bk-cov"><span class="note">Загружено из выписок:</span>'+bs.map(function(b){
+      var r=cv[b].map(function(x){return bkSpan(x[0],x[1])}).join(', ');
+      return '<span class="bk-cb"><b>'+esc(b)+'</b> '+r+
+        (bkAsk===b?' <button type="button" class="lnk bad" data-act="bkdel" data-bank="'+esc(b)+'">Убрать '+bkCount(b)+' '+plural(bkCount(b),'трату','траты','трат')+'?</button> <button type="button" class="lnk" data-act="bknodel">нет</button>':' <button type="button" class="lnk" data-act="bkdel" data-bank="'+esc(b)+'" title="Убрать всё, что загружено из этого банка">убрать</button>')+'</span>';
+    }).join('')+(last&&last<dShift(TODAY,-1)?'<span class="note">Позже '+bkDm(last)+' в тратах только то, что вписано вручную: загрузи свежие выписки, повторы не добавятся.</span>':'')+'</div>';
+  }
+  function bkDel(bank){
+    if(bkAsk!==bank){bkAsk=bank;render();return}
+    bkAsk='';var src=bkSrc(bank),n=0;
+    Object.keys(F.days).forEach(function(k){var o=F.days[k];Object.keys(o).forEach(function(id){if(o[id].bk===src){delete o[id];n++}});if(!Object.keys(o).length)delete F.days[k]});
+    if(isO(F.bkcov))delete F.bkcov[bank];
+    save();render();toast('Убрано '+n+' '+plural(n,'трата','траты','трат')+' из выписок: '+bank+'.');
   }
   /* ---------- данные и общие помощники ---------- */
   var $=function(id){return document.getElementById(id)},view=$('view');
@@ -1192,7 +1270,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       '<div class="tile'+(lim&&M.bal<0?' neg':'')+'"><span class="lab">'+(curM?(M.s0>1?'Итог с '+M.s0+'-го числа':'Итог с начала месяца'):'Итог за '+mName(mk))+'</span><span class="val">'+(lim?signed(M.bal):'—')+'</span><span class="sub">'+(lim?(M.bal>=0?'идёшь с запасом':'перерасход')+' · план '+money(M.plan)+' за '+M.cnt+' '+plural(M.cnt,'день','дня','дней')+', потрачено '+money(M.spent):'задай план на день, и здесь будет видно, в плюсе ты или в минусе')+'</span></div>'+
       '<div class="tile"><span class="lab">В среднем в день</span><span class="val">'+money(M.avg)+'</span><span class="sub">'+(lim?'план '+money(lim)+(curM&&M.next!=null?(M.next>0?' · дальше можно по '+money(M.next)+' в день':' · бюджет месяца уже потрачен'):''):'за '+M.cnt+' '+plural(M.cnt,'день','дня','дней'))+'</span></div></div>';
     /* выписка банка: траты из файла */
-    h+='<div class="bk-in"><button type="button" class="btn ghost" data-act="bkopen">Загрузить выписку банка</button><span class="note">Т-Банк, Сбер, Альфа: Excel, CSV, OFX или PDF. Файл можно просто перетащить на страницу.</span><button type="button" class="lnk" data-act="bkhow" aria-expanded="'+!!bkHow+'">Как скачать выписку</button></div>'+(bkHow?bkHowH():'');
+    h+='<div class="bk-in"><button type="button" class="btn ghost" data-act="bkopen">Загрузить выписку банка</button><span class="note">Т-Банк, Сбер, Альфа и другие: Excel, CSV, OFX или PDF. Можно сразу несколько файлов из разных банков, можно просто перетащить их на страницу.</span><button type="button" class="lnk" data-act="bkhow" aria-expanded="'+!!bkHow+'">Как скачать выписку</button></div>'+(bkHow?bkHowH():'')+bkCovH();
     /* день: ввод трат */
     var o=F.days[spD]||{},ids=Object.keys(o).sort(function(x,y){return(o[x].t||0)-(o[y].t||0)});
     h+='<section class="sec"><div class="row between"><h2>'+dLabel(spD)+'</h2><span class="ctl"><button type="button" class="ib" data-day="-1" aria-label="Предыдущий день">‹</button><input class="inp" type="date" id="sp-date" value="'+spD+'" max="'+TODAY+'" aria-label="Выбрать день"><button type="button" class="ib" data-day="1" aria-label="Следующий день"'+(spD>=TODAY?' disabled':'')+'>›</button>'+(isT?'':'<button type="button" class="btn ghost" data-day="0">Сегодня</button>')+'</span></div>'+
@@ -1371,6 +1449,8 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     else if(a==='catok')spCatAdd();
     else if(a==='bkopen')bkPick();
     else if(a==='bkhow'){bkHow=!bkHow;render()}
+    else if(a==='bkdel')bkDel(b.dataset.bank);
+    else if(a==='bknodel'){bkAsk='';render()}
     else if(a==='catedit'){spEdit=!spEdit;render()}
     else if(a==='fill'){var R=finPlan(F,{now:NOW}),row=R.months[0];if(row){draft.inc=R.income;draft.exp=Math.round(factExp(recM));Object.keys(row.pay).forEach(function(id){draft['p.'+id]=Math.round(row.pay[id])});Object.keys(row.save).forEach(function(id){draft['s.'+id]=Math.round(row.save[id])});render()}}
     else if(a==='delrec'){var k=b.dataset.k;if(askDel!==k){askDel=k;render();return}askDel='';unapply(F.months[k]);delete F.months[k];save();render();toast('Запись удалена, суммы возвращены.')}
