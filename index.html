@@ -3672,7 +3672,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       srow('Размер календаря','сколько места занимает один час в сетке',seg('cal.hh',[[36,'Компактно'],[46,'Обычно'],[60,'Просторно']],calS.hh))+
       srow('С какого часа открывать день','сетка прокручивается к этому времени','<select class="inp" id="cal-start" aria-label="Начало дня">'+st+'</select>')+'</div>'+
       '<div class="s-g"><h2>Что показывать</h2>'+sw2([['cal.chips',calS.chips,'Привычки дня под датой'],['cal.tick',calS.tick,'Галочка у прошедших событий']])+'</div>'+
-      '<div class="s-g"><h2>Звук</h2>'+srow('Звук в начале события','тихая капелька, когда начинается запланированное событие. Звучит, пока сайт открыт на этом устройстве (можно в фоновой вкладке)',swt('cal.ding',calS.ding,'Звук в начале события'))+
+      '<div class="s-g"><h2>Звук</h2>'+srow('Звук в начале события','капелька, когда начинается запланированное событие. Звучит, пока сайт открыт на этом устройстве (можно в фоновой вкладке) и после открытия на страницу хоть раз нажали. На iPhone в режиме «Без звука» молчит',swt('cal.ding',calS.ding,'Звук в начале события'))+
       (calS.ding?srow('Громкость','',seg('cal.dvol',[[1,'Тише'],[2,'Обычно'],[3,'Громче']],calS.dvol)+'<button type="button" class="btn ghost" id="ding-test">Прослушать</button>'):'')+'</div>';
   }
   function renderHabSet(){
@@ -3771,7 +3771,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else if(t.id==='food-open'){if(!food.on){food.on=1;persist('@set')}setTab(foodInHabits()?'habits':'food')}
     else if(t.id==='acc-reset'){ui.accent='ink';colClose();saveUI()}
     else if(t.id==='ui-reset'){ui=clone(UI0);colClose();saveUI()}
-    else if(t.id==='ding-test'){if(!ding())toast('Браузер пока не дал включить звук. Нажми «Прослушать» ещё раз.')}
+    else if(t.id==='ding-test')ding().then(function(ok){toast(ok?'Капелька прозвучала. Не слышно — прибавь громкость устройства, на iPhone выключи режим «Без звука».':'Браузер не дал включить звук. Нажми «Прослушать» ещё раз.')});
     else if(t.id==='dt-imp'){if(!askImp){askImp=true;renderData();return}askImp=false;renderData();$('dt-file').click()}
     else if(t.id==='dt-old'){if(!askOld){askOld=true;renderData();return}askOld=false;migrateOld()}
     else if(t.id==='fs-pick')filePick();
@@ -3954,34 +3954,79 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     e.preventDefault();
   });
 
-  /* ---------- звук в начале события: тихая «капелька» (19.10) ----------
-     Звук собирается в браузере (Web Audio), файлов нет. Браузер разрешает звук только после нажатия на страницу,
-     поэтому первое нажатие или клавиша его и включает. Проверка раз в 5 секунд; событие звенит один раз на устройстве. */
-  var dkAC=null,dkLast=Date.now(),dkDone={},DKK=LSK+'-ding',DKV=[0,.06,.12,.22];
+  /* ---------- звук в начале события: «капелька» (19.10, переделано 20.10) ----------
+     Звук один и тот же для двух путей: он считается в браузере в виде отсчётов (файлов нет).
+     Основной путь — Web Audio: смешивается с музыкой и не прерывает её. Браузер включает его только после нажатия на страницу,
+     поэтому включение ловится на любом нажатии, касании или клавише (разные браузеры засчитывают разные события).
+     Запасной путь — обычный аудио-элемент: Chrome и Firefox разрешают его после любого нажатия на странице, даже по таймеру.
+     Проверка раз в 5 секунд; событие звенит один раз на устройстве. */
+  var dkAC=null,dkLast=Date.now(),dkDone={},DKK=LSK+'-ding',DKV=[0,.22,.4,.7],dkBufs={},dkUrls={},dkEl=null,dkWarned=false;
   try{dkDone=JSON.parse(localStorage.getItem(DKK)||'{}')||{}}catch(_){dkDone={}}
+  /* две капли: чистый тон с быстро растущей высотой (так звучит капля, падающая в воду), лёгкий обертон, чтобы было слышно
+     и на маленьких динамиках, мягкая атака и затухание примерно за 0,3 секунды */
+  var DKSR=44100;
+  function dkSamples(vol){
+    var n=Math.round(DKSR*.62),out=new Float32Array(n),pk=0,j;
+    [[0,520,1250,1],[.19,700,1650,.5]].forEach(function(dp){
+      var s0=Math.round(dp[0]*DKSR),f0=dp[1],f1=dp[2],k=dp[3],ph=0;
+      for(var i=0;s0+i<n&&i<DKSR*.42;i++){
+        var t=i/DKSR,f=t<.075?f0*Math.pow(f1/f0,t/.075):f1,env=t<.008?t/.008:Math.exp(-(t-.008)/.07);
+        ph+=2*Math.PI*f/DKSR;out[s0+i]+=k*env*(Math.sin(ph)+.18*Math.sin(2*ph));
+      }
+    });
+    for(j=0;j<n;j++)pk=Math.max(pk,Math.abs(out[j]));
+    for(j=0;j<n;j++)out[j]=out[j]/pk*vol;
+    return out;
+  }
+  function dkVol(){return DKV[calS.dvol]||DKV[2]}
   function dkCtx(){
     var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
     if(!dkAC){try{dkAC=new C()}catch(_){return null}}
-    if(dkAC.state==='suspended'){try{dkAC.resume().catch(function(){})}catch(_){}}
+    if(dkAC.state!=='running'&&dkAC.state!=='closed'){try{var p=dkAC.resume();if(p&&p.catch)p.catch(function(){})}catch(_){}}
     return dkAC;
   }
-  ['pointerdown','keydown','touchend'].forEach(function(t){document.addEventListener(t,function(){if(calS.ding&&(!dkAC||dkAC.state!=='running'))dkCtx()},{capture:true,passive:true})});
-  /* одна капля: чистый тон, высота быстро растёт (так звучит капля, падающая в воду), мягкая атака, короткое затухание */
-  function dkDrop(ac,t,f0,f1,vol){
-    var o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
-    o.type='sine';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+.075);
-    lp.type='lowpass';lp.frequency.value=2400;lp.Q.value=.4;
-    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.3);
-    o.connect(lp);lp.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.32);
+  function dkBuf(ac,v){
+    if(!dkBufs[v]){var s=dkSamples(v),b=ac.createBuffer(1,s.length,DKSR);if(b.copyToChannel)b.copyToChannel(s,0);else b.getChannelData(0).set(s);dkBufs[v]=b}
+    return dkBufs[v];
   }
-  function dkPlay(ac){var v=DKV[calS.dvol]||DKV[2],t=ac.currentTime+.03;dkDrop(ac,t,480,1100,v);dkDrop(ac,t+.19,640,1480,v*.45)}
-  /* true: звук ушёл; false: браузер пока не дал звук (страницу ещё не нажимали) */
+  function dkUrl(v){
+    if(!dkUrls[v]){
+      var s=dkSamples(v),n=s.length,buf=new ArrayBuffer(44+n*2),d=new DataView(buf),i;
+      function w(o,t){for(var k=0;k<t.length;k++)d.setUint8(o+k,t.charCodeAt(k))}
+      w(0,'RIFF');d.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,1,true);
+      d.setUint32(24,DKSR,true);d.setUint32(28,DKSR*2,true);d.setUint16(32,2,true);d.setUint16(34,16,true);w(36,'data');d.setUint32(40,n*2,true);
+      for(i=0;i<n;i++)d.setInt16(44+i*2,Math.max(-32767,Math.min(32767,Math.round(s[i]*32767))),true);
+      dkUrls[v]=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
+    }
+    return dkUrls[v];
+  }
+  /* включение звука на первом же нажатии: тихий пустой звук внутри нажатия окончательно «будит» звук в Safari */
+  function dkUnlock(){
+    if(!calS.ding)return;
+    var ac=dkCtx();if(!ac||ac.state==='running')return;
+    try{var b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0)}catch(_){}
+  }
+  ['pointerdown','pointerup','mousedown','click','touchstart','touchend','keydown'].forEach(function(t){document.addEventListener(t,dkUnlock,{capture:true,passive:true})});
+  /* результат: Promise<true> — звук ушёл, Promise<false> — браузер не дал звук */
   function ding(){
-    var ac=dkCtx();if(!ac)return false;
-    if(ac.state==='running'){dkPlay(ac);return true}
-    var t0=Date.now();try{ac.resume().then(function(){if(Date.now()-t0<1500)dkPlay(ac)},function(){})}catch(_){}
-    return false;
+    var v=dkVol(),ac=dkCtx();
+    function viaWA(){try{var s=ac.createBufferSource();s.buffer=dkBuf(ac,v);s.connect(ac.destination);s.start(ac.currentTime+.02);return true}catch(_){return false}}
+    function viaEl(){
+      try{
+        if(!dkEl){dkEl=new Audio();dkEl.preload='auto'}
+        dkEl.src=dkUrl(v);var p=dkEl.play();
+        return p&&p.then?p.then(function(){return true},function(){return false}):Promise.resolve(true);
+      }catch(_){return Promise.resolve(false)}
+    }
+    if(ac&&ac.state==='running')return Promise.resolve(viaWA());
+    /* Web Audio ещё спит: пробуем разбудить, а если за полсекунды не вышло — играем через аудио-элемент */
+    return new Promise(function(done){
+      var fin=false,to=setTimeout(function(){if(fin)return;fin=true;viaEl().then(done)},500);
+      if(!ac){clearTimeout(to);fin=true;viaEl().then(done);return}
+      try{ac.resume().then(function(){if(fin||ac.state!=='running')return;fin=true;clearTimeout(to);done(viaWA())},function(){})}catch(_){}
+    });
   }
+  document.addEventListener('visibilitychange',function(){if(!document.hidden&&calS.ding&&dkAC&&dkAC.state!=='running')dkCtx()});
   function dkCheck(){
     var t=Date.now(),from=Math.max(dkLast,t-12e4);dkLast=t;
     if(!calS.ding||!loaded||isDemo)return;
@@ -3994,8 +4039,11 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(!hit)return;
     Object.keys(dkDone).forEach(function(k){if(t-dkDone[k]>2*DAY)delete dkDone[k]});
     try{localStorage.setItem(DKK,JSON.stringify(dkDone))}catch(_){}
-    ding();
-    toast('Начинается: '+(hit.t||'событие')+(n>1?' и ещё '+(n-1):'')+' · '+hm(hit.a));
+    var msg='Начинается: '+(hit.t||'событие')+(n>1?' и ещё '+(n-1):'')+' · '+hm(hit.a);
+    ding().then(function(ok){
+      if(!ok&&!dkWarned){dkWarned=true;toast(msg+'. Звук браузер не дал: после открытия сайта нажми на любое место страницы, и капелька будет звучать.')}
+      else toast(msg);
+    });
   }
   setInterval(dkCheck,5000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)dkCheck()});
