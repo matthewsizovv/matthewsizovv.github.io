@@ -3954,7 +3954,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     e.preventDefault();
   });
 
-  /* ---------- звук в начале события: «капелька» (19.10, переделано 20.10) ----------
+  /* ---------- звук в начале события: капля (19.10, 20.10: громче и надёжнее; 20.10 ночью: настоящая капля вместо писка) ----------
      Звук один и тот же для двух путей: он считается в браузере в виде отсчётов (файлов нет).
      Основной путь — Web Audio: смешивается с музыкой и не прерывает её. Браузер включает его только после нажатия на страницу,
      поэтому включение ловится на любом нажатии, касании или клавише (разные браузеры засчитывают разные события).
@@ -3962,22 +3962,37 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
      Проверка раз в 5 секунд; событие звенит один раз на устройстве. */
   var dkAC=null,dkLast=Date.now(),dkDone={},DKK=LSK+'-ding',DKV=[0,.22,.4,.7],dkBufs={},dkUrls={},dkEl=null,dkWarned=false;
   try{dkDone=JSON.parse(localStorage.getItem(DKK)||'{}')||{}}catch(_){dkDone={}}
-  /* две капли: чистый тон с быстро растущей высотой (так звучит капля, падающая в воду), лёгкий обертон, чтобы было слышно
-     и на маленьких динамиках, мягкая атака и затухание примерно за 0,3 секунды */
+  /* настоящая капля по физической модели пузырька (van den Doel, 2005): когда капля падает в воду, она уносит под поверхность
+     пузырёк, и он коротко звенит, а его звук быстро уходит вверх («плинк»). Частота пузырька f0 = 3/r, затухание d = 0,13/r + 0,0072·r^-1,5,
+     рост частоты f(t) = f0·(1 + ξ·d·t). Перед ним — тихий щелчок удара о воду, после — лёгкое эхо комнаты (разреженный шум с затуханием,
+     сглаженный, как от мягких стен). Каждая капля чуть другая: радиус и рост частоты слегка гуляют, поэтому звук не механический. */
   var DKSR=44100;
-  function dkSamples(vol){
-    var n=Math.round(DKSR*.62),out=new Float32Array(n),pk=0,j;
-    [[0,520,1250,1],[.19,700,1650,.5]].forEach(function(dp){
-      var s0=Math.round(dp[0]*DKSR),f0=dp[1],f1=dp[2],k=dp[3],ph=0;
-      for(var i=0;s0+i<n&&i<DKSR*.42;i++){
-        var t=i/DKSR,f=t<.075?f0*Math.pow(f1/f0,t/.075):f1,env=t<.008?t/.008:Math.exp(-(t-.008)/.07);
-        ph+=2*Math.PI*f/DKSR;out[s0+i]+=k*env*(Math.sin(ph)+.18*Math.sin(2*ph));
-      }
-    });
-    for(j=0;j<n;j++)pk=Math.max(pk,Math.abs(out[j]));
-    for(j=0;j<n;j++)out[j]=out[j]/pk*vol;
+  function dkRand(seed){var x=(seed>>>0)||1;return function(){x=(Math.imul(x,1103515245)+12345)>>>0;return(x>>>8)/8388608-1}}
+  function dkSamples(vol,seed){
+    var R=dkRand(seed||7),n=Math.round(DKSR*.5),out=new Float32Array(n),i,j;
+    var r=(2.5+.4*(R()+1)/2)/1000,xi=.24+.1*(R()+1)/2,f0=3/r,d=.13/r+.0072*Math.pow(r,-1.5),sg=xi*d,pre=Math.round(DKSR*.008);
+    var m=Math.round(DKSR*.11),L=pre+m,dry=new Float32Array(L),ph=0,fo=Math.round(DKSR*.03);
+    for(i=0;i<m;i++){var t=i/DKSR;ph+=2*Math.PI*f0*(1+sg*t)/DKSR;dry[pre+i]=Math.sin(ph)*Math.exp(-d*t)*Math.min(1,t/.0015)*(i>m-fo?.5+.5*Math.cos(Math.PI*(i-m+fo)/fo):1)}
+    /* щелчок удара: 2 мс шума с быстрым затуханием, только верхние частоты */
+    var k=Math.round(DKSR*.002),pv=0,cl=new Float32Array(k),cm=0;
+    for(i=0;i<k;i++){var z=R()*Math.exp(-i/DKSR/.0005);cl[i]=z-pv;pv=z;cm=Math.max(cm,Math.abs(cl[i]))}
+    for(i=0;i<k;i++)dry[i]+=.11*cl[i]/(cm||1);
+    /* комната: разреженные отражения со случайным знаком и затуханием за ~0,3 с */
+    var rt=.3,len=Math.round(DKSR*rt*1.25),taps=Math.round(len/DKSR*1800),wet=new Float32Array(n),en=0,p0=Math.round(DKSR*.009);
+    for(j=0;j<taps;j++){
+      var p=p0+Math.round(len*(j+.25+.5*(R()+1)/2)/taps),amp=Math.exp(-6.9*(p/DKSR)/rt)*(R()<0?-1:1);en+=amp*amp;
+      for(i=0;i<L&&p+i<n;i++)wet[p+i]+=amp*dry[i];
+    }
+    en=Math.sqrt(en)||1;
+    var a=0,pk=0;
+    for(i=0;i<n;i++){a+=.35*(wet[i]/en-a);out[i]=(i<L?dry[i]:0)+.28*a}
+    var fl=Math.round(DKSR*.08);for(i=n-fl;i<n;i++)out[i]*=(n-i)/fl;
+    for(i=0;i<n;i++)pk=Math.max(pk,Math.abs(out[i]));
+    for(i=0;i<n;i++)out[i]=out[i]/pk*vol;
     return out;
   }
+  var DKSEEDS=[7,19,31],dkLastSeed=-1;
+  function dkSeed(){var i;do{i=Math.floor(Math.random()*DKSEEDS.length)}while(i===dkLastSeed&&DKSEEDS.length>1);dkLastSeed=i;return DKSEEDS[i]}
   function dkVol(){return DKV[calS.dvol]||DKV[2]}
   function dkCtx(){
     var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
@@ -3985,20 +4000,22 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(dkAC.state!=='running'&&dkAC.state!=='closed'){try{var p=dkAC.resume();if(p&&p.catch)p.catch(function(){})}catch(_){}}
     return dkAC;
   }
-  function dkBuf(ac,v){
-    if(!dkBufs[v]){var s=dkSamples(v),b=ac.createBuffer(1,s.length,DKSR);if(b.copyToChannel)b.copyToChannel(s,0);else b.getChannelData(0).set(s);dkBufs[v]=b}
-    return dkBufs[v];
+  function dkBuf(ac,v,sd){
+    var key=v+'_'+sd;
+    if(!dkBufs[key]){var s=dkSamples(v,sd),b=ac.createBuffer(1,s.length,DKSR);if(b.copyToChannel)b.copyToChannel(s,0);else b.getChannelData(0).set(s);dkBufs[key]=b}
+    return dkBufs[key];
   }
-  function dkUrl(v){
-    if(!dkUrls[v]){
-      var s=dkSamples(v),n=s.length,buf=new ArrayBuffer(44+n*2),d=new DataView(buf),i;
+  function dkUrl(v,sd){
+    var key=v+'_'+sd;
+    if(!dkUrls[key]){
+      var s=dkSamples(v,sd),n=s.length,buf=new ArrayBuffer(44+n*2),d=new DataView(buf),i;
       function w(o,t){for(var k=0;k<t.length;k++)d.setUint8(o+k,t.charCodeAt(k))}
       w(0,'RIFF');d.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,1,true);
       d.setUint32(24,DKSR,true);d.setUint32(28,DKSR*2,true);d.setUint16(32,2,true);d.setUint16(34,16,true);w(36,'data');d.setUint32(40,n*2,true);
       for(i=0;i<n;i++)d.setInt16(44+i*2,Math.max(-32767,Math.min(32767,Math.round(s[i]*32767))),true);
-      dkUrls[v]=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
+      dkUrls[key]=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
     }
-    return dkUrls[v];
+    return dkUrls[key];
   }
   /* включение звука на первом же нажатии: тихий пустой звук внутри нажатия окончательно «будит» звук в Safari */
   function dkUnlock(){
@@ -4009,12 +4026,12 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   ['pointerdown','pointerup','mousedown','click','touchstart','touchend','keydown'].forEach(function(t){document.addEventListener(t,dkUnlock,{capture:true,passive:true})});
   /* результат: Promise<true> — звук ушёл, Promise<false> — браузер не дал звук */
   function ding(){
-    var v=dkVol(),ac=dkCtx();
-    function viaWA(){try{var s=ac.createBufferSource();s.buffer=dkBuf(ac,v);s.connect(ac.destination);s.start(ac.currentTime+.02);return true}catch(_){return false}}
+    var v=dkVol(),sd=dkSeed(),ac=dkCtx();
+    function viaWA(){try{var s=ac.createBufferSource();s.buffer=dkBuf(ac,v,sd);s.connect(ac.destination);s.start(ac.currentTime+.02);return true}catch(_){return false}}
     function viaEl(){
       try{
         if(!dkEl){dkEl=new Audio();dkEl.preload='auto'}
-        dkEl.src=dkUrl(v);var p=dkEl.play();
+        dkEl.src=dkUrl(v,sd);var p=dkEl.play();
         return p&&p.then?p.then(function(){return true},function(){return false}):Promise.resolve(true);
       }catch(_){return Promise.resolve(false)}
     }
