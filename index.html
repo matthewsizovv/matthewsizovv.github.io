@@ -617,6 +617,25 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 .sy-alt{border:0;background:none;padding:2px 0;justify-self:start;color:var(--muted);font-size:calc(12px*var(--fz));text-decoration:underline;text-underline-offset:2px}
 .sy-db a.btn{font-size:calc(13px*var(--fz))}
 
+/* отчёт по календарным месяцам */
+#view-report{grid-auto-rows:max-content}
+.sum{grid-template-columns:auto repeat(4,minmax(0,1fr))}
+.sum.noe{grid-template-columns:auto repeat(3,minmax(0,1fr))}
+.sum .metric.per{padding-right:26px}
+.sum .metric.per .val small{font-size:calc(14px*var(--fz));margin-left:6px}
+#view-report .mat{overflow:visible}
+.mat-s{overflow-x:auto;min-width:0}
+.mat-s .mat-g{width:max-content}
+/* названия сфер стоят на месте, вбок листаются только месяцы */
+.mat-s .mat-g .rl,.mat-s .mat-g>.hdc:first-child{position:sticky;left:0;z-index:1;background:var(--bg)}
+.mat-g .hdc small{display:block;font-size:calc(11px*var(--fz));font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:820px){
+  .sum,.sum.noe{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sum .metric.per{grid-column:1/-1;padding:0 0 12px}
+  .sum .metric.per~.metric:nth-child(even){padding-left:0;border-left:0}
+  .sum .metric.per~.metric:nth-child(odd){padding-left:18px;border-left:1px solid var(--line)}
+}
+
 @media (max-width:1100px){
   .lower{grid-template-columns:1fr}
   #view-report{grid-template-columns:minmax(0,1fr)}
@@ -930,7 +949,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   /* настройки по умолчанию; всё, что меняется в «Настройках», лежит в этих объектах и сохраняется вместе с записями */
   var UI0={theme:'light',accent:'ink',sat:1,font:'onest',dfont:'unbounded',fz:1};
   var CAL0={hh:46,start:7.5,snap:15,view:'week',dur:30,side:1,chips:1,we:1,info:1,tick:1};
-  var REP0={mode:'week',months:6,wheel:1,empty:1,autoW:1,autoM:1,s1:1,s2:1,s3:1,s4:1,s5:1};
+  var REP0={mode:'month',months:6,wheel:1,empty:1,autoW:0,autoM:1,s1:1,s2:1,s3:1,s4:1,s5:1};
   var SEC0={habits:1,goals:1,diary:1,report:1},FEAT0={gh:'off',links:1},GS0={url:'',key:'',on:0,show:1,cals:{},hid:{},src:'',cid:''};
   var FOOD0={on:1,inHabits:1,c:'#B9C45E',rk:1,rp:1,rf:1,rc:1,rm:1,nk:0,np:0,nf:0,nc:0,mfix:0,meals:['Завтрак','Обед','Перекус','Ужин']};
   var ui=clone(UI0),calS=clone(CAL0),repS=clone(REP0),sec=clone(SEC0),feat=clone(FEAT0),food=clone(FOOD0),gs=clone(GS0),gcalOn=true,saveSt={s:'ok',t:0},saveErr=false;
@@ -986,7 +1005,6 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     /* прежний порядок приёмов пищи по умолчанию меняется на «завтрак, обед, перекус, ужин»; старые записи корзины переставляются при чтении */
     if(!(d.v>=6)&&food.meals.join('|')==='Завтрак|Обед|Ужин|Перекус'){food.meals=clone(FOOD0.meals);food.mfix=1}
     gcalOn=d.gcal!==false;
-    if(!loaded)repMode=repS.mode;
     applyUI();buildChips();
     if(d.plans)SP.forEach(function(s){if(typeof d.plans[s.id]==='number')plans[s.id]=d.plans[s.id]});
     hideDemo=true;if(typeof d.budget==='number')budget=d.budget;
@@ -2193,69 +2211,54 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   }
   $('ev-del').onclick=deleteCur;
 
-  /* ---------- Отчёт ---------- */
-  var rep=$('view-report'),repMode='week',repB=null,repBM=null;
+  /* ---------- Отчёт: только календарные месяцы, с 1-го по последнее число (по просьбе 19.10) ---------- */
+  var rep=$('view-report');
+  function rpDays(n){var a=n%100,d=n%10;return n+' '+(a>10&&a<20?'дней':d===1?'день':d>1&&d<5?'дня':'дней')}
+  /* «1–31 октября» */
+  function mSpan(k,short){var d=mStart(k);return '1–'+daysIn(k)+' '+(short?MS:MG)[d.getMonth()]}
   function renderReport(){
     var frac=monthFrac(curM),future=curM>nowM,past=curM<nowM;
     var sumP=0,sumC=0,short=0,behind=0,nShort=0;
     var nH=0,allC=0;
     SP.forEach(function(s){if(!isD(s.id))allC+=st(s.id,curM).c;if(isD(s.id)||!inRep(s.id))return;nH++;var a=st(s.id,curM),p=planOf(s.id,curM);sumP+=p;sumC+=a.c;var d=p-a.c;if(d>0){short+=d;nShort++}behind+=Math.max(0,p*frac-a.c)});
-    var elapsed=frac*daysIn(curM)*24,empty=Math.max(0,elapsed-allC);
-    var wkMode=repMode==='week',mkeys=matKeys();
+    var dim=daysIn(curM),elapsed=frac*dim*24,empty=Math.max(0,elapsed-allC),mkeys=matKeys();
+    var dn=past?dim:future?0:Math.min(dim,now.getDate());
     if(mkeys.indexOf(curM)<0)mkeys=curM<mkeys[0]?[curM].concat(mkeys).slice(0,repS.months):mkeys.concat([curM]).slice(-repS.months);
-    function cellHtml(s,i,k,c,g,on){var q=g?c/g:0;return '<button type="button" class="cell sph'+(q>=1?' full':'')+(on?' on':'')+'" style="--h:'+s.h+'" data-s="'+i+'" data-m="'+k+'" title="'+s.n+': '+hrs(c)+' из '+hrs(g)+' '+U(s.id)+'"><i style="width:'+pc(q)+'%"></i><span>'+hrs(c)+' <small>/ '+hrs(g)+(isD(s.id)?' дн.':'')+'</small></span></button>'}
-    /* недели месяца: пять полос по датам (1–7, 8–14, 15–21, 22–28, 29–конец), в сумме дают месяц */
-    var ms=mStart(curM),dim=daysIn(curM),bands=[],W={},bi;
-    for(bi=0;bi<5;bi++){var d1=bi*7+1,d2=bi<4?d1+6:dim;if(d1<=dim)bands.push({l:d1+(d2>d1?'–'+d2:'')+' '+MS[ms.getMonth()],n:d2-d1+1,d1:d1})}
-    if(repBM!==curM){repBM=curM;repB=null}
-    var selB=repB!=null?Math.min(repB,bands.length-1):curM===nowM?Math.min(4,Math.floor((now.getDate()-1)/7)):0;
-    EV.forEach(function(e){
-      if(e.x||!cred(e))return;var d=new Date(e.a);if(mk(d)!==curM)return;
-      var w=W[e.s]||(W[e.s]=[0,0,0,0,0]);w[Math.min(4,Math.floor((d.getDate()-1)/7))]+=(e.b-e.a)/36e5;
-    });
-    SP.forEach(function(s){if(isD(s.id))W[s.id]=bands.map(function(x){var a=new Date(ms.getFullYear(),ms.getMonth(),x.d1).getTime();return dDone(s.id,a,a+x.n*DAY)})});
-    var head='<div class="hdc"></div>'+(wkMode
-      ?bands.map(function(x,j){return '<button type="button" class="hdc'+(j===selB?' on':'')+'" data-band="'+j+'">'+x.l+'</button>'})
-      :mkeys.map(function(k){return '<button type="button" class="hdc'+(k===curM?' on':'')+'" data-m="'+k+'">'+mName(k,1)+' '+String(mStart(k).getFullYear()).slice(2)+'</button>'})).join('');
+    function cellHtml(s,i,k,c,g,on){var q=g?c/g:0;return '<button type="button" class="cell sph'+(q>=1?' full':'')+(on?' on':'')+'" style="--h:'+s.h+'" data-s="'+i+'" data-m="'+k+'" title="'+s.n+', '+mSpan(k)+': '+hrs(c)+' из '+hrs(g)+' '+U(s.id)+'"><i style="width:'+pc(q)+'%"></i><span>'+hrs(c)+' <small>/ '+hrs(g)+(isD(s.id)?' дн.':'')+'</small></span></button>'}
+    var head='<div class="hdc"></div>'+mkeys.map(function(k){return '<button type="button" class="hdc'+(k===curM?' on':'')+'" data-m="'+k+'">'+mName(k,1)+' '+String(mStart(k).getFullYear()).slice(2)+'<small>1–'+daysIn(k)+'</small></button>'}).join('');
     var body='',R=104,g='';
     [.25,.5,.75,1].forEach(function(q){g+='<circle class="ring" r="'+(R*q)+'"/>'});
     var FW=SP.filter(function(x){return x.free!==false&&!x.off}),ang=360/Math.max(1,FW.length);
     SP.forEach(function(s,i){
       if(!inRep(s.id))return;
-      var w=W[s.id]||[0,0,0,0,0],p=planOf(s.id,curM);
+      var p=planOf(s.id,curM);
       body+='<div class="rl sph" style="--h:'+s.h+'"><i></i>'+s.n+'</div>';
-      var bg=function(x){var v=p*x.n/dim;return isD(s.id)?Math.round(v):v};
-      if(wkMode)bands.forEach(function(x,j){body+=cellHtml(s,i,curM,w[j],bg(x),j===selB)});
-      else mkeys.forEach(function(k){body+=cellHtml(s,i,k,st(s.id,k).c,planOf(s.id,k),k===curM)});
-      /* колесо: только сферы свободного времени; радиус сектора = доля цели выбранной недели или месяца */
+      mkeys.forEach(function(k){body+=cellHtml(s,i,k,st(s.id,k).c,planOf(s.id,k),k===curM)});
+      /* колесо: только сферы свободного времени; радиус сектора = доля цели месяца */
       var fi=FW.indexOf(s);if(fi<0)return;
-      var c=wkMode?w[selB]:st(s.id,curM).c,gl=wkMode?bg(bands[selB]):p,q=gl>0?Math.min(1,c/gl):0,r=R*q;if(r>0&&r<5)r=5;
+      var c=st(s.id,curM).c,q=p>0?Math.min(1,c/p):0,r=R*q;if(r>0&&r<5)r=5;
       var a0=(fi*ang-90)*Math.PI/180,a1=((fi+1)*ang-90)*Math.PI/180,am=(a0+a1)/2;
-      if(r>0)g+='<path class="sec sph" data-s="'+i+'" style="--h:'+s.h+'" d="M0 0L'+(r*Math.cos(a0)).toFixed(1)+' '+(r*Math.sin(a0)).toFixed(1)+'A'+r.toFixed(1)+' '+r.toFixed(1)+' 0 0 1 '+(r*Math.cos(a1)).toFixed(1)+' '+(r*Math.sin(a1)).toFixed(1)+'Z"><title>'+s.n+': '+hrs(c)+' из '+hrs(gl)+' '+U(s.id)+'</title></path>';
+      if(r>0)g+='<path class="sec sph" data-s="'+i+'" style="--h:'+s.h+'" d="M0 0L'+(r*Math.cos(a0)).toFixed(1)+' '+(r*Math.sin(a0)).toFixed(1)+'A'+r.toFixed(1)+' '+r.toFixed(1)+' 0 0 1 '+(r*Math.cos(a1)).toFixed(1)+' '+(r*Math.sin(a1)).toFixed(1)+'Z"><title>'+s.n+': '+hrs(c)+' из '+hrs(p)+' '+U(s.id)+'</title></path>';
       var lx=(R+14)*Math.cos(am),ly=(R+14)*Math.sin(am);
       g+='<text x="'+lx.toFixed(1)+'" y="'+(ly+4).toFixed(1)+'" text-anchor="'+(Math.abs(lx)<20?'middle':lx>0?'start':'end')+'">'+s.sh+' '+pct(q)+'%</text>';
     });
-    var ncol=wkMode?5:mkeys.length;
     rep.innerHTML=
-      '<section class="sum"'+(repS.empty?'':' style="grid-template-columns:repeat(3,minmax(0,1fr)) auto"')+'>'+
+      '<section class="sum'+(repS.empty?'':' noe')+'">'+
+        '<div class="metric per"><div class="lab">'+mName(curM)+'</div><div class="val">1–'+dim+'<small>'+MG[mStart(curM).getMonth()]+'</small></div><div class="sub">'+(past?'месяц закрыт: все '+rpDays(dim):future?'месяц ещё не начался':'прошло '+rpDays(dn)+' из '+dim)+'</div></div>'+
         '<div class="metric"><div class="lab">Цель месяца</div><div class="val">'+hrs(sumP)+'<small>ч</small></div><div class="sub">по '+nH+' сферам свободного времени</div></div>'+
-        '<div class="metric"><div class="lab">Зачтено</div><div class="val">'+hrs(sumC)+'<small>ч</small></div><div class="sub">'+(sumP?pct(sumC/sumP):0)+'% цели</div></div>'+
+        '<div class="metric"><div class="lab">Зачтено</div><div class="val">'+hrs(sumC)+'<small>ч</small></div><div class="sub">'+(sumP?pct(sumC/sumP):0)+'% цели'+(past?'':future?'':' за 1–'+dn+' '+MG[mStart(curM).getMonth()])+'</div></div>'+
         '<div class="metric"><div class="lab">'+(past?'Недобежал':'Отставание от темпа')+'</div><div class="val">'+(future?'0':hrs(past?short:behind))+'<small>ч</small></div><div class="sub">'+(past?'цель не закрыта в '+nShort+' из '+nH+' сфер':future?'месяц ещё не начался':'до цели месяца ещё '+hrs(short)+' ч')+'</div></div>'+
         (!repS.empty?'':'<div class="metric"><div class="lab">Пустые часы</div><div class="val">'+hrs(empty)+'<small>ч</small></div><div class="sub">из '+hrs(elapsed)+' прошедших; сон и «Другое» пустыми не считаются</div></div>')+
-        '<div class="rc-btns"><button type="button" class="btn'+(wkMode?' ghost':'')+'" data-mode="month" aria-pressed="'+!wkMode+'">Итог месяца</button><button type="button" class="btn'+(wkMode?'':' ghost')+'" data-mode="week" aria-pressed="'+wkMode+'">Итоги недель</button></div>'+
       '</section>'+
-      '<section class="mat'+(repS.wheel?'':' full')+'"><div class="sec-h"><h2>'+(wkMode?'Итоги недель':'Итог месяца')+': зачтено / цель</h2><span>'+(wkMode?mName(curM)+' · нажми на неделю, чтобы выбрать':'нажми на месяц, чтобы выбрать')+'</span></div><div class="mat-g" style="grid-template-columns:minmax(120px,190px) repeat('+ncol+',minmax(84px,150px))">'+head+body+'</div>'+
-        '<div><button type="button" class="fact" id="rc-open">Открыть листаемый итог '+(wkMode?'недели':'месяца')+' ↗</button></div></section>'+
-      (!repS.wheel?'':'<section class="bal"><div class="sec-h"><h2>Колесо свободного времени</h2><span>% цели '+(wkMode?'недели '+bands[selB].l:'месяца, '+mName(curM).toLowerCase())+'</span></div><svg viewBox="-190 -132 380 264" role="img" aria-label="Выполнение цели по сферам">'+g+'</svg></section>');
-    $('rc-open').onclick=function(){
-      if(!wkMode){openRecap('month',curM>nowM?nowM:curM);return}
-      var w=monday(new Date(ms.getFullYear(),ms.getMonth(),bands[selB].d1)),cw=monday(now);
-      openRecap('week',(w>cw?cw:w).getTime());
-    };
+      '<section class="mat'+(repS.wheel?'':' full')+'"><div class="sec-h"><h2>Итог по месяцам: зачтено / цель</h2><span>месяц считается с 1-го по последнее число · нажми на месяц, чтобы выбрать</span></div><div class="mat-s"><div class="mat-g" style="grid-template-columns:minmax(120px,190px) repeat('+mkeys.length+',minmax(84px,150px))">'+head+body+'</div></div>'+
+        '<div><button type="button" class="fact" id="rc-open">Открыть листаемый итог за '+mSpan(curM)+' ↗</button></div></section>'+
+      (!repS.wheel?'':'<section class="bal"><div class="sec-h"><h2>Колесо свободного времени</h2><span>% цели за '+mSpan(curM)+'</span></div><svg viewBox="-190 -132 380 264" role="img" aria-label="Выполнение цели по сферам">'+g+'</svg></section>');
+    $('rc-open').onclick=function(){openRecap('month',curM>nowM?nowM:curM)};
+    /* на узком экране таблица листается вбок: выбранный месяц всегда в поле зрения */
+    var mo=rep.querySelector('.mat-s'),on=rep.querySelector('.mat-g .hdc.on');
+    if(mo&&on&&mo.scrollWidth>mo.clientWidth){var r0=mo.getBoundingClientRect(),r1=on.getBoundingClientRect(),lw=rep.querySelector('.mat-g>.hdc').getBoundingClientRect().width+4,vis=mo.clientWidth-lw;if(r1.left<r0.left+lw||r1.right>r0.right)mo.scrollLeft+=r1.left-(r0.left+lw)-Math.max(0,(vis-r1.width)/2)}
   }
   rep.addEventListener('click',function(e){
-    var t=e.target.closest('[data-mode],[data-band]');
-    if(t){if(t.dataset.mode)repMode=t.dataset.mode;else repB=+t.dataset.band;renderReport();return}
     var c=e.target.closest('.cell,.sec');
     if(c){if(c.dataset.m)curM=c.dataset.m;openPanel(+c.dataset.s);renderAll();return}
     var b=e.target.closest('[data-m]');if(b){curM=b.dataset.m;renderAll();navPush()}
@@ -2272,12 +2275,14 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var s=new Date(rc.key),e=addDays(s,6);return s.getDate()+(s.getMonth()!==e.getMonth()?' '+MS[s.getMonth()]:'')+'–'+e.getDate()+' '+MS[e.getMonth()];
   }
   function renderRecap(){
-    var q=rcRange(),r=rangeStats(q.a,q.b),p=rangeStats(q.pa,q.a),mon=rc.type==='month',open=q.b>syncAt;
+    var q=rcRange(),r=rangeStats(q.a,q.b),mon=rc.type==='month',open=q.b>syncAt;
+    /* текущий месяц сравнивается с тем же отрезком прошлого: 1–19 октября с 1–19 сентября */
+    var pS=new Date(q.pa),cutD=mon&&open?Math.min(new Date(Math.max(q.a,syncAt)).getDate(),daysIn(mk(pS))):0,pEnd=cutD?Math.min(q.a,new Date(pS.getFullYear(),pS.getMonth(),cutD+1).getTime()):q.a,cutL=cutD?'1–'+cutD+' '+MG[pS.getMonth()]:'',p=rangeStats(q.pa,pEnd);
     var goal=0,rows=SP.filter(function(s){return inRep(s.id)}).map(function(s){var g=planOf(s.id,q.k)*q.f;if(isD(s.id))g=Math.round(g);else goal+=g;return{s:s,c:r.sp[s.id].c,g:g,q:g?r.sp[s.id].c/g:0}});
     var word=mon?'месяца':'недели',diff=r.tot-p.tot;
     var sl=[];
-    sl.push('<div class="lab">Итог '+word+(open?' · на сегодня':'')+'</div><h3>'+rcLabel()+'</h3><div class="big">'+hrs(r.tot)+'<small>ч в зачёте</small></div>'+
-      '<p>Это '+(goal?pct(r.tot/goal):0)+'% от цели в '+hrs(goal)+' ч. '+(p.tot?(diff>=0?'На '+hrs(diff)+' ч больше, чем':'На '+hrs(-diff)+' ч меньше, чем')+(mon?' в прошлом месяце.':' неделей раньше.'):'')+'</p>'+
+    sl.push('<div class="lab">Итог '+word+(mon?' · '+mSpan(rc.key):'')+(open?' · на сегодня':'')+'</div><h3>'+rcLabel()+'</h3><div class="big">'+hrs(r.tot)+'<small>ч в зачёте</small></div>'+
+      '<p>Это '+(goal?pct(r.tot/goal):0)+'% от цели в '+hrs(goal)+' ч. '+(p.tot?(diff>=0?'На '+hrs(diff)+' ч больше, чем':'На '+hrs(-diff)+' ч меньше, чем')+(mon?(cutD?' за '+cutL+'.':' в прошлом месяце.'):' неделей раньше.'):'')+'</p>'+
       '<p class="m">Дел сделано: '+r.done+'. Листай дальше стрелками или свайпом.</p>');
     var by=rows.slice().sort(function(x,y){return y.q-x.q});
     if(repS.s1)sl.push('<div class="lab">Сферы</div><h3>Кто закрыл цель, а кто отстал</h3>'+by.map(function(x){return '<div class="rr sph" style="--h:'+x.s.h+'"><span>'+x.s.n+'</span><div class="bar"><i style="width:'+pc(x.q)+'%"></i></div><span>'+hrs(x.c)+' / '+hrs(x.g)+' '+U(x.s.id)+'</span></div>'}).join(''));
@@ -2291,8 +2296,8 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       (gk.length?'<ul class="rl2">'+gk.slice(0,8).map(function(id){var gs=goals[id].s;return '<li class="sph" style="--h:'+(gs&&SPI[gs]!=null?hOf(gs):'0;'+cv(GREY))+'"><i></i>'+esc(gName(id))+'<span>'+hrs(r.goals[id])+' ч</span></li>'}).join('')+'</ul>'+(gk.length>8?'<p class="m">И ещё '+(gk.length-8)+'.</p>':'')
         :'<p class="m">В окне события нажми «+ Добавить цель», и его часы пойдут в зачёт цели.</p>'));
     if(repS.s4&&sec.habits)sl.push('<div class="lab">Привычки</div><h3>Что держал, что срывал</h3>'+(habits.length?'<ul class="rl2">'+habits.map(function(h){
-      var x=hRange(h,q.a,q.b),y=hRange(h,q.pa,q.a),d=h.type==='check'?x.done-y.done:h.type==='count'?x.sum-y.sum:0;
-      return '<li class="sph" style="--h:'+hOf(h.s)+'"><i></i>'+esc(h.n)+'<span>'+hStatText(h,x)+(d?' ('+(d>0?'+':'−')+Math.abs(d)+')':'')+'</span></li>'}).join('')+'</ul><p class="m">В скобках разница с прошлым периодом.</p>':'<p class="m">Привычек пока нет.</p>'));
+      var x=hRange(h,q.a,q.b),y=hRange(h,q.pa,pEnd),d=h.type==='check'?x.done-y.done:h.type==='count'?x.sum-y.sum:0;
+      return '<li class="sph" style="--h:'+hOf(h.s)+'"><i></i>'+esc(h.n)+'<span>'+hStatText(h,x)+(d?' ('+(d>0?'+':'−')+Math.abs(d)+')':'')+'</span></li>'}).join('')+'</ul><p class="m">В скобках разница с '+(cutD?'тем же отрезком прошлого месяца ('+cutL+')':mon?'прошлым месяцем':'прошлой неделей')+'.</p>':'<p class="m">Привычек пока нет.</p>'));
     var best=null;Object.keys(r.days).forEach(function(k){if(!best||r.days[k].h>best.h)best=r.days[k]});
     var closed=rows.filter(function(x){return x.g>0&&x.c>=x.g});
     if(repS.s5)sl.push('<div class="lab">Рекорды и фокус</div><h3>'+(lag.length?'В фокусе дальше: '+lag.slice(0,2).map(function(x){return x.s.n.toLowerCase()}).join(' и '):'Держать темп')+'</h3><ul class="rl2">'+
@@ -2333,7 +2338,6 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       for(var k=seen.m;k<nowM;k=mAdd(k,1))if(!snap[k])snap[k]=clone(plans);
       if(repS.autoM&&sec.report)q.push(['month',mAdd(nowM,-1)]);
     }
-    if(seen.w&&seen.w<wk&&repS.autoW&&sec.report)q.push(['week',addDays(monday(now),-7).getTime()]);
     if(seen.m!==nowM||seen.w!==wk){seen={m:nowM,w:wk};persist('@set')}
     if(q.length&&$('recap').hidden){rcQueue=q.slice(1);openRecap(q[0][0],q[0][1])}
   }
@@ -3697,11 +3701,10 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var rs={};SP.forEach(function(s){if(s.rep!==false)rs[s.id]=1});
     $('set-report').innerHTML='<div class="s-g"><h2>Отчёт</h2>'+
       srow('Раздел «Отчёт»','вкладка с итогами по сферам',swt('sec.report',sec.report,'Раздел «Отчёт»'))+
-      srow('Что открывать сначала','',seg('rep.mode',[['week','Итоги недель'],['month','Итог месяца']],repS.mode))+
-      srow('Сколько месяцев в таблице','в режиме «Итог месяца»',seg('rep.months',[[3,'3'],[6,'6'],[12,'12']],repS.months))+
+      srow('Сколько месяцев в таблице','каждый месяц считается с 1-го по последнее число',seg('rep.months',[[3,'3'],[6,'6'],[12,'12']],repS.months))+
       srow('Сферы в отчёте','какие сферы входят в таблицу, сумму и итоги',mselBtn('x-rep','Ни одной',spItems(SP.filter(function(s){return !s.off})),rs,function(sel){SP.forEach(function(s){s.rep=!!sel[s.id]});saveSpheres()}))+'</div>'+
       '<div class="s-g"><h2>Что показывать</h2>'+sw2([['rep.wheel',repS.wheel,'Колесо свободного времени'],['rep.empty',repS.empty,'Пустые часы']])+'</div>'+
-      '<div class="s-g"><h2>Листаемые итоги</h2>'+sw2([['rep.autoW',repS.autoW,'Показывать сами в начале недели'],['rep.autoM',repS.autoM,'Показывать сами в начале месяца'],['rep.s1',repS.s1,'Слайд «Сферы»'],['rep.s2',repS.s2,'Слайд «Где недобежал»'],['rep.s3',repS.s3,'Слайд «Цели» (нужны часы у целей)'],['rep.s4',repS.s4,'Слайд «Привычки»'],['rep.s5',repS.s5,'Слайд «Рекорды и фокус»']])+'</div>';
+      '<div class="s-g"><h2>Листаемые итоги</h2>'+sw2([['rep.autoM',repS.autoM,'Показывать итог прошлого месяца сам 1-го числа'],['rep.s1',repS.s1,'Слайд «Сферы»'],['rep.s2',repS.s2,'Слайд «Где недобежал»'],['rep.s3',repS.s3,'Слайд «Цели» (нужны часы у целей)'],['rep.s4',repS.s4,'Слайд «Привычки»'],['rep.s5',repS.s5,'Слайд «Рекорды и фокус»']])+'</div>';
   }
   function renderMore(){
     var gs={},items=Object.keys(goals).sort(function(x,y){return(goals[x].o||0)-(goals[y].o||0)}).map(function(id){var g=goals[id];if(g.hh)gs[id]=1;return{v:id,n:gName(id),c:g.s&&SPI[g.s]!=null?SP[SPI[g.s]].c:GREY}});
@@ -3738,7 +3741,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var t=e.target,b=t.closest('[data-sec],[data-open]');
     if(b){setSec=b.dataset.sec||b.dataset.open;askImp=askOld=gAskTake=syAskWipe=syAskOver=false;spDel=false;hbDel=null;renderAll();navPush();return}
     b=t.closest('.seg[data-seg] button');
-    if(b){var a=b.parentNode.dataset.seg.split('.');OBJ[a[0]]()[a[1]]=parseV(b.dataset.v);if(a[0]==='rep'&&a[1]==='mode')repMode=repS.mode;if(a[0]==='cal'&&a[1]==='view')applyDefView();saveUI();return}
+    if(b){var a=b.parentNode.dataset.seg.split('.');OBJ[a[0]]()[a[1]]=parseV(b.dataset.v);if(a[0]==='cal'&&a[1]==='view')applyDefView();saveUI();return}
     b=t.closest('[data-sw]');
     if(b){
       var n=b.dataset.sw;
