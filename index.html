@@ -3672,7 +3672,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       srow('Размер календаря','сколько места занимает один час в сетке',seg('cal.hh',[[36,'Компактно'],[46,'Обычно'],[60,'Просторно']],calS.hh))+
       srow('С какого часа открывать день','сетка прокручивается к этому времени','<select class="inp" id="cal-start" aria-label="Начало дня">'+st+'</select>')+'</div>'+
       '<div class="s-g"><h2>Что показывать</h2>'+sw2([['cal.chips',calS.chips,'Привычки дня под датой'],['cal.tick',calS.tick,'Галочка у прошедших событий']])+'</div>'+
-      '<div class="s-g"><h2>Звук</h2>'+srow('Звук в начале события','капелька, когда начинается запланированное событие. Звучит, пока сайт открыт на этом устройстве (можно в фоновой вкладке) и после открытия на страницу хоть раз нажали. На iPhone в режиме «Без звука» молчит',swt('cal.ding',calS.ding,'Звук в начале события'))+
+      '<div class="s-g"><h2>Звук</h2>'+srow('Звук в начале события','звук капли, когда начинается запланированное событие. Звучит, пока сайт открыт на этом устройстве (можно в фоновой вкладке) и после открытия на страницу хоть раз нажали. На iPhone в режиме «Без звука» молчит',swt('cal.ding',calS.ding,'Звук в начале события'))+
       (calS.ding?srow('Громкость','',seg('cal.dvol',[[1,'Тише'],[2,'Обычно'],[3,'Громче']],calS.dvol)+'<button type="button" class="btn ghost" id="ding-test">Прослушать</button>'):'')+'</div>';
   }
   function renderHabSet(){
@@ -3771,7 +3771,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else if(t.id==='food-open'){if(!food.on){food.on=1;persist('@set')}setTab(foodInHabits()?'habits':'food')}
     else if(t.id==='acc-reset'){ui.accent='ink';colClose();saveUI()}
     else if(t.id==='ui-reset'){ui=clone(UI0);colClose();saveUI()}
-    else if(t.id==='ding-test')ding().then(function(ok){toast(ok?'Капелька прозвучала. Не слышно — прибавь громкость устройства, на iPhone выключи режим «Без звука».':'Браузер не дал включить звук. Нажми «Прослушать» ещё раз.')});
+    else if(t.id==='ding-test')ding().then(function(ok){toast(ok?'Капля прозвучала. Не слышно — прибавь громкость устройства, на iPhone выключи режим «Без звука».':'Браузер не дал включить звук. Нажми «Прослушать» ещё раз.')});
     else if(t.id==='dt-imp'){if(!askImp){askImp=true;renderData();return}askImp=false;renderData();$('dt-file').click()}
     else if(t.id==='dt-old'){if(!askOld){askOld=true;renderData();return}askOld=false;migrateOld()}
     else if(t.id==='fs-pick')filePick();
@@ -3954,96 +3954,63 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     e.preventDefault();
   });
 
-  /* ---------- звук в начале события: капля (19.10, 20.10: громче и надёжнее; 20.10 ночью: настоящая капля вместо писка) ----------
-     Звук один и тот же для двух путей: он считается в браузере в виде отсчётов (файлов нет).
+  /* ---------- звук в начале события (19.10; 20.10: запись капли, которую выбрал пользователь) ----------
+     Звук — запись «water drop single short soft close» (0,65 с, стерео), присланная пользователем; обложка из файла убрана,
+     громкость выровнена до пика −2 дБ, сам звук не менялся. Запись встроена в страницу (MP3, ~10 КБ), поэтому работает и без интернета.
      Основной путь — Web Audio: смешивается с музыкой и не прерывает её. Браузер включает его только после нажатия на страницу,
      поэтому включение ловится на любом нажатии, касании или клавише (разные браузеры засчитывают разные события).
      Запасной путь — обычный аудио-элемент: Chrome и Firefox разрешают его после любого нажатия на странице, даже по таймеру.
      Проверка раз в 5 секунд; событие звенит один раз на устройстве. */
-  var dkAC=null,dkLast=Date.now(),dkDone={},DKK=LSK+'-ding',DKV=[0,.22,.4,.7],dkBufs={},dkUrls={},dkEl=null,dkWarned=false;
+  var dkAC=null,dkLast=Date.now(),dkDone={},DKK=LSK+'-ding',DKV=[0,.35,.6,1],dkDec=null,dkUrl0='',dkEl=null,dkWarned=false;
+  var DKMP3='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';
   try{dkDone=JSON.parse(localStorage.getItem(DKK)||'{}')||{}}catch(_){dkDone={}}
-  /* настоящая капля по физической модели пузырька (van den Doel, 2005): когда капля падает в воду, она уносит под поверхность
-     пузырёк, и он коротко звенит, а его звук быстро уходит вверх («плинк»). Частота пузырька f0 = 3/r, затухание d = 0,13/r + 0,0072·r^-1,5,
-     рост частоты f(t) = f0·(1 + ξ·d·t). Перед ним — тихий щелчок удара о воду, после — лёгкое эхо комнаты (разреженный шум с затуханием,
-     сглаженный, как от мягких стен). Каждая капля чуть другая: радиус и рост частоты слегка гуляют, поэтому звук не механический. */
-  var DKSR=44100;
-  function dkRand(seed){var x=(seed>>>0)||1;return function(){x=(Math.imul(x,1103515245)+12345)>>>0;return(x>>>8)/8388608-1}}
-  /* мягкая капля (20.10): пузырёк крупнее (ниже и дольше звенит), высота уходит вверх чуть-чуть, плавное начало без щелчка,
-     верха срезаны, эхо тёплое и тихое. Звук всегда один и тот же */
-  function dkSamples(vol){
-    var R=dkRand(7),n=Math.round(DKSR*.55),out=new Float32Array(n),i,j;
-    var r=.0036,xi=.17,f0=3/r,d=.13/r+.0072*Math.pow(r,-1.5),sg=xi*d,pre=Math.round(DKSR*.006);
-    var m=Math.round(DKSR*.14),L=pre+m,dry=new Float32Array(L),ph=0,fo=Math.round(DKSR*.04),at=DKSR*.004;
-    for(i=0;i<m;i++){
-      var t=i/DKSR;ph+=2*Math.PI*f0*(1+sg*t)/DKSR;
-      var att=i<at?.5-.5*Math.cos(Math.PI*i/at):1,end=i>m-fo?.5+.5*Math.cos(Math.PI*(i-m+fo)/fo):1;
-      dry[pre+i]=Math.sin(ph)*Math.exp(-d*t)*att*end;
-    }
-    /* мягкость: два сглаживания срезают верха выше ~2 кГц */
-    for(var pass=0;pass<2;pass++){var y=0;for(i=0;i<L;i++){y+=.26*(dry[i]-y);dry[i]=y}}
-    /* тёплое эхо комнаты: разреженные отражения с затуханием за ~0,4 с, сильно сглаженные */
-    var rt=.4,len=Math.round(DKSR*rt*1.2),taps=Math.round(len/DKSR*1600),wet=new Float32Array(n),en=0,p0=Math.round(DKSR*.012);
-    for(j=0;j<taps;j++){
-      var p=p0+Math.round(len*(j+.25+.5*(R()+1)/2)/taps),amp=Math.exp(-6.9*(p/DKSR)/rt)*(R()<0?-1:1);en+=amp*amp;
-      for(i=0;i<L&&p+i<n;i++)wet[p+i]+=amp*dry[i];
-    }
-    en=Math.sqrt(en)||1;
-    var a=0,b=0,pk=0;
-    for(i=0;i<n;i++){a+=.2*(wet[i]/en-a);b+=.2*(a-b);out[i]=(i<L?dry[i]:0)+.3*b}
-    var fl=Math.round(DKSR*.1);for(i=n-fl;i<n;i++)out[i]*=(n-i)/fl;
-    for(i=0;i<n;i++)pk=Math.max(pk,Math.abs(out[i]));
-    for(i=0;i<n;i++)out[i]=out[i]/pk*vol;
-    return out;
-  }
-  function dkSeed(){return 1}
   function dkVol(){return DKV[calS.dvol]||DKV[2]}
+  function dkBytes(){var b=atob(DKMP3),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
   function dkCtx(){
     var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
     if(!dkAC){try{dkAC=new C()}catch(_){return null}}
     if(dkAC.state!=='running'&&dkAC.state!=='closed'){try{var p=dkAC.resume();if(p&&p.catch)p.catch(function(){})}catch(_){}}
     return dkAC;
   }
-  function dkBuf(ac,v,sd){
-    var key=v+'_'+sd;
-    if(!dkBufs[key]){var s=dkSamples(v,sd),b=ac.createBuffer(1,s.length,DKSR);if(b.copyToChannel)b.copyToChannel(s,0);else b.getChannelData(0).set(s);dkBufs[key]=b}
-    return dkBufs[key];
+  /* запись раскодируется один раз и дальше лежит готовой */
+  function dkBuf(ac){
+    if(!dkDec)dkDec=new Promise(function(ok,no){
+      try{var r=ac.decodeAudioData(dkBytes().buffer,ok,no);if(r&&r.then)r.then(ok,no)}catch(e){no(e)}
+    }).catch(function(e){dkDec=null;throw e});
+    return dkDec;
   }
-  function dkUrl(v,sd){
-    var key=v+'_'+sd;
-    if(!dkUrls[key]){
-      var s=dkSamples(v,sd),n=s.length,buf=new ArrayBuffer(44+n*2),d=new DataView(buf),i;
-      function w(o,t){for(var k=0;k<t.length;k++)d.setUint8(o+k,t.charCodeAt(k))}
-      w(0,'RIFF');d.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,1,true);
-      d.setUint32(24,DKSR,true);d.setUint32(28,DKSR*2,true);d.setUint16(32,2,true);d.setUint16(34,16,true);w(36,'data');d.setUint32(40,n*2,true);
-      for(i=0;i<n;i++)d.setInt16(44+i*2,Math.max(-32767,Math.min(32767,Math.round(s[i]*32767))),true);
-      dkUrls[key]=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
-    }
-    return dkUrls[key];
-  }
-  /* включение звука на первом же нажатии: тихий пустой звук внутри нажатия окончательно «будит» звук в Safari */
+  function dkUrl(){if(!dkUrl0){try{dkUrl0=URL.createObjectURL(new Blob([dkBytes()],{type:'audio/mpeg'}))}catch(_){dkUrl0='data:audio/mpeg;base64,'+DKMP3}}return dkUrl0}
+  /* включение звука на первом же нажатии: тихий пустой звук внутри нажатия окончательно «будит» звук в Safari; заодно запись раскодируется заранее */
   function dkUnlock(){
     if(!calS.ding)return;
-    var ac=dkCtx();if(!ac||ac.state==='running')return;
-    try{var b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0)}catch(_){}
+    var ac=dkCtx();if(!ac)return;
+    if(ac.state!=='running'){try{var b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0)}catch(_){}}
+    dkBuf(ac).catch(function(){});
   }
   ['pointerdown','pointerup','mousedown','click','touchstart','touchend','keydown'].forEach(function(t){document.addEventListener(t,dkUnlock,{capture:true,passive:true})});
   /* результат: Promise<true> — звук ушёл, Promise<false> — браузер не дал звук */
   function ding(){
-    var v=dkVol(),sd=dkSeed(),ac=dkCtx();
-    function viaWA(){try{var s=ac.createBufferSource();s.buffer=dkBuf(ac,v,sd);s.connect(ac.destination);s.start(ac.currentTime+.02);return true}catch(_){return false}}
+    var v=dkVol(),ac=dkCtx();
     function viaEl(){
       try{
         if(!dkEl){dkEl=new Audio();dkEl.preload='auto'}
-        dkEl.src=dkUrl(v,sd);var p=dkEl.play();
+        if(dkEl.src!==dkUrl())dkEl.src=dkUrl();
+        try{dkEl.currentTime=0}catch(_){}
+        dkEl.volume=Math.min(1,v);var p=dkEl.play();
         return p&&p.then?p.then(function(){return true},function(){return false}):Promise.resolve(true);
       }catch(_){return Promise.resolve(false)}
     }
-    if(ac&&ac.state==='running')return Promise.resolve(viaWA());
+    function viaWA(){
+      return dkBuf(ac).then(function(buf){
+        var s=ac.createBufferSource(),g=ac.createGain();s.buffer=buf;g.gain.value=v;s.connect(g);g.connect(ac.destination);s.start(ac.currentTime+.02);return true;
+      },function(){return viaEl()});
+    }
+    if(ac&&ac.state==='running')return viaWA();
     /* Web Audio ещё спит: пробуем разбудить, а если за полсекунды не вышло — играем через аудио-элемент */
     return new Promise(function(done){
+      if(!ac){viaEl().then(done);return}
       var fin=false,to=setTimeout(function(){if(fin)return;fin=true;viaEl().then(done)},500);
-      if(!ac){clearTimeout(to);fin=true;viaEl().then(done);return}
-      try{ac.resume().then(function(){if(fin||ac.state!=='running')return;fin=true;clearTimeout(to);done(viaWA())},function(){})}catch(_){}
+      try{ac.resume().then(function(){if(fin||ac.state!=='running')return;fin=true;clearTimeout(to);viaWA().then(done)},function(){})}catch(_){}
     });
   }
   document.addEventListener('visibilitychange',function(){if(!document.hidden&&calS.ding&&dkAC&&dkAC.state!=='running')dkCtx()});
@@ -4061,7 +4028,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     try{localStorage.setItem(DKK,JSON.stringify(dkDone))}catch(_){}
     var msg='Начинается: '+(hit.t||'событие')+(n>1?' и ещё '+(n-1):'')+' · '+hm(hit.a);
     ding().then(function(ok){
-      if(!ok&&!dkWarned){dkWarned=true;toast(msg+'. Звук браузер не дал: после открытия сайта нажми на любое место страницы, и капелька будет звучать.')}
+      if(!ok&&!dkWarned){dkWarned=true;toast(msg+'. Звук браузер не дал: после открытия сайта нажми на любое место страницы, и капля будет звучать.')}
       else toast(msg);
     });
   }
