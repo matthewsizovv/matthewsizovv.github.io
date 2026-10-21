@@ -253,6 +253,10 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
 .bk-cb{white-space:normal}
 .bk-cb small{color:var(--muted)}
 .lnk.bad{color:var(--danger)}
+
+/* плашка «вышла новая версия» */
+.upd-bar{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);z-index:950;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--bg);border-radius:14px;padding:7px 7px 7px 16px;font-size:13px;box-shadow:0 12px 32px -12px rgba(0,0,0,.4);max-width:calc(100% - 32px)}
+.upd-bar button{border:0;border-radius:10px;padding:6px 12px;background:var(--bg);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1486,6 +1490,56 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   var h0=(location.hash||'').slice(1);if(TABS.some(function(x){return x[0]===h0}))tab=h0;
   try{history.replaceState({tab:tab},'','#'+tab)}catch(_){}
   render();pill();fsBoot();
+  var UPD_NAME='finansy',UPD_BUILD='708a7042e3';
+  function updBusy(){return fsBusy||(!!bkDlg&&!bkDlg.hidden)||(!!syDlg&&!syDlg.hidden)}
+  function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
+  /* ---------- сайт сам обновляется до новой версии (21.10) ----------
+     При выкладке рядом с сайтом кладётся version.json с номерами сборок обоих сайтов. Страница сверяется с ним через 8 секунд после
+     открытия, при возвращении на вкладку, при появлении сети и раз в 10 минут. Если вышла новая сборка, страница перезагружается сама,
+     но только когда ничего не печатается, нет недописанных полей, не открыто окно и не идёт отправка записей. Иначе внизу плашка
+     «Обновить», а перезагрузка случится сама, как только станет можно (проверка раз в 15 секунд; в скрытой вкладке — сразу).
+     Перезагрузка идёт на адрес с «?v=сборка», чтобы браузер и GitHub не отдали старую копию из кэша; если всё равно пришла старая,
+     второй раз страница не перезагружается, остаётся плашка. Записи перед перезагрузкой сохраняются в память браузера. */
+  var UPD_ON=/^https:$/.test(location.protocol)&&!/(^|\.)claude\.(ai|site)$|(^|\.)claudeusercontent\.com$/.test(location.hostname),updNew='',updT=0,updBar=null;
+  function updIdle(){
+    var a=document.activeElement;
+    if(a&&a!==document.body&&(a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable||(a.tagName==='INPUT'&&!/^(checkbox|radio|button|range|submit|file|color|reset)$/.test(a.type))))return false;
+    var dirty=[].some.call(document.querySelectorAll('input,textarea'),function(x){return !!x.offsetParent&&!/^(checkbox|radio|button|range|submit|file|hidden|color|reset)$/.test(x.type)&&x.value!==x.defaultValue});
+    if(dirty)return false;
+    try{if(updBusy())return false}catch(_){return false}
+    return true;
+  }
+  function updCheck(){
+    if(!UPD_ON||!window.fetch)return;
+    fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(v){
+      var nv=v&&v[UPD_NAME];if(!nv||nv===UPD_BUILD)return;
+      updNew=String(nv);updTry();
+    }).catch(function(){});
+  }
+  function updTry(){
+    clearTimeout(updT);if(!updNew)return;
+    var tried='';try{tried=sessionStorage.getItem('upd-'+UPD_NAME)||''}catch(_){}
+    if(tried===updNew){updShow();return}
+    if(!updIdle()){updShow();updT=setTimeout(updTry,15000);return}
+    updGo();
+  }
+  function updGo(){
+    try{updFlush()}catch(_){}
+    try{sessionStorage.setItem('upd-'+UPD_NAME,updNew)}catch(_){}
+    location.replace(location.pathname+'?v='+encodeURIComponent(updNew)+location.hash);
+  }
+  function updShow(){
+    if(updBar)return;
+    updBar=document.createElement('div');updBar.className='upd-bar';updBar.setAttribute('role','status');
+    updBar.innerHTML='<span>Вышла новая версия сайта</span><button type="button">Обновить</button>';
+    updBar.querySelector('button').onclick=updGo;document.body.appendChild(updBar);
+  }
+  /* после обновления в адресе остался «?v=…»: убираем, чтобы ссылка была чистой */
+  if(/(^|[?&])v=/.test(location.search.slice(1))){try{history.replaceState(history.state,'',location.pathname+location.hash)}catch(_){}}
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)updCheck();else if(updNew&&updIdle())updGo()});
+  window.addEventListener('focus',updCheck);window.addEventListener('online',updCheck);
+  setInterval(updCheck,6e5);setTimeout(updCheck,8000);
+
 })();
 </script>
 </body>
