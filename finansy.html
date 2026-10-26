@@ -257,6 +257,40 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
 /* плашка «вышла новая версия» */
 .upd-bar{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);z-index:950;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--bg);border-radius:14px;padding:7px 7px 7px 16px;font-size:13px;box-shadow:0 12px 32px -12px rgba(0,0,0,.4);max-width:calc(100% - 32px)}
 .upd-bar button{border:0;border-radius:10px;padding:6px 12px;background:var(--bg);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+/* сводка месяца (27.10) */
+.sum-strip{display:flex;justify-content:space-between;align-items:center;gap:6px 14px;flex-wrap:wrap;border:1px solid var(--line);border-radius:16px;padding:10px 14px;font-size:calc(13px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.sum-strip .lnk{color:var(--ink)}
+.sum-eq{display:grid;gap:0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.sum-eq>div{display:flex;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.sum-eq>div>span{color:var(--muted)}
+.sum-eq .tot span{color:var(--ink);font-weight:600}
+.sum-eq .tot b{font-family:var(--display);font-size:calc(18px*var(--fz));font-weight:400}
+.sum-eq b.neg{color:var(--danger)}.sum-eq b.pos{color:var(--ok-fg)}
+.sum-l{list-style:none;margin:0;padding:0;display:grid}
+.sum-l li{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;padding:10px 2px;border-bottom:1px solid var(--line);font-size:calc(13px*var(--fz));line-height:1.45;font-variant-numeric:tabular-nums}
+.sum-l li>span:first-child{flex:1 1 300px;min-width:0}
+.sum-l li.ask{background:var(--warn-bg);border-radius:12px;padding:10px 12px;border:0;margin-bottom:4px;color:var(--warn-fg)}
+.sum-l.pays li>span:first-child{flex:1 1 200px;color:var(--muted)}
+.bk-who{display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.bk-who button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font-size:calc(12px*var(--fz));font-weight:500;white-space:nowrap}
+.bk-who button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.box .opt.cc-min{border-top:1px solid var(--line)}
+.cc-add{grid-template-columns:150px minmax(0,1fr) auto}
+.sp-e .nt .ho{display:inline-block;border-radius:99px;padding:0 7px;background:var(--warn-bg);color:var(--warn-fg);font-size:calc(11px*var(--fz))}
+.bk-files{display:grid;gap:4px}
+.bk-f{display:flex;justify-content:space-between;align-items:center;gap:4px 12px;flex-wrap:wrap;font-size:calc(13px*var(--fz));color:var(--muted)}
+.bk-f b{color:var(--ink);font-weight:600}
+.bk-cr{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--ink)}
+.bk-cr input{width:16px;height:16px;accent-color:var(--accent);margin:0}
+.bk-r.fl{cursor:default}
+.bk-ic{width:18px;text-align:center;color:var(--muted);font-weight:600}
+.bk-d .bk-who{margin-top:6px}
+.bk-due{display:block;width:100%;background:var(--warn-bg);color:var(--warn-fg);border-radius:12px;padding:8px 12px;font-size:calc(13px*var(--fz))}
+@media (max-width:640px){
+  .cc-add{grid-template-columns:minmax(0,1fr) auto}
+  .cc-add select{grid-column:1/-1;grid-row:2}
+  .sum-eq .tot b{font-size:calc(16px*var(--fz))}
+}
 </style>
 </head>
 <body>
@@ -323,10 +357,10 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     var job=incomeOf(f),sd=sidesInPlan(f),extra=num(o.extra!=null?o.extra:p.extra);
     /* расходы плана: обязательные платежи месяца плюс план ежедневных трат */
     var fixed=expOf(f),daily=spendPlanM(f,now),income=job+sd+extra,exp=fixed+daily,free=income-exp;
-    var strat=o.strat||p.strat||'aval',mode=o.mode||p.mode||'debts',share=mode==='debts'?1:mode==='goals'?0:Math.min(100,Math.max(0,num(p.split!=null?p.split:50)))/100,even=(p.goals||'seq')==='even';
+    var floor=Math.max(0,num((f.cc||{}).min)),strat=o.strat||p.strat||'aval',mode=o.mode||p.mode||'debts',share=mode==='debts'?1:mode==='goals'?0:Math.min(100,Math.max(0,num(p.split!=null?p.split:50)))/100,even=(p.goals||'seq')==='even';
     var debts=list(f.debts).filter(function(d){return num(d.bal)>0}).map(function(d){return{id:d.id,n:d.n||'Долг',bal:num(d.bal),apr:Math.max(0,num(d.apr)),min:Math.max(0,num(d.min)),o:d.o||0,int:0,paid:0}});
     var goals=list(f.goals).filter(function(g){return num(g.target)-num(g.saved)>0}).map(function(g){return{id:g.id,n:g.n||'Цель',left:num(g.target)-num(g.saved),target:num(g.target),due:/^\d{4}-\d\d$/.test(g.due||'')?g.due:'',o:g.o||0}});
-    var R={now:now,income:income,job:job,sides:sd,extra:extra,exp:exp,fixed:fixed,daily:daily,free:free,months:[],events:[],interest:0,debtStart:0,goalStart:0,savedStart:0,debtFree:null,goalsDone:null,short:false,never:false,strat:strat,mode:mode,done:{},need:{}};
+    var R={floor:floor,now:now,income:income,job:job,sides:sd,extra:extra,exp:exp,fixed:fixed,daily:daily,free:free,months:[],events:[],interest:0,debtStart:0,goalStart:0,savedStart:0,debtFree:null,goalsDone:null,short:false,never:false,strat:strat,mode:mode,done:{},need:{}};
     debts.forEach(function(d){R.debtStart+=d.bal});goals.forEach(function(g){R.goalStart+=g.left});
     list(f.goals).forEach(function(g){R.savedStart+=Math.max(0,num(g.saved))});
     var minSum=0;debts.forEach(function(d){minSum+=Math.min(d.min,d.bal)});R.minSum=minSum;
@@ -344,6 +378,8 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       function putG(g,a){a=Math.min(a,g.left,budget);if(a<=0)return 0;g.left-=a;budget-=a;saved+=a;row.save[g.id]=(row.save[g.id]||0)+a;if(g.left<=0.005){g.left=0;if(R.done[g.id]==null){R.done[g.id]=m;R.events.push({m:m,k:row.k,t:'goal',id:g.id,n:g.n})}}return a}
       /* 1. минимальные платежи */
       dl.forEach(function(d){var need=Math.min(d.min,d.bal);if(budget<need-0.005)R.short=true;payD(d,need)});
+      /* 1б. свой минимум на долги в месяц (например, «на кредитки не меньше 30 000»): добирается сверх минимальных платежей */
+      if(floor>0){var fl0=floor-sumO(row.pay);dl.filter(function(d){return d.bal>0}).sort(strat==='snow'?function(a,b){return a.bal-b.bal||b.apr-a.apr}:function(a,b){return b.apr-a.apr||a.bal-b.bal}).forEach(function(d){if(fl0>0.005)fl0-=payD(d,fl0)})}
       /* 2. остаток: доля на досрочное погашение, остальное в цели */
       var sh=!gl.length?1:!dl.some(function(d){return d.bal>0})?0:share,toD=budget*sh;
       var ord=dl.filter(function(d){return d.bal>0}).sort(strat==='snow'?function(a,b){return a.bal-b.bal||b.apr-a.apr}:function(a,b){return b.apr-a.apr||a.bal-b.bal});
@@ -372,6 +408,35 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     return R;
   }
   function sumO(o){var s=0;Object.keys(o||{}).forEach(function(k){s+=o[k]});return s}
+  /* ---- переводы и поступления из выписок (f.flow): пары «списал в одном банке — пришло в другой» ---- */
+  function fDd(a,b){return Math.round((new Date(+b.slice(0,4),+b.slice(5,7)-1,+b.slice(8)).getTime()-new Date(+a.slice(0,4),+a.slice(5,7)-1,+a.slice(8)).getTime())/864e5)}
+  var FLINC=/зарплат|заработн|аванс|преми|кэшб|кешб|cashback|бонус|процент(ы)? на остаток/i;
+  function flowLink(f){
+    var fl=f.flow||{},ids=Object.keys(fl).filter(function(id){var x=fl[id];return x&&typeof x==='object'&&/^\d{4}-\d\d-\d\d$/.test(x.d||'')}).sort(function(a,b){return fl[a].d<fl[b].d?-1:fl[a].d>fl[b].d?1:0});
+    ids.forEach(function(id){delete fl[id].pr});
+    var ins=ids.filter(function(id){return num(fl[id].a)>0&&!fl[id].man&&!FLINC.test(fl[id].n||'')});
+    ids.forEach(function(o){
+      var x=fl[o];if(x.k!=='out')return;
+      ins.some(function(i){var y=fl[i];if(y.pr||(x.ac&&y.ac?x.ac===y.ac:x.b===y.b)||Math.abs(Math.abs(num(x.a))-num(y.a))>=0.01||Math.abs(fDd(x.d,y.d))>3)return false;
+        x.pr=i;y.pr=o;x.self=1;delete x.ask;y.self=1;return true});
+    });
+  }
+  /* сводка месяца: доход (база + премия), траты, плата банку, платежи по кредиткам, переводы себе без пары */
+  function monthSum(f,mk,today){
+    var M=spendMonth(f,mk,today),fee=0,cc=0,hold=0,holdN=0;
+    Object.keys(f.days||{}).forEach(function(dk){if(dk.slice(0,7)!==mk)return;var o=f.days[dk];Object.keys(o).forEach(function(id){var e=o[id],a=num(e.a);
+      if(e.fee||e.c==='Проценты и комиссии')fee+=a;if(e.cc)cc+=a;if(e.ho){hold+=a;holdN++}})});
+    var base=incomeOf(f),bonus=num((f.bonus||{})[mk]),sides=sidesInPlan(f),pay=0,pays=[],inc=0,incs=[],open=[],ask=[],cash=0,fl=f.flow||{},byAc={};
+    Object.keys(fl).sort(function(a,b){return fl[a].d<fl[b].d?-1:1}).forEach(function(id){var x=fl[id];if(!x||typeof x!=='object'||String(x.d||'').slice(0,7)!==mk)return;var a=num(x.a);x.id=id;
+      if(x.k==='in'&&x.cc&&!FLINC.test(x.n||'')){pay+=a;pays.push(x);var k=x.ac||x.b||'';byAc[k]=(byAc[k]||0)+a}
+      else if(x.k==='in'&&!x.self){inc+=a;incs.push(x)}
+      if(x.self&&!x.pr&&!x.man)open.push(x);
+      if(x.ask)ask.push(x);
+      if(x.k==='cash')cash+=Math.abs(a);
+    });
+    var income=base+bonus+sides,ccMin=Math.max(0,num((f.cc||{}).min));
+    return{mk:mk,M:M,spent:M.all,fee:fee,cc:cc,hold:hold,holdN:holdN,base:base,bonus:bonus,sides:sides,income:income,pay:pay,pays:pays,byAc:byAc,ccMin:ccMin,inc:inc,incs:incs,open:open,ask:ask,cash:cash,net:income-M.all,debtChg:cc-pay};
+  }
   /* ---- общее с главным сайтом ---- */
   function syStr(v){
     if(v===undefined)return 'undefined';
@@ -696,11 +761,19 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function bkKey(s){return String(s||'').toUpperCase().replace(/[^A-ZА-ЯЁ ]+/g,' ').replace(/\b(MOSCOW|MOSKVA|MOSKVA G|RUS|RU|SANKT|PETERBURG|SPB|G|OOO|ООО|ИП|АО|ПАО)\b/g,' ').replace(/\s+/g,' ').trim().split(' ').slice(0,2).join(' ')}
 
   /* ---- что за операция: трата, возврат, перевод своих денег, наличные, поступление ---- */
+  /* виды: buy — покупка, fee — проценты, страховка и комиссии банка (тоже траты), refund — возврат,
+     move — перевод своих денег, p2p — перевод по номеру телефона или карты (себе или другому человеку — спрашивается один раз),
+     cash — наличные, in — поступление, skip — служебная строка банка */
+  var BKFEE=/процент(ы|ов) (по|за) (кредит|пользован)|плата за (программу|обслуживан|страхов|оповещ|услуг|sms|смс|пользован)|комисси|страхов(ая|ой|ание|ания) защит|организаци\S* страхован|неустойк|штраф за просроч/,
+      BKSELF=/перевод себе|себе на |между (своими )?сч|собственных средств|на свой|инвесткопилк|копилк|пополнение (сч|вклад|копилк|брокер)|сбережен|вклад/;
+  function bkPhone(t){var m=/(?:\+7|(?:^|[^\d])8)[\s(\-]*(9\d\d)[\s)\-]*(\d{3})[\s\-]*(\d{2})[\s\-]*(\d{2})/.exec(t||'');return m?'+7'+m[1]+m[2]+m[3]+m[4]:''}
   function bkKind(sum,bcat,desc,mcc){
     var t=((bcat||'')+' '+(desc||'')).toLowerCase();
     if(sum<0){
       if(mcc==='6010'||mcc==='6011'||/наличн|банкомат|\batm\b|снятие/.test(t))return 'cash';
-      if(/перевод|пополнение (сч|вклад|копилк|брокер)|между (своими )?сч|собственных средств|на свой|инвесткопилк|погашение (кредит|ссуд|задолж|од\b)|сбережен|вклад/.test(t))return 'move';
+      if(BKFEE.test(t))return 'fee';
+      if(BKSELF.test(t)||/погашение (кредит|ссуд|задолж|од(?![а-яё]))/.test(t))return 'move';
+      if(/перевод/.test(t))return 'p2p';
       return 'buy';
     }
     if(/возврат|отмена|refund|reversal/.test(t))return 'refund';
@@ -710,32 +783,41 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   }
   /* ---- категория: сначала то, что ты сам выбирал раньше, потом категория банка, MCC, название магазина ---- */
   var BKC=[
-    ['cafe',/рестора|кафе|фастфуд|фаст-фуд|кофейн|доставка еды|столов|\bKAFE\b|\bCAFE\b|COFFEE|KOFE|BURGER|PIZZ|SUSHI|\bKFC\b|MCDON|VKUSNO|ROSTIC|STARBUCKS|\bDODO\b|SHOKOLADN|TEREMOK|BISTRO|PEKARN|ПЕКАРН|КОФЕ|БУРГЕР|ПИЦЦ/i],
-    ['food',/супермаркет|продукт|SUPERMARK|PYATEROCHK|PJATEROCHK|PEREKRESTOK|MAGNIT|\bLENTA\b|DIXY|VKUSVILL|AUCHAN|AZBUKA|SAMOKAT|LAVKA|\bSPAR\b|GLOBUS|\bVERNY|ПЯТ[ЕЁ]РОЧК|МАГНИТ|ЛЕНТА|ПЕРЕКР[ЕЁ]СТОК|ДИКСИ|ВКУСВИЛЛ|АШАН|САМОКАТ|ВЕРНЫЙ/i],
-    ['transport',/транспорт|такси|каршеринг|топливо|азс|ж\/д|авиабилет|метро|парковк|\bTAXI|YANDEX\s*\*?\s*GO|YANDEX\s*\*?\s*TAXI|\bUBER\b|CITYDRIVE|DELIMOBIL|BELKACAR|MOSGORTRANS|\bMETRO\b|\bRZD\b|LUKOIL|GAZPROMNEFT|ROSNEFT|TATNEFT|TROIKA|ТРОЙКА|МЕТРОПОЛИТЕН/i],
+    ['fee',/процент(ы|ов) (по|за) кредит|плата за программу|страхов(ая|ой) защит|комисси|организаци\S* страхован/i],
+    ['transport',/SCOOTER|URENT|WHOOSH|\bYANDEX\s*\*?\s*GO\b|\*4121\*|FASTEN|CITYMOBIL|ЮРЕНТ|ВУШ|самокат(ы|ов)? (в )?аренд/i],
+    ['cafe',/рестора|рест(?![а-яё])|кафе|фастфуд|фаст-фуд|кофейн|доставка еды|столов|бистро|ланчбокс|милти|вкусно и точка|шоколадниц|теремок|\bKAFE\b|\bCAFE\b|COFFEE|KOFE|BURGER|PIZZ|SUSHI|\bKFC\b|MCDON|VKUSNO|ROSTIC|STARBUCKS|\bDODO\b|SHOKOLADN|TEREMOK|BISTRO|PEKARN|MILTI|LUNCH|ПЕКАРН|КОФЕ|БУРГЕР|ПИЦЦ/i],
+    ['food',/супермаркет|продукт|SUPERMARK|PYATEROCHK|PJATEROCHK|PEREKRESTOK|MAGNIT|\bLENTA\b|DIXY|VKUSVILL|AUCHAN|AZBUKA|SAMOKAT|LAVKA|\bSPAR\b|GLOBUS|\bVERNY|ПЯТ[ЕЁ]РОЧК|МАГНИТ|ЛЕНТА|ПЕРЕКР[ЕЁ]СТОК|ДИКСИ|ВКУСВИЛЛ|АШАН|САМОКАТ|ВЕРНЫЙ|ЛАВКА/i],
+    ['transport',/транспорт|такси|каршеринг|топливо|азс|ж\/д|авиабилет|метро|парковк|\bTAXI|YANDEX\s*\*?\s*TAXI|\bUBER\b|CITYDRIVE|DELIMOBIL|BELKACAR|MOSGORTRANS|\bMETRO\b|\bRZD\b|LUKOIL|GAZPROMNEFT|ROSNEFT|TATNEFT|TROIKA|ТРОЙКА|МЕТРОПОЛИТЕН/i],
     ['health',/аптек|медицин|здоров|клиник|стомат|анализ|APTEK|APTEKA|PHARM|GORZDRAV|CLINIC|STOMAT|INVITRO|GEMOTEST|ГОРЗДРАВ/i],
-    ['fun',/развлеч|кино|театр|музе|концерт|онлайн-кинотеатр|музыка|отдых|спорт|фитнес|\bKINO|CINEMA|STEAM|PLAYSTATION|KINOPOISK|\bIVI\b|OKKO|SPOTIFY|TICKET|FITNESS|\bGYM\b/i],
+    ['sport',/спортзал|фитнес|бассейн|FITNESS|SPIRITFIT|WORLD\s*CLASS|\bDDX\b|X-FIT|\bGYM\b|ФИТНЕС/i],
+    ['fun',/развлеч|кино|театр|музе|концерт|онлайн-кинотеатр|музыка|отдых|спорт|\bKINO|CINEMA|STEAM|PLAYSTATION|KINOPOISK|\bIVI\b|OKKO|SPOTIFY|TICKET|PLATI\.?MARKET|DIGISELLER/i],
     ['gift',/цвет|подар|FLOWER|CVETY|PODAR/i],
     ['bills',/жкх|коммунал|связь|интернет|мобильн|госуслуг|налог|штраф|подписк|\bMTS\b|BEELINE|MEGAFON|TELE2|ROSTELECOM|YANDEX\s*\*?\s*PLUS|МТС|БИЛАЙН|МЕГАФОН/i],
-    ['shop',/маркетплейс|одежд|обув|электрон|техник|дом и ремонт|ремонт|все для дома|спорттовар|книг|различные товары|детск|животн|красот|косметик|сувенир|OZON|WILDBERRIES|\bWB\b|YANDEX\s*\*?\s*MARKET|ALIEXPRESS|LAMODA|\bDNS\b|MVIDEO|ELDORADO|CITILINK|LEROY|SPORTMASTER|LETU|PODRUZHKA|FIX\s*PRICE|ОЗОН|ВАЙЛДБЕРРИЗ/i]
+    ['shop',/маркетплейс|одежд|обув|электрон|техник|дом и ремонт|ремонт|все для дома|спорттовар|книг|различные товары|детск|животн|красот|косметик|сувенир|лемана|леруа|digital goods|OZON|WILDBERRIES|\bWB\b|YANDEX\s*\*?\s*MARKET|ALIEXPRESS|LAMODA|\bDNS\b|MVIDEO|ELDORADO|CITILINK|LEROY|LEMANA|SPORTMASTER|LETU|PODRUZHKA|FIX\s*PRICE|ОЗОН|ВАЙЛДБЕРРИЗ/i]
   ];
   var BKMCC={food:'5411 5422 5441 5451 5462 5499',cafe:'5811 5812 5813 5814',transport:'4111 4112 4121 4131 4784 4789 5541 5542 7523 4511 3990 3991',health:'5912 5122 8011 8021 8031 8041 8042 8043 8049 8050 8062 8071 8099',
-    fun:'7832 7922 7929 7991 7996 7997 7999 5815 5816 5817 5818 5735',gift:'5992 5193 5947',bills:'4814 4899 4900 9311 9399 9222',shop:'5300 5310 5311 5331 5399 5651 5661 5691 5699 5732 5734 5722 5200 5211 5251 5712 5719 5941 5942 5945 5977 5995 5999 5964 5965 5969 5137 5139 5611 5621 5631 5641 5655'};
-  var BKN={food:['Еда','Продукты','Супермаркеты'],cafe:['Кафе','Рестораны','Кафе и рестораны','Еда'],transport:['Транспорт','Такси'],health:['Здоровье','Аптека','Медицина'],
+    sport:'7997 7941',fun:'7832 7922 7929 7991 7996 7999 5815 5816 5817 5818 5735',gift:'5992 5193 5947',bills:'4814 4899 4900 9311 9399 9222',shop:'5300 5310 5311 5331 5399 5651 5661 5691 5699 5732 5734 5722 5200 5211 5251 5712 5719 5941 5942 5945 5977 5995 5999 5964 5965 5969 5137 5139 5611 5621 5631 5641 5655'};
+  var BKFEEC='Проценты и комиссии',BKP2PC='Переводы людям';
+  var BKN={fee:[BKFEEC,'Комиссии','Банк','Кредиты'],sport:['Спорт','Фитнес','Здоровье','Развлечения'],food:['Еда','Продукты','Супермаркеты'],cafe:['Кафе','Рестораны','Кафе и рестораны','Еда'],transport:['Транспорт','Такси'],health:['Здоровье','Аптека','Медицина'],
     fun:['Развлечения','Досуг','Отдых'],gift:['Подарки','Покупки'],bills:['Связь','Счета','ЖКХ','Коммуналка','Подписки'],shop:['Покупки','Маркетплейсы']};
   function bkConcept(bcat,mcc,desc){
     var i,c=null;
+    /* название магазина важнее MCC: у Яндекса один MCC 3990 и на Лавку, и на такси, и на самокаты */
     if(bcat)for(i=0;i<BKC.length&&!c;i++)if(BKC[i][1].test(bcat))c=BKC[i][0];
-    if(!c&&mcc)Object.keys(BKMCC).forEach(function(k){if(!c&&(' '+BKMCC[k]+' ').indexOf(' '+mcc+' ')>=0)c=k});
     if(!c&&desc)for(i=0;i<BKC.length&&!c;i++)if(BKC[i][1].test(desc))c=BKC[i][0];
+    if(!c&&mcc)Object.keys(BKMCC).forEach(function(k){if(!c&&(' '+BKMCC[k]+' ').indexOf(' '+mcc+' ')>=0)c=k});
     return c;
   }
+  function bkHasCat(cats,l){for(var i=0;i<l.length;i++)if(cats.indexOf(l[i])>=0)return l[i];return ''}
   function bkCat(r,cats){
     var mp=isO(F.bkmap)?F.bkmap:{};
     if(r.key&&mp[r.key]&&cats.indexOf(mp[r.key])>=0)return mp[r.key];
+    if(r.kind==='fee')return bkHasCat(cats,BKN.fee)||BKFEEC;
+    if(r.kind==='p2p')return BKP2PC;
     var c=bkConcept(r.bcat,r.mcc,r.desc),l=c?BKN[c]:[];
-    for(var i=0;i<l.length;i++)if(cats.indexOf(l[i])>=0)return l[i];
-    return cats.indexOf('Другое')>=0?'Другое':cats[0]||'Другое';
+    /* проценты и комиссии банка — отдельная категория: её видно в сводке месяца; если такой ещё нет, она появится */
+    if(c==='fee')return bkHasCat(cats,l)||BKFEEC;
+    return bkHasCat(cats,l)||(cats.indexOf('Другое')>=0?'Другое':cats[0]||'Другое');
   }
 
   /* ---- таблицы: CSV, Excel, Дзен-мани ---- */
@@ -854,32 +936,89 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     out.forEach(function(r){r.desc=bkClean(r._l.join(' '));delete r._l});
     return out;
   }
-  /* Альфа: «09.10.2026 CRD_5BR6UE Операция по карте: … -450,00 RUR», описание продолжается на следующих строках */
+  /* Альфа: «09.10.2026 CRD_5BR6UE Операция по карте: … -450,00 RUR», описание продолжается на следующих строках.
+     У кредитки каждая покупка идёт парой со строкой «Предоставление транша» с плюсом: это не доход, такие строки пропускаются.
+     HOLD — покупка, которую банк ещё не провёл: деньги уже заблокированы, поэтому она тоже трата. У неё тот же код авторизации,
+     что потом будет в «CRD_…», по нему проведённая покупка заменяет блокировку и не задваивается */
   function bkAlfa(lines){
     var RR=new RegExp('^(\\d\\d\\.\\d\\d\\.\\d{4}) (\\S+) (.*?)\\s*(-?'+BKNUM+') RU[RB]$'),START=/^\d\d\.\d\d\.\d{4} \S+ /,
-        STOP=/^(Уполномоченное лицо|\(подпись|Страница \d+ из|Дата проводки|в валюте счета|Код операции|Описание|Сумма в валюте)/i;
-    var out=[],cur=null,hold=false;
+        RH=new RegExp('^HOLD (.*?)\\s*(-?'+BKNUM+') RU[RB]$'),
+        STOP=/^(Уполномоченное лицо|\(подпись|Страница \d+ из|Дата проводки|в валюте счета|Код операции|Описание|Сумма в валюте)/i,SIGN=/^[А-ЯЁ]\.[А-ЯЁ]\. [А-ЯЁ][а-яё]+$/;
+    var out=[],cur=null,m,who='';
+    lines.some(function(l){var x=/^Клиент\s+([А-ЯЁа-яё\- ]{5,60}?)(?:\s+Платежный лимит.*)?$/.exec(l);if(x){who=x[1].trim().toUpperCase();return true}return false});
     lines.forEach(function(l){
-      if(/^HOLD\b/.test(l)){hold=true;return}
-      var m=RR.exec(l);
-      if(m&&START.test(l)){hold=false;cur={d:bkDate(m[1]).d,t:'',sum:bkNum(m[4]),code:m[2],_l:[m[3]]};out.push(cur);return}
-      if(hold||!cur||STOP.test(l))return;
+      if((m=RH.exec(l))){cur={d:'',t:'',sum:bkNum(m[2]),code:'',hold:1,_l:[m[1]]};out.push(cur);return}
+      if(/^HOLD\b/.test(l)){cur=null;return}
+      m=RR.exec(l);
+      if(m&&START.test(l)){cur={d:bkDate(m[1]).d,t:'',sum:bkNum(m[4]),code:m[2],_l:[m[3]]};out.push(cur);return}
+      if(!cur)return;
+      if(STOP.test(l)||SIGN.test(l)){cur=null;return}
       if(cur._l.length<6)cur._l.push(l);
     });
     out.forEach(function(r){
       var t=r._l.join(' ').replace(/\s+/g,' ').trim(),mm;delete r._l;
+      if(r.hold){
+        /* «Неподтвержденная операция: 9KW3F9 I1001043 RU VKUSVILL>Moskva 25.10.26 …, дата операции: 25.10.2026» */
+        r.raw=t;
+        if(/Кумулятивная сумма/i.test(t)||!r.sum){r.kind='skip';return}
+        if((mm=/дата операции:\s*(\d\d\.\d\d\.\d{4})/i.exec(t)))r.d=bkDate(mm[1]).d;
+        if((mm=/операция:\s*([A-Z0-9]{6})\s+(\S+)\s+[A-Z]{2}\s+(.+?)>/.exec(t))){r.au=mm[1];r.term=mm[2];r.desc=mm[3].trim()}
+        else r.desc=t.replace(/^Неподтвержденная операция:\s*/,'').slice(0,60);
+        r.kind=r.sum<0?'buy':'refund';r.code='HOLD'+(r.au||'');return;
+      }
       if((mm=/дата\s+совершения\s+операции:\s*(\d\d\.\d\d\.\d\d(?:\d\d)?)/i.exec(t)))r.d=bkDate(mm[1]).d||r.d;
       if((mm=/MCC\s?(\d{4})/.exec(t)))r.mcc=mm[1];
+      if((mm=/^CRD_([A-Z0-9]{6})$/.exec(r.code||'')))r.au=mm[1];
       var place=(/место\s+совершения\s+операции:\s*(.+)$/i.exec(t)||[])[1];
-      if(place){var ps=place.replace(/MCC\s?\d{4}.*$/,'').replace(/\((?:AP|ALFA PAY)-\d+\)/g,'').split('\\').map(function(x){return x.trim()}).filter(Boolean);r.desc=ps.length>=4?ps.slice(3).join(' '):ps[ps.length-1]||''}
+      if(place){var ps=place.replace(/MCC\s?\d{4}.*$/,'').replace(/\((?:AP|ALFA PAY)-\d+\)/g,'').split('\\').map(function(x){return x.trim()}).filter(Boolean);r.term=ps[0]||'';r.desc=ps.length>=4?ps.slice(3).join(' '):ps[ps.length-1]||'';if(ps.length<4)r.city=1}
+      else if((mm=/Получатель\s+(.+?)(?:\.\s|\.$|$)/.exec(t)))r.desc=bkOrg(mm[1]);
       else if((mm=/^Платеж \S+ (?:в пользу|в) (.+?)(?:,| через Систему|\. |$)/.exec(t)))r.desc=mm[1];
+      else if(/^Комиссия за использование кредитного лимита/.test(t))r.desc='Комиссия за перевод с кредитки'+(bkPhone(t)?' на '+bkPhoneH(bkPhone(t)):'');
+      else if(/^(Комиссия|Плата|Проценты)/.test(t))r.desc=(who?t.split(who).join(' '):t).replace(/,? в т\.ч\. НДС,?/i,'').replace(/\s+/g,' ').replace(/[\s,]+$/,'').trim().slice(0,90);
+      else if(/^Перевод/.test(t)&&bkPhone(t))r.desc='Перевод на '+bkPhoneH(bkPhone(t));
       else r.desc=t.slice(0,80);
-      if(/Предоставление транша|Погашение ОД/.test(t))r.kind='skip';
-      else if(/Внутрибанковский перевод между счетами|Перевод собственных средств|перевод на сч[её]т Дог/i.test(t)||/^Перевод/.test(t))r.kind=r.sum<0?'move':'in';
+      if(/Предоставление транша|Погашение ОД|Погашение основного долга|Погашение процентов/.test(t))r.kind='skip';
+      else if(/^(Комиссия|Плата за|Проценты)/.test(t)||BKFEE.test(t.toLowerCase()))r.kind=r.sum<0?'fee':'refund';
+      else if(/Внутрибанковский перевод между счетами|Перевод собственных средств|перевод на сч[её]т Дог|Перевод себе/i.test(t))r.kind=r.sum<0?'move':'in';
+      else if(/^Перевод/.test(t)){r.kind=r.sum<0?'p2p':'in';r.to=bkPhone(t)}
       else if(/^Операция по карте/.test(t))r.kind=r.sum<0?'buy':'refund';
-      else if(/^(Платеж|Комиссия)/.test(t))r.kind=r.sum<0?'buy':'in';
+      else if(/^Платеж/.test(t))r.kind=r.sum<0?'buy':'in';
       else if(r.sum>0)r.kind='in';
       r.raw=t;
+    });
+    /* у части покупок вместо магазина только город (терминал «81730768\RU\MOSKOVSKAJA…»): имя берётся из блокировки того же терминала */
+    var tn=isO(F.bkterm)?F.bkterm:{},nm={};
+    out.forEach(function(r){if(r.hold&&r.term&&r.desc)nm[r.term]=r.desc});
+    out.forEach(function(r){if(r.city&&r.term&&(nm[r.term]||tn[r.term]))r.desc=nm[r.term]||tn[r.term];delete r.city});
+    out.terms=nm;
+    return out;
+  }
+  function bkOrg(s){return String(s||'').replace(/ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ|^ООО\s|^ИП\s|^АО\s|^ПАО\s|^ОАО\s|ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ/g,' ').replace(/["«»]/g,'').replace(/\s+/g,' ').trim().slice(0,60)}
+  function bkPhoneH(p){return p?p.slice(0,2)+' '+p.slice(2,5)+' '+p.slice(5,8)+'-'+p.slice(8,10)+'-'+p.slice(10):''}
+  /* Т-Банк, PDF «Справка о движении средств»: «25.10.2026 25.10.2026 +12 900.00 ₽ +12 900.00 ₽ Перевод себе 6076»,
+     ниже «10:38 10:38» и продолжение описания */
+  function bkTbank(lines){
+    var RO=/^(\d\d\.\d\d\.\d{4}) (\d\d\.\d\d\.\d{4}) ([+\-−]?\d{1,3}(?:[ \u00a0]\d{3})*[.,]\d\d) ₽ ([+\-−]?\d{1,3}(?:[ \u00a0]\d{3})*[.,]\d\d) ₽ ?(.*)$/,
+        RT=/^(\d\d:\d\d) (\d\d:\d\d) ?(.*)$/,
+        NOISE=/^(АО «Т|АО «Тинькофф|БИК |\d{1,3}$|Пополнения:|Расходы:|С уважением|Руководитель|Дата и время|операции списания|Движение средств)/;
+    var out=[],cur=null,mode='',m;
+    lines.forEach(function(l){
+      if((m=RO.exec(l))){
+        cur={d:bkDate(m[1]).d,t:'',sum:bkNum(m[4]),code:'',_l:[]};
+        var rest=m[5].replace(/\s+(\d{4}|—|-)$/,function(x,c){if(/\d/.test(c))cur.card=c;return ''});
+        if(rest)cur._l.push(rest);out.push(cur);mode='t';return;
+      }
+      if(!cur)return;
+      if(NOISE.test(l)){cur=null;return}
+      if(mode==='t'&&(m=RT.exec(l))){cur.t=m[1];if(m[3])cur._l.push(m[3]);mode='d';return}
+      if(cur._l.length<4)cur._l.push(l);
+    });
+    out.forEach(function(r){
+      var t=r._l.join(' ').replace(/\s+/g,' ').trim(),mm;delete r._l;r.raw=t;
+      if((mm=/\*(\d{4})\*/.exec(t)))r.mcc=mm[1];
+      r.desc=t.replace(/^(Оплата в|Оплата услуг|Покупка в)\s+/i,'').replace(/\s+g\.\s+\S+(\s+RUS)?$/i,'').replace(/\s+(RUS|RU)$/,'').replace(/\*\d{4}\*/,' ').replace(/\s+/g,' ').trim()||t;
+      if(/Перевод себе/i.test(t))r.kind=r.sum<0?'move':'in';
+      else if(/^(Внешний перевод|Перевод)/i.test(t)&&r.sum<0){r.kind='p2p';r.to=bkPhone(t)}
     });
     return out;
   }
@@ -889,13 +1028,13 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     lines.forEach(function(l){
       var m=/^(\d\d\.\d\d\.\d{2,4})(?:[ ,]+(\d\d:\d\d)(?::\d\d)?)?\s/.exec(l+' ');
       if(m){
-        var ms=[],x;MON.lastIndex=0;var rest=l.slice(m[0].length);
+        var ms=[],x;MON.lastIndex=0;var rest=l.slice(m[0].length).replace(/\b\d\d\.\d\d\.\d{2,4}\b/g,' ');
         while((x=MON.exec(rest)))ms.push(x);
         if(!ms.length){cur=null;return}
         var pick=ms.filter(function(z){return /[\-−+]/.test(z[1])})[0]||ms[0],s=pick[1].replace(/\s/g,''),v=bkNum(s);
         if(isNaN(v)||!v){cur=null;return}
         var sum=/^\+/.test(s)?Math.abs(v):-Math.abs(v);
-        var desc=rest.replace(MON,' ').replace(/\b\d\d\.\d\d\.\d{2,4}\b|\b\d\d:\d\d(:\d\d)?\b/g,' ').replace(/\s+/g,' ').trim();
+        var desc=rest.replace(MON,' ').replace(/\b\d\d:\d\d(:\d\d)?\b/g,' ').replace(/\s+/g,' ').trim();
         var dt=bkDate(m[1]+(m[2]?' '+m[2]:''));if(!dt){cur=null;return}
         cur={d:dt.d,t:dt.t,sum:sum,desc:desc,bcat:'',unsure:!/^[\-−+]/.test(s)};out.push(cur);return;
       }
@@ -903,11 +1042,29 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     });
     return out;
   }
+  /* что за счёт: банк, последние 4 цифры, кредитка ли, долг по выписке */
+  function bkAcct(lines,bank){
+    var txt=lines.join('\n'),head=lines.slice(0,40).join('\n'),m,a={b:bank||'',n:'',cr:0,debt:null,at:''};
+    if((m=/(?:Номер (?:лицевого )?сч[её]та|Номер сч[её]та карты|Счёт №|Счет №)[:\s]*(\d{20})/i.exec(txt)))a.n=m[1].slice(-4);
+    else if((m=/Номер договора[:\s]*(\d{6,})/i.exec(txt)))a.n=m[1].slice(-4);
+    if(/Сч[её]т кредитной карты|Кредитная карта|кредитной карт/i.test(head)||/Проценты по кредиту|Предоставление транша|Общая задолженность/i.test(txt))a.cr=1;
+    if((m=new RegExp('Общая задолженность к погашению\\s*('+BKNUM+')').exec(txt)))a.debt=bkNum(m[1]);
+    if((m=/Дата формирования\s*(\d\d\.\d\d\.\d{4})/.exec(txt))||(m=/Исх\. №\s*\S+\s+(\d\d\.\d\d\.\d{4})/.exec(txt)))a.at=(bkDate(m[1])||{}).d||'';
+    /* период из шапки: по нему видно, что дни без операций тоже проверены */
+    if((m=/(?:за период|период)\s*с\s*(\d\d\.\d\d\.\d{4})\s*(?:г\.\s*)?по\s*(\d\d\.\d\d\.\d{4})/i.exec(txt))){var f1=bkDate(m[1]),f2=bkDate(m[2]);if(f1&&f2&&f1.d<=f2.d){a.from=f1.d;a.to=f2.d}}
+    return a;
+  }
   function bkFromPdf(lines){
-    var txt=lines.slice(0,60).join(' '),s=bkSber(lines),a=bkAlfa(lines),g=bkPdfAny(lines),bank=/сбер/i.test(txt)?'Сбер':/альфа/i.test(txt)?'Альфа-Банк':/т-банк|тинькофф|tinkoff|tbank/i.test(txt)?'Т-Банк':'';
-    if(s.length&&s.length>=a.length&&s.length>=g.length*.5)return{rows:s,bank:bank||'Сбер',warn:''};
-    if(a.length&&a.length>=g.length*.5)return{rows:a,bank:bank||'Альфа-Банк',warn:''};
-    return{rows:g,bank:bank,warn:g.some(function(r){return r.unsure})?'Формат выписки разобран по общим правилам: проверь суммы и отметки, прежде чем добавлять.':''};
+    var txt=lines.join(' '),top=lines.slice(0,25).join(' '),s=bkSber(lines),a=bkAlfa(lines),tb=bkTbank(lines),g=bkPdfAny(lines);
+    /* банк узнаётся по формату строк, а не по словам в тексте: в выписке Альфы встречается «Сбербанк по QR коду» */
+    var bank=/ТБАНК|T-?BANK|ТИНЬКОФФ|TINKOFF/i.test(top)?'Т-Банк':/АЛЬФА-БАНК|ALFA-?BANK/i.test(txt)?'Альфа-Банк':/ПАО Сбербанк|СберБанк Онлайн|SBERBANK/i.test(top)?'Сбер':/т-банк|тинькофф/i.test(txt)?'Т-Банк':'';
+    var r;
+    if(tb.length&&tb.length>=s.length&&tb.length>=a.length&&tb.length>=g.length*.5)r={rows:tb,bank:'Т-Банк',warn:''};
+    else if(a.length&&a.length>=s.length&&a.length>=g.length*.5)r={rows:a,bank:'Альфа-Банк',warn:''};
+    else if(s.length&&s.length>=g.length*.5)r={rows:s,bank:bank==='Альфа-Банк'||bank==='Т-Банк'?bank:'Сбер',warn:''};
+    else r={rows:g,bank:bank,warn:g.some(function(x){return x.unsure})?'Формат выписки разобран по общим правилам: проверь суммы и отметки, прежде чем добавлять.':''};
+    r.acct=bkAcct(lines,r.bank);r.terms=a.terms||{};
+    return r;
   }
 
   /* ---- чтение файла ---- */
@@ -943,7 +1100,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       if(i>=files.length){done();return}
       var f=files[i++];
       bkShow('<p class="bk-wait">Читаю «'+esc(f.name)+'»'+(files.length>1?' ('+i+' из '+files.length+')':'')+'…</p>');
-      bkRead(f).then(function(r){if(!r||!r.rows.length)throw bkErr('none');res.push({file:f.name,bank:r.bank||'',warn:r.warn||'',rows:r.rows})}).catch(function(e){res.push({file:f.name,err:e||bkErr('none')})}).then(next);
+      bkRead(f).then(function(r){if(!r||!r.rows.length)throw bkErr('none');res.push({file:f.name,bank:r.bank||'',warn:r.warn||'',rows:r.rows,acct:r.acct||null,terms:r.terms||{}})}).catch(function(e){res.push({file:f.name,err:e||bkErr('none')})}).then(next);
     }
     function done(){
       var ok=res.filter(function(x){return !x.err});
@@ -951,14 +1108,20 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
         bkShow('<div class="box-h"><span>Выписка</span><button type="button" class="ib" data-bkx aria-label="Закрыть">×</button></div>'+res.map(function(x){var c=x.err&&x.err.code;return '<p class="bk-err">'+(res.length>1?'«'+esc(x.file)+'»: ':'')+esc(BKMSG[c]||BKMSG.none)+'</p>'+(c?'':'<p class="note">'+esc(String(x.err&&x.err.message||x.err).slice(0,140))+'</p>')}).join('')+'<div class="row"><button type="button" class="btn ghost" data-bkx>Закрыть</button></div>');
         return;
       }
-      var ids={};BK={files:res,open:false,rows:[]};
-      ok.forEach(function(x){
-        var src=bkSrc(x.bank||'Другой банк'),lo='',hi='';
+      var ids={},acs=isO(F.accts)?F.accts:{};BK={files:res,open:false,rows:[],terms:{},who:{}};
+      res.forEach(function(x,fi){
+        if(x.err)return;
+        var A=x.acct||{},bank=x.bank||'Другой банк',src=bkSrc(bank),lo='',hi='';
+        /* одна и та же выписка, скачанная дважды (у Т-Банка меняется только номер справки), даёт те же номера операций: повторы отбрасываются */
+        x.ac=bank+(A.n?' ·'+A.n:'');var kn=acs[x.ac];
+        x.cr=kn&&kn.u?(kn.cr?1:0):(A.cr||(kn&&kn.cr))?1:0;
         bkRows(x.rows,x.bank||x.file).forEach(function(r){
           if(!lo||r.d<lo)lo=r.d;if(!hi||r.d>hi)hi=r.d;
-          if(ids[r.id])return;ids[r.id]=1;r.bank=x.bank;r.src=src;BK.rows.push(r);
+          if(ids[r.id]){x.dupN=(x.dupN||0)+1;return}ids[r.id]=1;r.bank=x.bank;r.src=src;r.ac=x.ac;r.fx=fi;BK.rows.push(r);
         });
+        if(A.from&&A.to){if(!lo||A.from<lo)lo=A.from;if(!hi||A.to>hi)hi=A.to}
         x.from=lo;x.to=hi;
+        Object.keys(x.terms||{}).forEach(function(k){BK.terms[k]=x.terms[k]});
       });
       bkMark(BK.rows);
       bkDraw();
@@ -967,40 +1130,73 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   }
   /* ---- строки окна: постоянный номер, категория, уже загружено, похоже на ручную запись ---- */
   function bkRows(raw,bank){
-    var cats=catList(),seen={},rows=[],used={};
+    var cats=catList(),seen={},rows=[];
     raw.forEach(function(r){
       var kind=r.kind||bkKind(r.sum,r.bcat,r.desc,r.mcc);
       if(kind==='skip'||!r.d)return;
       var a=Math.round(Math.abs(r.sum)*100)/100,base=bank+'|'+r.d+'|'+(r.t||'')+'|'+r.sum+'|'+bkClean(r.desc)+'|'+(r.code||'');
       var id='b'+syHash(base).replace(/\W/g,'').slice(0,14),k=2;while(seen[id])id=id.replace(/_\d+$/,'')+'_'+(k++);seen[id]=1;
       var desc=bkClean(r.desc)||r.bcat||'Без описания',row={id:id,d:r.d,t:r.t||'',a:a,kind:kind,desc:desc,bcat:r.bcat||'',mcc:r.mcc||'',key:bkKey(desc)};
-      row.cat=bkCat({key:row.key,bcat:row.bcat,mcc:row.mcc,desc:desc},cats);
-      row.have=!!(F.days[r.d]&&F.days[r.d][id]);
+      if(r.au)row.au=r.au;if(r.hold)row.ho=1;if(r.term)row.term=r.term;
+      if(kind==='p2p'){row.to=r.to||bkPhone((r.desc||'')+' '+(r.raw||''));if(row.to&&/^Без описания$|^Перевод/.test(desc))row.desc='Перевод на '+bkPhoneH(row.to)}
+      if(kind==='move'&&BKSELF.test((desc+' '+(r.raw||'')).toLowerCase()))row.self=1;
+      if(kind==='in'&&/себе|собственных средств|между (своими )?сч/i.test(desc+' '+(r.raw||'')))row.self=1;
+      row.cat=bkCat({key:row.key,bcat:row.bcat,mcc:row.mcc,desc:desc,kind:kind},cats);
       rows.push(row);
     });
     return rows;
   }
+  function bkIsSp(r){return r.kind==='buy'||r.kind==='fee'||r.kind==='refund'||(r.kind==='p2p'&&r.who==='o')}
+  function bkSg(r){return r.kind==='refund'?-r.a:r.a}
+  function bkDd(a,b){return Math.round((dDate(b).getTime()-dDate(a).getTime())/864e5)}
+  /* ищет запись трат в днях около даты: f(день, номер, запись) */
+  function bkNear(d,back,fwd,f){
+    for(var i=-back;i<=fwd;i++){var dk=dShift(d,i),o=F.days[dk];if(!o)continue;var ks=Object.keys(o);for(var j=0;j<ks.length;j++)if(f(dk,ks[j],o[ks[j]]))return{d:dk,id:ks[j],e:o[ks[j]]}}
+    return null;
+  }
   function bkMark(rows){
-    var used={};
-    /* перевод между своими картами в разных банках: списание в одном и поступление в другом на ту же сумму в пределах двух дней.
-       Такая пара не трата, даже если банк записал списание как покупку (например, «пополнение карты другого банка») */
-    var ins=rows.filter(function(r){return r.kind==='in'});
+    var used={},claimed={},flow=isO(F.flow)?F.flow:{},who=isO(F.bkwho)?F.bkwho:{};
     rows.forEach(function(r){
-      if(r.have||(r.kind!=='move'&&r.kind!=='buy'))return;
-      var buy=r.kind==='buy',d0=dDate(r.d).getTime();
+      r.have=false;r.fix=null;r.dup='';r.pair='';r.gone=0;
+      if(r.kind==='p2p'&&r.to&&(BK.who[r.to]||who[r.to])){var w=BK.who[r.to]||who[r.to];if(w==='me'){r.self=1;r.who='me'}else r.who='o'}
+      if(F.days[r.d]&&F.days[r.d][r.id]){r.have=true;claimed[r.d+'|'+r.id]=1}
+      else if(flow[r.id]||(r.ho&&isO(F.bkgone)&&F.bkgone[r.id]))r.have=true;
+    });
+    /* 1. проведённая покупка заменяет свою блокировку; записи, загруженные раньше с другим номером
+       (когда разбор выписки уточнился: банк, название), не задваиваются, а обновляются */
+    rows.forEach(function(r){
+      if(r.have||!(bkIsSp(r)||r.kind==='p2p'))return;
+      var sg=bkSg(r),hit=null;
+      function free(dk,id,e){return !claimed[dk+'|'+id]&&e.bk&&!(e.au&&r.au&&e.au!==r.au)}
+      if(r.au)hit=bkNear(r.d,7,7,function(dk,id,e){return free(dk,id,e)&&e.au===r.au});
+      if(!hit&&!r.ho)hit=bkNear(r.d,1,4,function(dk,id,e){return !claimed[dk+'|'+id]&&e.ho&&e.bk===r.src&&Math.abs(num(e.a)-sg)<0.01});
+      if(!hit)hit=bkNear(r.d,0,0,function(dk,id,e){return free(dk,id,e)&&Math.abs(num(e.a)-sg)<0.01&&(e.bk===r.src||(e.bk==='сбер'&&r.bank==='Альфа-Банк'))&&!(e.ho&&!r.ho&&e.au&&!r.au)});
+      if(hit){claimed[hit.d+'|'+hit.id]=1;r.have=true;r.fix={d:hit.d,id:hit.id,mode:hit.e.ho&&!r.ho?'post':'rekey'};if(r.kind==='p2p')r.who='o'}
+    });
+    /* 2. перевод между своими счетами: списание в одном и поступление в другом на ту же сумму в пределах трёх дней.
+       Такая пара не трата, даже если банк записал списание как покупку («пополнение карты другого банка») */
+    var ins=[],outs=[];
+    rows.forEach(function(r){if(r.kind==='in'&&!/зарплат|заработн|аванс|преми/i.test(r.desc))ins.push({r:r,a:r.a,d:r.d,ac:r.ac,b:r.bank});else if((r.kind==='move'||r.kind==='p2p'||r.kind==='buy')&&!r.fix)outs.push({r:r,a:r.a,d:r.d,ac:r.ac,b:r.bank})});
+    Object.keys(flow).forEach(function(id){var x=flow[id];if(!isO(x)||x.pr||rows.some(function(r){return r.id===id}))return;var o={f:id,a:Math.abs(num(x.a)),d:x.d,ac:x.ac||'',b:x.b||''};if(num(x.a)>0)ins.push(o);else if(x.k==='out')outs.push(o)});
+    outs.forEach(function(o){
+      if(o.r&&o.r.have&&o.r.kind!=='move'&&o.r.kind!=='p2p')return;
+      var buy=o.r&&o.r.kind==='buy';
       ins.some(function(x){
-        if(x.pair||x.bank===r.bank||Math.abs(x.a-r.a)>=0.01||Math.abs(dDate(x.d).getTime()-d0)>2*864e5)return false;
-        if(buy&&!/перевод|пополнен|зачислен|c2c|card2card|с карты/i.test(x.desc+' '+x.bcat))return false;
-        x.pair=r.bank||'выписка';r.pair=x.bank||'другой банк';if(buy)r.kind='move';return true;
+        if(x.used||(!o.r&&!x.r)||(o.ac&&x.ac?o.ac===x.ac:o.b===x.b)||Math.abs(x.a-o.a)>=0.01||Math.abs(bkDd(x.d,o.d))>3)return false;
+        if(buy&&!/перевод|пополнен|зачислен|c2c|card2card|с карты/i.test((x.r?x.r.desc+' '+x.r.bcat:'')+' перевод'))return false;
+        x.used=1;
+        if(o.r){o.r.pair=x.b||'другой банк';if(o.r.kind!=='move'){o.r.kind='move';o.r.who='me'}o.r.self=1}
+        if(x.r){x.r.pair=o.b||'другой счёт';x.r.self=1}
+        return true;
       });
     });
-    /* трата, которую ты уже вписал руками (тот же день и та же сумма), не отмечается, чтобы не задвоить */
+    /* 3. трата, которую ты уже вписал руками (тот же день и та же сумма), не отмечается, чтобы не задвоить */
     rows.forEach(function(row){
-      if(row.have||row.kind!=='buy')return;
+      if(row.have||(row.kind!=='buy'&&row.kind!=='fee'))return;
       var o=F.days[row.d]||{};
       Object.keys(o).some(function(id){var e=o[id];if(!e.bk&&!used[row.d+id]&&Math.abs(num(e.a)-row.a)<0.01){used[row.d+id]=1;row.dup=e.c+(e.n?' · '+e.n:'');return true}return false});
     });
-    rows.forEach(function(row){row.on=!row.have&&!row.dup&&(row.kind==='buy'||row.kind==='refund')});
+    rows.forEach(function(row){row.on=!row.have&&!row.dup&&bkIsSp(row)});
     rows.sort(function(x,y){return x.d<y.d?1:x.d>y.d?-1:(y.t||'').localeCompare(x.t||'')});
   }
 
@@ -1019,31 +1215,48 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function bkSpan(a,b){if(a===b)return bkDm(a);var x=dDate(a),y=dDate(b);return x.getFullYear()===y.getFullYear()&&x.getMonth()===y.getMonth()?x.getDate()+'–'+bkDm(b):bkDm(a)+' – '+bkDm(b)}
   function bkDm(dk){var d=dDate(dk);return d.getDate()+' '+MG[d.getMonth()]+(d.getFullYear()!==dDate(TODAY).getFullYear()?' '+d.getFullYear():'')}
   function bkCatSel(r){var cats=catList();if(cats.indexOf(r.cat)<0)cats=cats.concat([r.cat]);return '<select class="inp" data-bkcat="'+r.id+'" aria-label="Категория"'+(r.have?' disabled':'')+'>'+cats.map(function(c){return '<option'+(c===r.cat?' selected':'')+'>'+esc(c)+'</option>'}).join('')+'</select>'}
+  function bkCr(r){var f=BK&&BK.files[r.fx];return !!(f&&f.cr)}
   function bkRowH(r){
-    var tag=r.have?'<span class="bk-tag">уже загружено</span>':r.dup?'<span class="bk-tag warn" title="'+esc(r.dup)+'">похоже, уже вписано вручную</span>':r.kind==='refund'?'<span class="bk-tag ok">возврат</span>':r.kind==='move'?'<span class="bk-tag">'+(r.pair?'перевод себе → '+esc(r.pair):'перевод')+'</span>':r.kind==='cash'?'<span class="bk-tag">наличные</span>':'';
-    return '<div class="bk-r'+(r.on?'':' off')+'" data-bkrow="'+r.id+'"><input type="checkbox" data-bkon="'+r.id+'"'+(r.on?' checked':'')+(r.have?' disabled':'')+' aria-label="Добавить"><span class="bk-d"><b>'+esc(r.desc)+'</b><small>'+(BK&&BK.many&&r.bank?'<i class="bk-bank">'+esc(r.bank)+'</i> ':'')+(r.t?r.t+' · ':'')+esc(r.bcat||'')+(r.mcc?' · MCC '+r.mcc:'')+' '+tag+'</small></span>'+bkCatSel(r)+'<span class="bk-a">'+(r.kind==='refund'?'−':'')+money(r.a)+'</span></div>';
+    var t=[];
+    if(r.fix)t.push(r.fix.mode==='post'?'<span class="bk-tag ok">банк провёл покупку: обновлю запись</span>':'<span class="bk-tag">уже загружено, обновлю название</span>');
+    else if(r.have)t.push('<span class="bk-tag">уже загружено</span>');
+    else if(r.dup)t.push('<span class="bk-tag warn" title="'+esc(r.dup)+'">похоже, уже вписано вручную</span>');
+    if(r.ho)t.push('<span class="bk-tag warn" title="Банк ещё не провёл операцию, но деньги уже заблокированы">ещё не проведено</span>');
+    if(r.kind==='refund')t.push('<span class="bk-tag ok">возврат</span>');
+    if(r.kind==='fee')t.push('<span class="bk-tag warn">плата банку</span>');
+    if(r.kind==='move')t.push('<span class="bk-tag">'+(r.pair?'перевод себе ↔ '+esc(r.pair):r.self?'перевод себе':'перевод')+'</span>');
+    if(r.kind==='in')t.push('<span class="bk-tag ok">'+(r.pair?'перевод себе ↔ '+esc(r.pair)+(bkCr(r)?' · платёж по кредитке':''):bkCr(r)?'платёж по кредитке':r.self?'перевод себе':'поступление')+'</span>');
+    if(r.kind==='cash')t.push('<span class="bk-tag">наличные</span>');
+    var ask=r.kind==='p2p'&&!r.have&&!r.pair?'<span class="bk-who" role="group" aria-label="Кому перевод"><button type="button" data-bkwho="me" data-id="'+r.id+'" aria-pressed="'+(r.who==='me')+'">Это я, другой мой счёт</button><button type="button" data-bkwho="o" data-id="'+r.id+'" aria-pressed="'+(r.who==='o')+'">Другому человеку</button></span>':'';
+    var sp=bkIsSp(r),sign=r.kind==='refund'?'−':r.kind==='in'?'+':'';
+    return '<div class="bk-r'+(sp?(r.on?'':' off'):' fl'+(r.have?' off':''))+'" data-bkrow="'+r.id+'">'+(sp?'<input type="checkbox" data-bkon="'+r.id+'"'+(r.on?' checked':'')+(r.have?' disabled':'')+' aria-label="Добавить">':'<span class="bk-ic" aria-hidden="true">'+(r.kind==='in'?'↓':r.kind==='cash'?'₽':'↑')+'</span>')+
+      '<span class="bk-d"><b>'+esc(r.desc)+'</b><small>'+(BK&&BK.many&&r.bank?'<i class="bk-bank">'+esc(r.bank)+'</i> ':'')+esc([r.t,r.bcat,r.mcc?'MCC '+r.mcc:''].filter(Boolean).join(' · '))+' '+t.join(' ')+'</small>'+ask+'</span>'+
+      (sp?bkCatSel(r):'<span></span>')+'<span class="bk-a">'+sign+money(r.a)+'</span></div>';
   }
   function bkDraw(){
     if(!BK)return;
-    var main=BK.rows.filter(function(r){return r.kind==='buy'||r.kind==='refund'}),more=BK.rows.filter(function(r){return r.kind==='move'||r.kind==='cash'}),inc=BK.rows.filter(function(r){return r.kind==='in'}).length;
-    var on=BK.rows.filter(function(r){return r.on&&!r.have}),sum=0;on.forEach(function(r){sum+=r.kind==='refund'?-r.a:r.a});
-    var have=BK.rows.filter(function(r){return r.have}).length,dup=BK.rows.filter(function(r){return r.dup&&!r.have}).length;
+    var main=BK.rows.filter(function(r){return bkIsSp(r)||(r.kind==='p2p'&&!r.self)}),more=BK.rows.filter(function(r){return main.indexOf(r)<0});
+    var on=BK.rows.filter(function(r){return r.on&&!r.have}),sum=0;on.forEach(function(r){sum+=bkSg(r)});
+    var have=BK.rows.filter(function(r){return r.have&&!r.fix}).length,fix=BK.rows.filter(function(r){return r.fix}).length,dup=BK.rows.filter(function(r){return r.dup&&!r.have}).length,hold=BK.rows.filter(function(r){return r.ho&&!r.have}),ask=BK.rows.filter(function(r){return r.kind==='p2p'&&!r.who&&!r.pair&&!r.have}).length;
     var lst=bkDlg&&bkDlg.querySelector('.bk-list'),sc=lst?lst.scrollTop:0;
     var ok=BK.files.filter(function(x){return !x.err}),banks=[];ok.forEach(function(x){var b=x.bank||'Другой банк';if(banks.indexOf(b)<0)banks.push(b)});
     BK.many=banks.length>1;
-    var pairs=BK.rows.filter(function(r){return r.pair&&r.kind==='move'}).length;
+    var fees=0,inc=0;BK.rows.forEach(function(r){if(r.kind==='fee'&&!r.have)fees+=r.a;if(r.kind==='in'&&!r.have)inc++});
     var h='<div class="box-h"><span>'+(ok.length>1?'Выписки':'Выписка')+(banks.length?': '+esc(banks.join(', ')):'')+'</span><button type="button" class="ib" data-bkx aria-label="Закрыть">×</button></div>'+
-      (ok.length>1?'<div class="bk-files">'+BK.files.map(function(x){return '<p class="note">«'+esc(x.file)+'»'+(x.err?' <span class="bk-err">'+esc(BKMSG[x.err.code]||BKMSG.none)+'</span>':' · '+esc(x.bank||'банк не узнан')+' · '+bkSpan(x.from,x.to))+'</p>'}).join('')+'</div>':'')+
-      '<p class="note">'+(ok.length>1?'Всего':'«'+esc(ok[0].file)+'» ·')+' '+bkRange(BK.rows)+' · трат '+main.length+(more.length?', переводов и снятий '+more.length:'')+(inc?', поступлений '+inc+' (их не добавляю)':'')+(pairs?'. Переводов между своими картами в разных банках: '+pairs+', они не траты':'')+'</p>'+
+      '<div class="bk-files">'+BK.files.map(function(x,i){return '<div class="bk-f"><span>«'+esc(x.file)+'»'+(x.err?' <span class="bk-err">'+esc(BKMSG[x.err.code]||BKMSG.none)+'</span>':' · <b>'+esc(x.ac||x.bank||'банк не узнан')+'</b> · '+(x.from?bkSpan(x.from,x.to):'')+(x.acct&&x.acct.debt!=null?' · долг по выписке '+money(x.acct.debt):'')+(x.dupN&&x.dupN>=x.rows.length-1?' · <span class="bk-tag">та же выписка ещё раз, повторы не добавятся</span>':''))+'</span>'+
+        (x.err?'':'<label class="bk-cr"><input type="checkbox" data-bkcr="'+i+'"'+(x.cr?' checked':'')+'> кредитка</label>')+'</div>'}).join('')+'</div>'+
+      '<p class="note">'+(ok.length>1?'Всего':'')+' '+bkRange(BK.rows)+' · трат '+main.length+(more.length?', переводов и поступлений '+more.length:'')+(fees?'. Плата банку (проценты, страховка, комиссии): '+money(fees):'')+'</p>'+
       ok.filter(function(x){return x.warn}).map(function(x){return '<p class="banner">'+(ok.length>1?'«'+esc(x.file)+'»: ':'')+esc(x.warn)+'</p>'}).join('')+
-      (BK.files.some(function(x){return x.err})&&ok.length===1?'<p class="banner">'+BK.files.filter(function(x){return x.err}).map(function(x){return '«'+esc(x.file)+'»: '+esc(BKMSG[x.err.code]||BKMSG.none)}).join(' ')+'</p>':'')+
-      (have||dup?'<p class="note">'+(have?'Уже загружено раньше: '+have+'. ':'')+(dup?'Похоже, уже вписано вручную: '+dup+' (галочки сняты, чтобы не задвоить).':'')+'</p>':'')+
+      (ask?'<p class="banner">Есть '+(ask===1?'перевод':'переводы')+' по номеру: отметь, '+(ask===1?'это твой другой счёт или другой человек':'куда они ушли')+'. Перевод себе не трата, перевод человеку — трата. Ответ запомнится для этого номера.</p>':'')+
+      (hold.length?'<p class="note">'+hold.length+' '+plural(hold.length,'покупка','покупки','покупок')+' ещё не '+plural(hold.length,'проведена','проведены','проведены')+' банком (деньги уже заблокированы) — считаю их тратами. Когда загрузишь следующую выписку, они заменятся проведёнными без повторов.</p>':'')+
+      (have||dup||fix?'<p class="note">'+(have?'Уже загружено раньше: '+have+'. ':'')+(fix?'Обновлю загруженное раньше: '+fix+' (уточнились банк, названия или покупка провелась). ':'')+(dup?'Похоже, уже вписано вручную: '+dup+' (галочки сняты, чтобы не задвоить).':'')+'</p>':'')+
       '<div class="bk-list">';
     var day='';
-    main.forEach(function(r){if(r.d!==day){day=r.d;var ds=0;main.forEach(function(x){if(x.d===day&&(x.on||x.have))ds+=x.kind==='refund'?-x.a:x.a});h+='<div class="bk-day" data-bkd="'+day+'"><span>'+dLabel(day)+'</span><small>'+money(ds)+'</small></div>'}h+=bkRowH(r)});
+    main.forEach(function(r){if(r.d!==day){day=r.d;var ds=0;main.forEach(function(x){if(x.d===day&&(x.on||x.have)&&bkIsSp(x))ds+=bkSg(x)});h+='<div class="bk-day" data-bkd="'+day+'"><span>'+dLabel(day)+'</span><small>'+money(ds)+'</small></div>'}h+=bkRowH(r)});
     if(!main.length)h+='<p class="note">Трат в '+(ok.length>1?'файлах':'файле')+' нет.</p>';
-    if(more.length)h+='<button type="button" class="bk-more" data-bkmore aria-expanded="'+!!BK.open+'">'+(BK.open?'▾':'▸')+' Переводы и снятие наличных: '+more.length+'. Обычно это не траты, поэтому не отмечены</button>'+(BK.open?more.map(bkRowH).join(''):'');
-    h+='</div><div class="row bk-foot"><button type="button" class="btn" data-bkgo'+(on.length?'':' disabled')+'>'+(on.length?'Добавить '+on.length+' '+plural(on.length,'трату','траты','трат')+' на '+money(sum):'Нечего добавлять')+'</button>'+
+    if(more.length)h+='<button type="button" class="bk-more" data-bkmore aria-expanded="'+!!BK.open+'">'+(BK.open?'▾':'▸')+' Переводы, пополнения и наличные: '+more.length+'. Это не траты: они попадут в сводку месяца</button>'+(BK.open?more.map(bkRowH).join(''):'');
+    var go=on.length||fix||more.some(function(r){return !r.have});
+    h+='</div><div class="row bk-foot"><button type="button" class="btn" data-bkgo'+(go?'':' disabled')+'>'+(on.length?'Добавить '+on.length+' '+plural(on.length,'трату','траты','трат')+' на '+money(sum):fix?'Обновить '+fix+' '+plural(fix,'запись','записи','записей'):go?'Сохранить переводы':'Нечего добавлять')+'</button>'+
       '<button type="button" class="btn ghost" data-bkall="1">Отметить все траты</button><button type="button" class="btn ghost" data-bkall="0">Снять все</button></div>'+
       '<p class="note">Категорию можно поменять в строке: у всех операций этого магазина она поменяется сразу и запомнится для следующих выписок.</p>';
     bkShow(h);
@@ -1052,9 +1265,9 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   /* галочка: без перерисовки всего списка (в выписке за год их сотни) */
   function bkTick(r){
     var el=bkDlg.querySelector('[data-bkrow="'+r.id+'"]');if(el)el.classList.toggle('off',!r.on);
-    var on=0,sum=0,ds=0;BK.rows.forEach(function(x){var v=x.kind==='refund'?-x.a:x.a;if(x.on&&!x.have){on++;sum+=v}if(x.d===r.d&&(x.kind==='buy'||x.kind==='refund')&&(x.on||x.have))ds+=v});
+    var on=0,sum=0,ds=0,fix=0;BK.rows.forEach(function(x){var v=bkSg(x);if(x.fix)fix++;if(x.on&&!x.have){on++;sum+=v}if(x.d===r.d&&bkIsSp(x)&&(x.on||x.have))ds+=v});
     var dh=bkDlg.querySelector('[data-bkd="'+r.d+'"] small');if(dh)dh.textContent=money(ds);
-    var b=bkDlg.querySelector('[data-bkgo]');if(b){b.disabled=!on;b.textContent=on?'Добавить '+on+' '+plural(on,'трату','траты','трат')+' на '+money(sum):'Нечего добавлять'}
+    var b=bkDlg.querySelector('[data-bkgo]');if(b){var go=on||fix||BK.rows.some(function(x){return !bkIsSp(x)&&!x.have});b.disabled=!go;b.textContent=on?'Добавить '+on+' '+plural(on,'трату','траты','трат')+' на '+money(sum):fix?'Обновить '+fix+' '+plural(fix,'запись','записи','записей'):go?'Сохранить переводы':'Нечего добавлять'}
   }
   function bkFind(id){for(var i=0;i<BK.rows.length;i++)if(BK.rows[i].id===id)return BK.rows[i];return null}
   function bkClick(e){
@@ -1062,14 +1275,22 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     if(t===bkDlg||t.closest('[data-bkx]')){bkClose();return}
     if(!BK)return;
     if(t.closest('[data-bkmore]')){BK.open=!BK.open;bkDraw();return}
-    if((b=t.closest('[data-bkall]'))){var v=b.dataset.bkall==='1';BK.rows.forEach(function(r){if(!r.have&&(r.kind==='buy'||r.kind==='refund'))r.on=v});bkDraw();return}
+    if((b=t.closest('[data-bkall]'))){var v=b.dataset.bkall==='1';BK.rows.forEach(function(r){if(!r.have&&(r.kind==='buy'||r.kind==='fee'||r.kind==='refund'))r.on=v});bkDraw();return}
     if(t.closest('[data-bkgo]')){bkApply();return}
+    if((b=t.closest('[data-bkwho]'))){
+      var r0=bkFind(b.dataset.id);if(!r0)return;var w=b.dataset.bkwho;
+      /* ответ относится ко всем переводам на этот номер */
+      BK.rows.forEach(function(x){if(x===r0||(r0.to&&x.to===r0.to&&x.kind==='p2p'&&!x.have)){x.who=w;x.self=w==='me'?1:0;if(w==='o'){x.cat=BKP2PC;x.on=!x.dup}else x.on=false}});
+      if(r0.to)BK.who[r0.to]=w;
+      bkDraw();return;
+    }
     var row=t.closest('.bk-r');
-    if(row&&!t.closest('select')&&!t.closest('input')){var cb=row.querySelector('[data-bkon]');if(cb&&!cb.disabled){var r=bkFind(cb.dataset.bkon);if(r){r.on=!r.on;cb.checked=r.on;bkTick(r)}}}
+    if(row&&!t.closest('select')&&!t.closest('input')&&!t.closest('button')){var cb=row.querySelector('[data-bkon]');if(cb&&!cb.disabled){var r=bkFind(cb.dataset.bkon);if(r){r.on=!r.on;cb.checked=r.on;bkTick(r)}}}
   }
   function bkChange(e){
     var t=e.target,r;
     if(!BK)return;
+    if(t.dataset.bkcr!=null){var f=BK.files[+t.dataset.bkcr];if(f){f.cr=t.checked?1:0;f.crU=1;bkDraw()}return}
     if(t.dataset.bkon&&(r=bkFind(t.dataset.bkon))){r.on=t.checked;bkTick(r);return}
     if(t.dataset.bkcat&&(r=bkFind(t.dataset.bkcat))){
       var c=t.value;BK.chg=BK.chg||{};
@@ -1078,21 +1299,63 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     }
   }
   function bkTs(r){var d=dDate(r.d);if(r.t){d.setHours(+r.t.slice(0,2),+r.t.slice(3,5))}else d.setHours(12,0);return d.getTime()}
+  function bkAddCat(c){if(!c||catList().indexOf(c)>=0)return;var mx=0;list(F.cats).forEach(function(x){mx=Math.max(mx,x.o||0)});F.cats[nid('c')]={n:c,o:mx+1}}
+  function bkEntry(r,cc){var e={c:r.cat,a:bkSg(r),n:((r.kind==='refund'?'возврат: ':'')+r.desc).slice(0,60),t:bkTs(r),bk:r.src||'bank'};if(r.au)e.au=r.au;if(r.ho)e.ho=1;if(cc)e.cc=1;if(r.kind==='fee')e.fee=1;if(r.to)e.to=r.to;return e}
   function bkApply(){
     if(!BK)return;
-    var n=0,sum=0,days={};
+    var n=0,sum=0,days={},fixN=0,fl=0,mig={},gone=0;
+    if(!isO(F.flow))F.flow={};if(!isO(F.accts))F.accts={};
     BK.rows.forEach(function(r){
-      if(!r.on||r.have)return;
-      var d=F.days[r.d]||(F.days[r.d]={}),a=r.kind==='refund'?-r.a:r.a;
-      d[r.id]={c:r.cat,a:a,n:((r.kind==='refund'?'возврат: ':'')+r.desc).slice(0,60),t:bkTs(r),bk:r.src||'bank'};
-      n++;sum+=a;days[r.d]=1;
+      var cc=bkCr(r)?1:0,o,e;
+      if(r.fix){
+        o=F.days[r.fix.d];e=o&&o[r.fix.id];if(!e)return;
+        if(r.fix.mode==='post'){e.a=bkSg(r);e.n=r.desc.slice(0,60);delete e.ho;if(r.au)e.au=r.au;if(cc)e.cc=1;e.t=bkTs(r);
+          if(r.fix.d!==r.d){delete o[r.fix.id];if(!Object.keys(o).length)delete F.days[r.fix.d];(F.days[r.d]||(F.days[r.d]={}))[r.fix.id]=e}}
+        else{delete o[r.fix.id];if(!Object.keys(o).length)delete F.days[r.fix.d];mig[e.bk]=1;var ne=bkEntry(r,cc);(F.days[r.d]||(F.days[r.d]={}))[r.id]=ne;bkAddCat(ne.c)}
+        fixN++;days[r.d]=1;return;
+      }
+      if(r.have)return;
+      if(bkIsSp(r)){
+        if(!r.on)return;
+        var en=bkEntry(r,cc);(F.days[r.d]||(F.days[r.d]={}))[r.id]=en;bkAddCat(en.c);
+        n++;sum+=en.a;days[r.d]=1;return;
+      }
+      /* не траты: переводы, поступления, наличные — в отдельный журнал, из него собирается сводка месяца */
+      var x={d:r.d,a:r.kind==='in'?r.a:-r.a,k:r.kind==='in'?'in':r.kind==='cash'?'cash':'out',b:r.bank||'',ac:r.ac||'',n:r.desc.slice(0,60)};
+      if(cc)x.cc=1;if(r.to)x.to=r.to;if(r.self||r.kind==='move')x.self=1;if(r.kind==='p2p'&&!r.self)x.ask=1;
+      F.flow[r.id]=x;fl++;
+      /* платёж по кредитке, вписанный руками, заменяется тем же платежом из выписки */
+      if(x.k==='in'&&x.cc)Object.keys(F.flow).some(function(id){var y=F.flow[id];if(!y||!y.man||y.k!=='in'||(y.ac&&y.ac!==x.ac)||Math.abs(num(y.a)-x.a)>=0.01||Math.abs(bkDd(y.d,x.d))>5)return false;delete F.flow[id];return true});
+    });
+    /* блокировка, которая так и не провелась: выписка уже покрывает дни после неё, а покупки нет — блокировку сняли */
+    BK.files.forEach(function(x){
+      if(x.err||!x.from)return;var src=bkSrc(x.bank||'Другой банк');
+      Object.keys(F.days).forEach(function(dk){var o=F.days[dk];Object.keys(o).forEach(function(id){var e=o[id];
+        if(!e.ho||e.bk!==src||bkDd(dk,x.from)>2||bkDd(dk,x.to)<10||BK.rows.some(function(r){return r.id===id||(r.fix&&r.fix.id===id)}))return;
+        delete o[id];gone++;if(!isO(F.bkgone))F.bkgone={};F.bkgone[id]=dk});if(!Object.keys(o).length)delete F.days[dk]});
+      /* снятые блокировки помнятся 3 месяца, чтобы старая выписка не вернула их обратно */
+      if(isO(F.bkgone))Object.keys(F.bkgone).forEach(function(id){if(bkDd(F.bkgone[id],TODAY)>92)delete F.bkgone[id]});
     });
     if(BK.chg){if(!isO(F.bkmap))F.bkmap={};Object.keys(BK.chg).forEach(function(k){F.bkmap[k]=BK.chg[k]})}
-    BK.files.forEach(function(x){if(!x.err&&x.from)bkCovAdd(x.bank||'Другой банк',x.from,x.to)});
+    if(Object.keys(BK.who).length){if(!isO(F.bkwho))F.bkwho={};Object.keys(BK.who).forEach(function(k){F.bkwho[k]=BK.who[k]})}
+    var tk=Object.keys(BK.terms);if(tk.length){if(!isO(F.bkterm))F.bkterm={};tk.forEach(function(k){F.bkterm[k]=BK.terms[k]});var all=Object.keys(F.bkterm);if(all.length>300)all.slice(0,all.length-300).forEach(function(k){delete F.bkterm[k]})}
+    BK.files.forEach(function(x){
+      if(x.err)return;
+      if(x.from)bkCovAdd(x.bank||'Другой банк',x.from,x.to);
+      var A=x.acct||{},o=F.accts[x.ac]||{};
+      o.b=x.bank||'';o.n=A.n||o.n||'';o.cr=x.cr?1:0;if(x.crU)o.u=1;
+      if(A.debt!=null&&(!o.at||!A.at||A.at>=o.at)){o.debt=A.debt;o.at=A.at||x.to}
+      F.accts[x.ac]=o;
+    });
+    /* выписка Альфы раньше узнавалась как «Сбер»: если все те записи обновились, старой отметки «Сбер» больше нет */
+    Object.keys(mig).forEach(function(s){if(isO(F.bkcov))Object.keys(F.bkcov).forEach(function(b){if(bkSrc(b)===s&&!bkCount(b)&&!BK.files.some(function(x){return !x.err&&bkSrc(x.bank||'Другой банк')===s}))delete F.bkcov[b]})});
+    flowLink(F);
     var last=Object.keys(days).sort().pop();
     save();bkClose();
     if(last&&last.slice(0,7)!==spD.slice(0,7))spD=last>TODAY?TODAY:last;
-    render();toast(n?'Добавлено '+n+' '+plural(n,'трата','траты','трат')+' на '+money(sum)+'.':'Ничего не добавлено.');
+    render();
+    var msg=[];if(n)msg.push('добавлено '+n+' '+plural(n,'трата','траты','трат')+' на '+money(sum));if(fixN)msg.push('обновлено '+fixN);if(fl)msg.push('переводов и поступлений в сводку: '+fl);if(gone)msg.push('снято блокировок, которые не провелись: '+gone);
+    toast(msg.length?msg.join(', ').replace(/^./,function(c){return c.toUpperCase()})+'.':'Ничего не добавлено.');
   }
   /* файл можно просто перетащить на страницу */
   var bkDrag=0;
@@ -1128,12 +1391,22 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       var r=cv[b].map(function(x){return bkSpan(x[0],x[1])}).join(', ');
       return '<span class="bk-cb"><b>'+esc(b)+'</b> '+r+
         (bkAsk===b?' <button type="button" class="lnk bad" data-act="bkdel" data-bank="'+esc(b)+'">Убрать '+bkCount(b)+' '+plural(bkCount(b),'трату','траты','трат')+'?</button> <button type="button" class="lnk" data-act="bknodel">нет</button>':' <button type="button" class="lnk" data-act="bkdel" data-bank="'+esc(b)+'" title="Убрать всё, что загружено из этого банка">убрать</button>')+'</span>';
-    }).join('')+(last&&last<dShift(TODAY,-1)?'<span class="note">Позже '+bkDm(last)+' в тратах только то, что вписано вручную: загрузи свежие выписки, повторы не добавятся.</span>':'')+'</div>';
+    }).join('')+bkDueH(bs,cv)+'</div>';
+  }
+  /* выписки удобно загружать два раза в месяц: 1-го (за вторую половину прошлого месяца) и 15-го (за 1–14 число).
+     Здесь видно, когда следующая выгрузка и каких банков не хватает */
+  function bkCheck(dk){var d=+dk.slice(8);return dk.slice(0,8)+(d>=15?'15':'01')}
+  function bkNext(dk){var d=+dk.slice(8);return d<15?dk.slice(0,8)+'15':mAddK(dk.slice(0,7),1)+'-01'}
+  function bkDueH(bs,cv){
+    var cp=bkCheck(TODAY),need=dShift(cp,-1),late=bs.filter(function(b){return cv[b][cv[b].length-1][1]<need});
+    if(late.length)return '<span class="bk-due">Пора загрузить выписки'+(cp===TODAY?' (сегодня '+(+cp.slice(8))+'-е)':'')+': '+late.map(function(b){return esc(b)+' — загружено до '+bkDm(cv[b][cv[b].length-1][1])}).join(', ')+'. Бери период с прошлой выгрузки по вчера, можно с запасом: повторы не добавятся.</span>';
+    var nx=bkNext(TODAY);return '<span class="note">Следующая выгрузка: '+bkDm(nx)+'. Выписки всех карт, включая дебетовую, раз в две недели: 1-го и 15-го.</span>';
   }
   function bkDel(bank){
     if(bkAsk!==bank){bkAsk=bank;render();return}
     bkAsk='';var src=bkSrc(bank),n=0;
     Object.keys(F.days).forEach(function(k){var o=F.days[k];Object.keys(o).forEach(function(id){if(o[id].bk===src){delete o[id];n++}});if(!Object.keys(o).length)delete F.days[k]});
+    if(isO(F.flow))Object.keys(F.flow).forEach(function(id){var x=F.flow[id];if(x&&!x.man&&x.b===bank)delete F.flow[id]});flowLink(F);
     if(isO(F.bkcov))delete F.bkcov[bank];
     save();render();toast('Убрано '+n+' '+plural(n,'трата','траты','трат')+' из выписок: '+bank+'.');
   }
@@ -1149,7 +1422,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function isO(x){return !!x&&typeof x==='object'&&!Array.isArray(x)}
   function norm(f){
     var b=blank();f=isO(f)?f:{};
-    ['inc','exp','debts','goals','sides','months','days'].forEach(function(k){if(!isO(f[k]))f[k]={}});
+    ['inc','exp','debts','goals','sides','months','days','flow','accts','bonus','cc'].forEach(function(k){if(!isO(f[k]))f[k]={}});
     if(!isO(f.cats))f.cats=b.cats;
     ['plan','spend'].forEach(function(k){var o=isO(f[k])?f[k]:{};Object.keys(b[k]).forEach(function(x){if(o[x]==null)o[x]=b[k][x]});f[k]=o});
     if(typeof f.cur!=='string'||!f.cur)f.cur='₽';f.v=1;return f;
@@ -1217,6 +1490,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       if(num(g.target)<=num(g.saved))return;var sv=row.save[g.id]||0,nd2=R.need[g.id];
       t+='<tr><td><i class="dot s"></i>'+esc(g.n||'Цель')+(nd2?'<small>к сроку нужно '+money(nd2.a)+' в месяц</small>':'')+'</td><td>'+money(sv)+'</td><td>'+money(num(g.saved)+sv)+' из '+money(g.target,1)+(R.done[g.id]!=null?'<small>закроется: '+when(R,R.done[g.id])+'</small>':'')+'</td></tr>'});
     if(row.free>0.5)t+='<tr><td>Остаётся свободным</td><td>'+money(row.free)+'</td><td></td></tr>';
+    if(R.floor>0)t+='<tr><td colspan="3"><small>Своё правило: на кредитки не меньше '+money(R.floor)+' в месяц (вкладка «Деньги»). Внесено в этом месяце: '+money(monthSum(F,NOW,TODAY).pay)+'.</small></td></tr>';
     h+='<section class="sec"><h2>План на '+mName(NOW)+'</h2><div class="tw"><table class="fit"><thead><tr><th>Куда</th><th>Внести в этом месяце</th><th>Станет после платежа</th></tr></thead><tbody>'+t+'<tr class="tot"><td>Всего</td><td>'+money(R.free-row.free)+'</td><td></td></tr></tbody></table></div></section>';
     /* график и события */
     var pts=[{k:'сейчас',debt:R.debtStart,saved:R.savedStart}].concat(R.months.slice(0,72).map(function(m){return{k:mName(m.k,1),debt:m.debt,saved:m.saved,pay:sumO(m.pay),sv:sumO(m.save)}}));
@@ -1237,9 +1511,10 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   /* ---------- вкладка «Деньги»: всё, из чего строится план ---------- */
   function renderMoney(){
     var inc=list(F.inc),ex=list(F.exp),db=list(F.debts),gl=list(F.goals),sd=sidesInPlan(F),dl=spendPlanM(F,NOW),dt=0;db.forEach(function(d){dt+=Math.max(0,num(d.bal))});
-    var h='<div class="grid2"><div class="box"><div class="box-h"><span>Доход в месяц</span><small>'+money(incomeOf(F)+sd)+'</small></div><div class="rows">'+
-      inc.map(function(x){return '<div class="r c2">'+fTxt('inc.'+x.id+'.n','Откуда: зарплата, заказы','Источник дохода')+fNum('inc.'+x.id+'.a','0','Сумма в месяц')+delB('inc.'+x.id)+'</div>'}).join('')+'</div>'+
+    var h='<div class="grid2"><div class="box"><div class="box-h"><span>Доход в месяц: база</span><small>'+money(incomeOf(F)+sd)+'</small></div><div class="rows">'+
+      inc.map(function(x){return '<div class="r c2">'+fTxt('inc.'+x.id+'.n','Зарплата без премии','Источник дохода')+fNum('inc.'+x.id+'.a','0','Сумма в месяц')+delB('inc.'+x.id)+'</div>'}).join('')+'</div>'+
       (sd?'<div class="gline"><span>Доп. источники в плане: '+money(sd)+' · меняется во вкладке «Доп. источники»</span></div>':'')+
+      '<p class="note">Сюда идёт то, что приходит каждый месяц (база). Премию вносишь отдельно за каждый месяц во вкладке «Месяцы» → «Сводка месяца»: план считается от базы, премия идёт сверху.</p>'+
       '<div><button type="button" class="btn ghost" data-add="inc">+ Доход</button></div></div>'+
       '<div class="box"><div class="box-h"><span>Обязательные расходы в месяц</span><small>'+money(expOf(F)+dl)+'</small></div><div class="rows">'+
       ex.map(function(x){return '<div class="r c2">'+fTxt('exp.'+x.id+'.n','На что: жильё, связь, подписки','Статья расходов')+fNum('exp.'+x.id+'.a','0','Сумма в месяц')+delB('exp.'+x.id)+'</div>'}).join('')+'</div>'+
@@ -1247,7 +1522,8 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       '<p class="note">Сюда идут постоянные платежи месяца: жильё, связь, подписки. Ежедневные траты (еда, транспорт, покупки) ведутся во вкладке «Траты», платежи по долгам считаются отдельно.</p><div><button type="button" class="btn ghost" data-add="exp">+ Расход</button></div></div>'+
       '<div class="box"><div class="box-h"><span>Долги и кредитки</span><small>'+money(dt)+'</small></div><div class="rows">'+(db.length?'<div class="r c4 hd"><span class="l">Название</span><span>Остаток</span><span>% годовых</span><span>Мин. платёж</span><span></span></div>':'')+
       db.map(function(x){return '<div class="r c4">'+fTxt('debts.'+x.id+'.n','Карта или кредит','Название долга')+lf('Остаток',fNum('debts.'+x.id+'.bal','0','Остаток долга'))+lf('% годовых',fDec('debts.'+x.id+'.apr','0','Ставка, % годовых'))+lf('Мин. платёж',fNum('debts.'+x.id+'.min','0','Минимальный платёж в месяц'))+delB('debts.'+x.id)+'</div>'}).join('')+'</div>'+
-      '<p class="note">Остаток и ставку смотри в приложении банка. Когда платишь, остаток можно поправить здесь или записать месяц во вкладке «Месяцы».</p><div><button type="button" class="btn ghost" data-add="debts">+ Долг</button></div></div>'+
+      '<div class="opt cc-min"><span>Вносить на кредитки в месяц, минимум<small>своё правило сверх минимальных платежей банка. План его соблюдает, а в сводке месяца видно, сколько уже внесено</small></span><span class="ctl">'+fNum('cc.min','0','Минимум на кредитки в месяц')+'</span></div>'+
+      '<p class="note">Остаток и ставку смотри в приложении банка или бери из выписки: в сводке месяца есть кнопка «Обновить в «Долгах»». Когда платишь, остаток можно поправить здесь или записать месяц во вкладке «Месяцы».</p><div><button type="button" class="btn ghost" data-add="debts">+ Долг</button></div></div>'+
       '<div class="box"><div class="box-h"><span>Цели</span><small>'+gl.length+'</small></div><div class="rows">'+(gl.length?'<div class="r g4 hd"><span class="l">На что</span><span>Нужно</span><span>Уже есть</span><span>Срок</span><span></span></div>':'')+
       gl.map(function(x){var pc=num(x.target)>0?Math.min(100,num(x.saved)/num(x.target)*100):0;
         return '<div class="r g4">'+fTxt('goals.'+x.id+'.n','Подушка, техника, поездка','Название цели')+lf('Нужно',fNum('goals.'+x.id+'.target','0','Сколько нужно'))+lf('Уже есть',fNum('goals.'+x.id+'.saved','0','Сколько уже есть'))+
@@ -1273,6 +1549,13 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     var h='<div class="tiles"><div class="tile'+(lim&&ds>lim?' neg':'')+'"><span class="lab">'+(isT?'Потрачено сегодня':'Потрачено: '+dLabel(spD).toLowerCase())+'</span><span class="val">'+money(ds)+'</span><span class="sub">'+(lim?(ds<=lim?'из '+money(lim)+' · осталось '+money(lim-ds):'из '+money(lim)+' · сверх плана '+money(ds-lim)):'план на день не задан')+'</span></div>'+
       '<div class="tile'+(lim&&M.bal<0?' neg':'')+'"><span class="lab">'+(curM?(M.s0>1?'Итог с '+M.s0+'-го числа':'Итог с начала месяца'):'Итог за '+mName(mk))+'</span><span class="val">'+(lim?signed(M.bal):'—')+'</span><span class="sub">'+(lim?(M.bal>=0?'идёшь с запасом':'перерасход')+' · план '+money(M.plan)+' за '+M.cnt+' '+plural(M.cnt,'день','дня','дней')+', потрачено '+money(M.spent):'задай план на день, и здесь будет видно, в плюсе ты или в минусе')+'</span></div>'+
       '<div class="tile"><span class="lab">В среднем в день</span><span class="val">'+money(M.avg)+'</span><span class="sub">'+(lim?'план '+money(lim)+(curM&&M.next!=null?(M.next>0?' · дальше можно по '+money(M.next)+' в день':' · бюджет месяца уже потрачен'):''):'за '+M.cnt+' '+plural(M.cnt,'день','дня','дней'))+'</span></div></div>';
+    /* коротко о месяце: кредитки, плата банку, переводы без ответа — подробности в сводке */
+    var SM=monthSum(F,mk,TODAY),st=[];
+    if(SM.ccMin)st.push('на кредитки внесено '+money(SM.pay)+' из '+money(SM.ccMin));else if(SM.pay)st.push('на кредитки внесено '+money(SM.pay));
+    if(SM.fee)st.push('плата банку '+money(SM.fee));
+    if(SM.ask.length)st.push('переводов без ответа «кому»: '+SM.ask.length);
+    if(SM.open.length)st.push('переводов себе без второй выписки: '+SM.open.length);
+    h+='<div class="sum-strip"><span>'+(st.length?mName(mk).replace(/ \d+$/,'').replace(/^./,function(c){return c.toUpperCase()})+': '+st.join(' · '):'Доход, премия, платежи по кредиткам и переводы себе — в сводке месяца')+'</span><button type="button" class="lnk" data-go="months" data-mk="'+mk+'">Сводка месяца →</button></div>';
     /* выписка банка: траты из файла */
     h+='<div class="bk-in"><button type="button" class="btn ghost" data-act="bkopen">Загрузить выписку банка</button><span class="note">Т-Банк, Сбер, Альфа и другие: Excel, CSV, OFX или PDF. Можно сразу несколько файлов из разных банков, можно просто перетащить их на страницу.</span><button type="button" class="lnk" data-act="bkhow" aria-expanded="'+!!bkHow+'">Как скачать выписку</button></div>'+(bkHow?bkHowH():'')+bkCovH();
     /* день: ввод трат */
@@ -1282,7 +1565,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       (spNewCat?'<span class="row"><input class="inp keep" id="sp-newcat" maxlength="24" placeholder="Новая категория" aria-label="Новая категория"><button type="button" class="btn ghost" data-act="catok">Добавить</button></span>':'<button type="button" class="chip add" data-act="catnew">+ категория</button>'+(cats.length?'<button type="button" class="chip add" data-act="catedit" aria-pressed="'+spEdit+'">'+(spEdit?'Готово':'Убрать лишние')+'</button>':''))+'</div>'+
       (spEdit?'<p class="note">Нажми на категорию, чтобы убрать её из списка. Уже записанные траты останутся.</p>':
       '<div class="addrow"><input class="inp num keep" id="sp-a" inputmode="decimal" autocomplete="off" placeholder="Сумма" aria-label="Сумма траты"><input class="inp keep" id="sp-n" maxlength="60" autocomplete="off" placeholder="На что, необязательно" aria-label="На что потрачено"><button type="button" class="btn" data-act="spadd">Добавить</button></div>')+
-      (ids.length?'<div class="sp-l">'+ids.map(function(id){var e=o[id];return '<div class="sp-e"><span class="tagc">'+esc(e.c||'Другое')+'</span><span class="nt">'+esc(e.n||'')+'</span><b>'+money(e.a)+'</b><button type="button" class="ib" data-spdel="'+id+'" aria-label="Удалить трату">×</button></div>'}).join('')+'<div class="sp-e tot"><span>Всего за день</span><span></span><b>'+money(ds)+'</b><span></span></div></div>':'<p class="note">'+(isT?'За сегодня трат пока нет. Выбери категорию, впиши сумму и нажми «Добавить».':'За этот день трат нет.')+'</p>')+'</section>';
+      (ids.length?'<div class="sp-l">'+ids.map(function(id){var e=o[id];return '<div class="sp-e"><span class="tagc">'+esc(e.c||'Другое')+'</span><span class="nt">'+esc(e.n||'')+(e.ho?' <small class="ho" title="Банк ещё не провёл покупку, деньги заблокированы">не проведено</small>':'')+'</span><b>'+money(e.a)+'</b><button type="button" class="ib" data-spdel="'+id+'" aria-label="Удалить трату">×</button></div>'}).join('')+'<div class="sp-e tot"><span>Всего за день</span><span></span><b>'+money(ds)+'</b><span></span></div></div>':'<p class="note">'+(isT?'За сегодня трат пока нет. Выбери категорию, впиши сумму и нажми «Добавить».':'За этот день трат нет.')+'</p>')+'</section>';
     /* план на день */
     h+='<section class="sec"><div class="opts"><div class="opt"><span>План трат на день<small>'+(lim?'это '+money(lim*M.n)+' за '+mName(mk)+'. Сумма входит в расходы плана накоплений':'сколько в среднем можно тратить в день. От этой суммы считается итог: в плюсе ты или в минусе')+'</small></span><span class="ctl">'+fNum('spend.day','0','План трат на день')+'</span></div></div></section>';
     /* дни месяца */
@@ -1333,18 +1616,70 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function apply(r){Object.keys(r.paid||{}).forEach(function(id){if(F.debts[id])F.debts[id].bal=Math.max(0,num(F.debts[id].bal)-num(r.paid[id]))});Object.keys(r.saved||{}).forEach(function(id){if(F.goals[id])F.goals[id].saved=num(F.goals[id].saved)+num(r.saved[id])})}
   function totals(){var d=0,s=0;list(F.debts).forEach(function(x){d+=Math.max(0,num(x.bal))});list(F.goals).forEach(function(x){s+=Math.max(0,num(x.saved))});return{d:d,s:s}}
   var draft={};
-  function renderMonths(){
-    var r=recOf(recM),R=finPlan(F,{now:NOW}),row=(recM===NOW&&R.months[0])||{pay:{},save:{}},opts='',db=list(F.debts),gl=list(F.goals);
+  /* ---------- сводка месяца: доход, траты, плата банку, кредитки, переводы себе — всё из записей и выписок в одном месте ---------- */
+  function acName(k){var a=(F.accts||{})[k];return a?(a.b||k)+(a.n?' ·'+a.n:''):(k||'кредитка')}
+  function crAccts(){var o=F.accts||{};return Object.keys(o).filter(function(k){return o[k]&&o[k].cr})}
+  /* какой долг во вкладке «Деньги» — это карта из выписки: по привязке или по названию банка */
+  function debtFor(k){
+    var a=(F.accts||{})[k]||{},b=String(a.b||k||'').toLowerCase(),keys=/т-?банк|тинькофф|tinkoff|tbank/.test(b)?/т-?банк|тинькофф|tinkoff|tbank|тиньк/:/альфа|alfa/.test(b)?/альфа|alfa/:/сбер|sber/.test(b)?/сбер|sber/:null,hit=null;
+    list(F.debts).some(function(d){if(d.ac===k){hit=d;return true}return false});
+    if(!hit&&keys)list(F.debts).some(function(d){if(!d.ac&&keys.test(String(d.n||'').toLowerCase())){hit=d;return true}return false});
+    return hit;
+  }
+  function dmy(dk){return +dk.slice(8)+' '+MG[+dk.slice(5,7)-1]}
+  function covMonth(mk){
+    var cv=isO(F.bkcov)?F.bkcov:{},a=mk+'-01',b=mk+'-'+p2(dimK(mk)),end=mk===NOW?TODAY:b,out=[];
+    if(end<a)return out;
+    Object.keys(cv).forEach(function(bank){if(!Array.isArray(cv[bank]))return;var parts=[];cv[bank].forEach(function(x){var f=x[0]>a?x[0]:a,t=x[1]<end?x[1]:end;if(f<=t)parts.push([f,t])});if(parts.length)out.push({b:bank,p:parts,full:parts.length===1&&parts[0][0]===a&&parts[0][1]>=dShift(end,-1)})});
+    return out;
+  }
+  function renderSum(){
+    var mk=recM,S=monthSum(F,mk,TODAY),cur=mk===NOW,past=mk<NOW,opts='',h='';
     for(var i=0;i>-13;i--){var k=mAddK(NOW,i);opts+='<option value="'+k+'"'+(k===recM?' selected':'')+'>'+mName(k)+(recOf(k)?' · записан':'')+'</option>'}
+    var pc=S.ccMin?Math.min(100,S.pay/S.ccMin*100):0;
+    h+='<section class="sec"><div class="row between"><h2>Сводка месяца</h2><select class="inp" id="rec-m" style="width:auto" aria-label="Месяц">'+opts+'</select></div>'+
+      '<div class="tiles"><div class="tile"><span class="lab">Доход</span><span class="val">'+money(S.income)+'</span><span class="sub">база '+money(S.base)+(S.bonus?' + премия '+money(S.bonus):' · премия не внесена')+(S.sides?' + доп. источники '+money(S.sides):'')+'</span></div>'+
+      '<div class="tile"><span class="lab">Траты</span><span class="val">'+money(S.spent)+'</span><span class="sub">'+(S.fee?'из них плата банку '+money(S.fee)+' · ':'')+(S.cc?'с кредиток '+money(S.cc):'с кредиток ничего')+'</span></div>'+
+      '<div class="tile'+(S.ccMin&&past&&S.pay<S.ccMin?' neg':'')+'"><span class="lab">Внесено на кредитки</span><span class="val">'+money(S.pay)+'</span>'+
+        (S.ccMin?'<div class="bar"><i style="width:'+pc.toFixed(1)+'%"></i></div><span class="sub">'+(S.pay>=S.ccMin?'минимум '+money(S.ccMin)+' выполнен':'минимум '+money(S.ccMin)+' · осталось '+money(S.ccMin-S.pay))+'</span>':'<span class="sub">свой минимум задаётся во вкладке «Деньги» → «Долги и кредитки»</span>')+'</div></div>'+
+      '<div class="opts"><div class="opt"><span>Премия за '+MN[+mk.slice(5)-1]+'<small>вносишь сам, когда пришла. План на будущие месяцы считается от базы, без премий</small></span><span class="ctl">'+fNum('bonus.'+mk,'0','Премия за месяц')+'</span></div></div>';
+    /* как сходится месяц */
+    h+='<div class="sum-eq"><div><span>Доход'+(S.bonus?': база + премия':': база')+'</span><b>'+money(S.income)+'</b></div><div><span>Траты'+(S.fee?' (плата банку '+money(S.fee)+' внутри)':'')+'</span><b>−'+money(S.spent)+'</b></div>'+
+      '<div class="tot"><span>Итог месяца</span><b class="'+(S.net<0?'neg':'pos')+'">'+signed(S.net)+'</b></div></div>';
+    /* без выписки дебетовой карты итог завышен: видны только траты с кредиток и то, что вписано руками */
+    var cov0=covMonth(mk),deb=cov0.some(function(c){return Object.keys(F.accts||{}).some(function(k){var a=F.accts[k];return a&&a.b===c.b&&!a.cr})||!Object.keys(F.accts||{}).some(function(k){return F.accts[k]&&F.accts[k].b===c.b})});
+    if(cov0.length&&!deb)h+='<p class="banner">Итог неполный: за этот месяц загружены только выписки кредиток. Траты с дебетовой карты (куда приходит зарплата) сюда не попали — загрузи и её выписку.</p>';
+    if(S.cc||S.pay)h+='<p class="note">Кредитки: потрачено с них '+money(S.cc)+', внесено '+money(S.pay)+' → долг '+(S.debtChg>0.5?'вырос на <b>'+money(S.debtChg)+'</b>':S.debtChg<-0.5?'уменьшился на <b>'+money(-S.debtChg)+'</b>':'не изменился')+'. Платёж по кредитке не трата: траты считаются в день покупки, а платёж только гасит долг.</p>';
+    /* на что обратить внимание */
+    var li=[];
+    S.ask.forEach(function(x){li.push('<li class="ask"><span>'+dmy(x.d)+' · '+esc(x.b||'')+': '+esc(x.n||'перевод')+' — <b>'+money(Math.abs(num(x.a)))+'</b></span><span class="bk-who" role="group" aria-label="Кому перевод"><button type="button" data-fwho="me" data-id="'+x.id+'">Это я, другой мой счёт</button><button type="button" data-fwho="o" data-id="'+x.id+'">Другому человеку</button></span></li>')});
+    S.open.forEach(function(x){li.push('<li><span>'+dmy(x.d)+' · '+esc(acName(x.ac)||x.b)+': '+(num(x.a)>0?'пришло <b>'+money(x.a)+'</b> с твоего другого счёта':'ушло <b>'+money(Math.abs(num(x.a)))+'</b> на твой другой счёт')+' («'+esc(x.n||'перевод себе')+'»). Выписки того счёта нет: загрузи её, иначе траты с той карты не видны.</span></li>')});
+    if(S.incs.length)li.push('<li><span>Поступления по выпискам: <b>'+money(S.inc)+'</b> ('+S.incs.slice(0,4).map(function(x){return dmy(x.d)+' '+esc(x.n||'поступление')+' '+money(x.a)}).join('; ')+(S.incs.length>4?' и ещё '+(S.incs.length-4):'')+'). Сверь с базой и премией: если пришло больше или меньше, поправь премию.</span></li>');
+    if(S.holdN)li.push('<li><span>Ещё не проведено банком: '+money(S.hold)+' ('+S.holdN+' '+plural(S.holdN,'покупка','покупки','покупок')+'). Уже в тратах; со следующей выпиской заменятся проведёнными.</span></li>');
+    var cov=covMonth(mk);
+    if(cov.length)li.push('<li><span>Выписки за месяц: '+cov.map(function(c){return esc(c.b)+' '+c.p.map(function(x){return x[0]===x[1]?dmy(x[0]):+x[0].slice(8)+'–'+dmy(x[1])}).join(', ')}).join('; ')+'. Траты с карт, выписок которых нет, видны, только если вписаны руками.</span></li>');
+    else if(cur||past)li.push('<li><span>Выписок за этот месяц нет: в тратах только то, что вписано руками. Загрузи выписки всех карт во вкладке «Траты».</span></li>');
+    crAccts().forEach(function(k){var a=F.accts[k];if(a.debt==null||!(cur||(a.at&&a.at.slice(0,7)===mk)))return;var d=debtFor(k);
+      li.push('<li><span>'+esc(acName(k))+': долг по выписке на '+(a.at?dmy(a.at):'—')+' — <b>'+money(a.debt)+'</b>'+(d?' · во вкладке «Деньги»: '+money(d.bal):'')+'</span>'+(d&&Math.abs(num(d.bal)-a.debt)<1?'':'<button type="button" class="btn ghost" data-act="debtsync" data-k="'+esc(k)+'">'+(d?'Обновить в «Долгах»':'Добавить в «Долги»')+'</button>')+'</li>')});
+    if(li.length)h+='<ul class="sum-l">'+li.join('')+'</ul>';
+    /* платежи по кредиткам: из выписок и вписанные руками */
+    var cr=crAccts();
+    h+='<h3>Платежи по кредиткам</h3>'+(S.pays.length?'<ul class="sum-l pays">'+S.pays.map(function(x){return '<li><span>'+dmy(x.d)+' · '+esc(acName(x.ac)||x.b||'кредитка')+(x.pr?' · перевод со своего счёта'+((F.flow[x.pr]||{}).b?' ('+esc(F.flow[x.pr].b)+')':''):'')+(x.man?' · вписано руками':' · из выписки')+'</span><b>'+money(x.a)+'</b>'+(x.man?'<button type="button" class="ib" data-act="ccdel" data-id="'+x.id+'" aria-label="Удалить платёж">×</button>':'')+'</li>'}).join('')+'</ul>':'<p class="note">Платежей за этот месяц нет.</p>')+
+      '<div class="addrow cc-add"><input class="inp num keep" id="cc-a" inputmode="decimal" autocomplete="off" placeholder="Сумма" aria-label="Сколько внёс на кредитку"><select class="inp" id="cc-ac" aria-label="Какая кредитка">'+cr.map(function(k){return '<option value="'+esc(k)+'">'+esc(acName(k))+'</option>'}).join('')+'<option value="">Другая кредитка</option></select><button type="button" class="btn ghost" data-act="ccpay">Внёс на кредитку</button></div>'+
+      '<p class="note">Внёс до выгрузки выписки — запиши руками, чтобы видеть, сколько осталось до минимума. Когда загрузишь выписку, тот же платёж из неё заменит ручную запись.</p></section>';
+    return h;
+  }
+  function renderMonths(){
+    var r=recOf(recM),R=finPlan(F,{now:NOW}),row=(recM===NOW&&R.months[0])||{pay:{},save:{}},db=list(F.debts),gl=list(F.goals);
     function dv(key,fb){return draft[key]!=null?draft[key]:fb}
     function dIn(key,fb,ph,lab){var v=num(dv(key,fb));return '<input class="inp num" id="d-'+key+'" data-d="'+key+'" inputmode="decimal" autocomplete="off" value="'+(v?money(v,1):'')+'" placeholder="'+ph+'" aria-label="'+esc(lab)+'">'}
-    var h='<section class="sec"><div class="row between"><h2>Итог месяца</h2><select class="inp" id="rec-m" style="width:auto" aria-label="Месяц">'+opts+'</select></div>'+
+    var h=renderSum()+'<section class="sec"><h2>Записать месяц в историю</h2>'+
       '<p class="note">Запиши, что было на самом деле. Остатки долгов уменьшатся на платежи, накопления по целям вырастут, а план пересчитается от новых чисел.'+(r?' Этот месяц уже записан: новая запись заменит старую.':'')+'</p>'+
       '<div class="mform"><label class="fld">Доход за месяц'+dIn('inc',r?r.inc:0,money(R.income,1),'Доход за месяц')+'</label><label class="fld">Расходы за месяц'+dIn('exp',r?r.exp:0,money(factExp(recM),1),'Расходы за месяц')+'</label></div>'+
       (db.length?'<h3>Заплатил по долгам</h3><div class="mform">'+db.map(function(d){return '<label class="fld">'+esc(d.n||'Долг')+dIn('p.'+d.id,r&&r.paid?r.paid[d.id]:0,row.pay[d.id]?money(row.pay[d.id],1):'0','Заплатил: '+(d.n||'долг'))+'</label>'}).join('')+'</div>':'')+
       (gl.length?'<h3>Отложил в цели</h3><div class="mform">'+gl.map(function(g){return '<label class="fld">'+esc(g.n||'Цель')+dIn('s.'+g.id,r&&r.saved?r.saved[g.id]:0,row.save[g.id]?money(row.save[g.id],1):'0','Отложил: '+(g.n||'цель'))+'</label>'}).join('')+'</div>':'')+
       '<label class="fld">Заметка<input class="inp" id="d-note" data-d="note" data-s="1" maxlength="200" value="'+esc(dv('note',r?r.note:'')||'')+'" placeholder="Что получилось, что помешало"></label>'+
-      '<div class="row"><button type="button" class="btn" data-act="rec">'+(r?'Заменить запись':'Записать месяц')+'</button>'+(recM===NOW&&R.months[0]?'<button type="button" class="btn ghost" data-act="fill">Подставить план</button>':'')+'</div></section>';
+      '<div class="row"><button type="button" class="btn" data-act="rec">'+(r?'Заменить запись':'Записать месяц')+'</button><button type="button" class="btn ghost" data-act="fill">Подставить из сводки</button></div></section>';
     var ks=Object.keys(F.months).sort().reverse();
     if(ks.length){
       var pts=ks.slice().reverse().map(function(k){var x=F.months[k];return{k:mName(k,1),debt:num(x.debtAfter),saved:num(x.savedAfter)}});
@@ -1355,6 +1690,15 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
         '<p class="note">Удаление записи возвращает суммы обратно: долг вырастет на платёж, накопления уменьшатся.</p></section>';
     }else CH.fact=null;
     return h;
+  }
+  /* перевод по номеру из сводки: «это я» — перевод себе, «другому человеку» — трата в категории «Переводы людям». Ответ запоминается для номера */
+  function fWho(id,w){
+    var x=F.flow[id];if(!x)return;var to=x.to||'';if(to){if(!isO(F.bkwho))F.bkwho={};F.bkwho[to]=w}
+    Object.keys(F.flow).forEach(function(fid){var y=F.flow[fid];if(!y||!y.ask||(fid!==id&&(!to||y.to!==to)))return;
+      if(w==='me'){y.self=1;delete y.ask}
+      else{var dd=F.days[y.d]||(F.days[y.d]={}),tt=dDate(y.d);tt.setHours(12,0);dd[fid]={c:BKP2PC,a:Math.abs(num(y.a)),n:(y.n||'Перевод').slice(0,60),t:tt.getTime(),bk:bkSrc(y.b||'Другой банк')};if(y.to)dd[fid].to=y.to;if(y.cc)dd[fid].cc=1;delete F.flow[fid]}});
+    if(w==='o')bkAddCat(BKP2PC);
+    flowLink(F);save();render();toast(w==='me'?'Отмечено как перевод себе: в траты не идёт.':'Отмечено как перевод человеку: добавлено в траты.');
   }
   function recSave(){
     var old=recOf(recM),r={inc:0,exp:0,paid:{},saved:{},note:'',at:Date.now()};
@@ -1432,7 +1776,8 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   var ADD={inc:function(){return{n:'',a:0}},exp:function(){return{n:'',a:0}},debts:function(){return{n:'',bal:0,apr:0,min:0}},goals:function(){return{n:'',target:0,saved:0,due:''}},sides:function(){return{n:'',st:'idea',inc:0,cost:0,start:0,note:'',inPlan:0}}};
   view.addEventListener('click',function(e){
     var t=e.target,b;
-    if((b=t.closest('[data-go]'))){setTab(b.dataset.go);return}
+    if((b=t.closest('[data-go]'))){if(b.dataset.mk){recM=b.dataset.mk;draft={}}setTab(b.dataset.go);return}
+    if((b=t.closest('[data-fwho]'))){fWho(b.dataset.id,b.dataset.fwho);return}
     if((b=t.closest('[data-cat]'))){
       var cn=b.dataset.cat;
       if(spEdit){list(F.cats).forEach(function(c){if(c.n===cn)delete F.cats[c.id]});save();if(!catList().length)spEdit=false;render();return}
@@ -1456,7 +1801,28 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     else if(a==='bkdel')bkDel(b.dataset.bank);
     else if(a==='bknodel'){bkAsk='';render()}
     else if(a==='catedit'){spEdit=!spEdit;render()}
-    else if(a==='fill'){var R=finPlan(F,{now:NOW}),row=R.months[0];if(row){draft.inc=R.income;draft.exp=Math.round(factExp(recM));Object.keys(row.pay).forEach(function(id){draft['p.'+id]=Math.round(row.pay[id])});Object.keys(row.save).forEach(function(id){draft['s.'+id]=Math.round(row.save[id])});render()}}
+    else if(a==='fill'){
+      /* из сводки: доход (база + премия), траты, платежи по кредиткам на свои долги; в цели — по плану, если месяц текущий */
+      var S=monthSum(F,recM,TODAY),R=finPlan(F,{now:NOW}),row=recM===NOW?R.months[0]:null;draft={};
+      draft.inc=Math.round(S.income);draft.exp=Math.round(factExp(recM));
+      Object.keys(S.byAc).forEach(function(k){var d=debtFor(k);if(d)draft['p.'+d.id]=Math.round((draft['p.'+d.id]||0)+S.byAc[k])});
+      if(row)Object.keys(row.save).forEach(function(id){draft['s.'+id]=Math.round(row.save[id])});
+      render();toast('Подставлено из сводки: проверь и нажми «Записать месяц».');
+    }
+    else if(a==='ccpay'){
+      var ci=$('cc-a'),ca=ci?parseNum(ci.value):0,ck=($('cc-ac')||{}).value||'';
+      if(!(ca>0)){toast('Впиши, сколько внёс на кредитку.');if(ci)ci.focus();return}
+      var cd=recM===NOW?TODAY:recM+'-'+p2(dimK(recM)),ac0=(F.accts||{})[ck];
+      F.flow[nid('m')]={d:cd,a:Math.round(ca*100)/100,k:'in',cc:1,man:1,ac:ck,b:ac0?ac0.b:'',n:'Платёж по кредитке, вписан руками'};
+      ci.value='';save();render();toast('Записано: '+money(ca)+' на кредитку.');
+    }
+    else if(a==='ccdel'){delete F.flow[b.dataset.id];save();render()}
+    else if(a==='debtsync'){
+      var k2=b.dataset.k,A=(F.accts||{})[k2];if(!A||A.debt==null)return;var d2=debtFor(k2);
+      if(d2){F.debts[d2.id].bal=A.debt;F.debts[d2.id].ac=k2;toast('Остаток «'+(d2.n||'долг')+'» теперь '+money(A.debt)+' (по выписке).')}
+      else{var mx=0;list(F.debts).forEach(function(x){mx=Math.max(mx,x.o||0)});F.debts[nid('d')]={n:acName(k2)+' кредитка',bal:A.debt,apr:0,min:0,ac:k2,o:mx+1};toast('Добавлено в «Долги»: впиши там ставку и минимальный платёж.')}
+      save();render();
+    }
     else if(a==='delrec'){var k=b.dataset.k;if(askDel!==k){askDel=k;render();return}askDel='';unapply(F.months[k]);delete F.months[k];save();render();toast('Запись удалена, суммы возвращены.')}
     else if(a==='exp'){try{var u=URL.createObjectURL(new Blob([JSON.stringify(F)],{type:'application/json'})),l=document.createElement('a');l.href=u;l.download='finansy-'+NOW+'.json';document.body.appendChild(l);l.click();l.remove()}catch(_){toast('Не получилось сохранить файл.')}}
     else if(a==='imp')$('imp-file').click();
@@ -1490,7 +1856,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   var h0=(location.hash||'').slice(1);if(TABS.some(function(x){return x[0]===h0}))tab=h0;
   try{history.replaceState({tab:tab},'','#'+tab)}catch(_){}
   render();pill();fsBoot();
-  var UPD_NAME='finansy',UPD_BUILD='708a7042e3';
+  var UPD_NAME='finansy',UPD_BUILD='d9797aae79';
   function updBusy(){return fsBusy||(!!bkDlg&&!bkDlg.hidden)||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
