@@ -293,6 +293,104 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
 }
 .r.fix .fixl{display:grid;gap:1px;font-size:calc(14px*var(--fz));padding-left:2px}
 .r.fix .fixl small{color:var(--muted);font-size:calc(12px*var(--fz))}
+/* ---- деньги: компактные строки, кредитки карточками (27.10) ---- */
+.btn.sm{padding:6px 12px;font-size:calc(12px*var(--fz))}
+.inp.sm{padding:5px 8px;font-size:calc(13px*var(--fz))}
+.kv{display:grid}
+.kv-r{display:grid;grid-template-columns:minmax(0,1fr) 120px 30px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.kv-r:last-child{border-bottom:0}
+.kv-r>span:first-child{display:grid;gap:1px;font-size:calc(14px*var(--fz));min-width:0}
+.kv-r>span:first-child small{color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.kv-r .inp{padding:6px 9px}
+.kv-r.ro b{text-align:right;font-weight:500;font-variant-numeric:tabular-nums;padding-right:10px}
+.box-f{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}
+.box-f .lnk{color:var(--ink);text-decoration:none;font-weight:500}
+.box-f .lnk:hover{text-decoration:underline}
+.box-f .note{margin:0;font-size:calc(12px*var(--fz))}
+.rec{display:grid;gap:2px;background:var(--soft);border-radius:14px;padding:8px 10px}
+.rec-h{font-size:calc(12px*var(--fz));color:var(--muted);padding:2px 2px 4px}
+.rec-r{display:grid;grid-template-columns:minmax(0,1fr) auto auto 30px;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
+.rec-r>span{display:grid;min-width:0;font-size:calc(13px*var(--fz))}
+.rec-r>span small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.rec-r b{font-weight:500;font-size:calc(13px*var(--fz))}
+.dsec{gap:12px}
+.dtop{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px}
+.ds-i{display:grid;gap:3px;align-content:start;background:var(--soft);border-radius:14px;padding:10px 12px;min-width:0}
+.ds-i>span{font-size:calc(12px*var(--fz));color:var(--muted)}
+.ds-i>b{font-family:var(--display);font-weight:400;font-size:calc(18px*var(--fz));letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ds-i>b small{font-family:var(--body,inherit);font-size:calc(12px*var(--fz));color:var(--muted);letter-spacing:0}
+.ds-i>small{font-size:calc(11.5px*var(--fz));color:var(--muted);line-height:1.35}
+.ds-i>small b{color:var(--ink);font-weight:600}
+.ds-i .inp{background:var(--surface)}
+.ds-i .lnk{justify-self:start;font-size:calc(12px*var(--fz));color:var(--ink)}
+.ds-n{margin:0}
+.dcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:10px}
+.dc{border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:8px;align-content:start;min-width:0}
+.dc.soon{border-color:var(--warn-fg);box-shadow:0 0 0 1px var(--warn-bg) inset}
+.dc-t{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.dc-h{border:0;background:none;padding:0;text-align:left;display:grid;gap:2px;color:var(--ink);min-width:0;cursor:pointer}
+.dc-h b{font-weight:600;font-size:calc(15px*var(--fz))}
+.dc-h small{color:var(--muted);font-size:calc(12px*var(--fz))}
+.dc-b{font-family:var(--display);font-size:calc(20px*var(--fz));letter-spacing:-.02em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dc-p{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;font-size:calc(13px*var(--fz));font-variant-numeric:tabular-nums}
+.dc-p small,.dc-pd{color:var(--muted);font-size:calc(12px*var(--fz))}
+.dc-p .tag{margin:0 4px 0 0}
+.dc-i{margin:0;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.dc-l{display:grid;gap:4px;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.bar.lm i{background:var(--s-debt)}
+.dc-a{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dc-a .lnk{color:var(--ink)}
+.dc-pay{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;align-items:center}
+.dc-pay small{grid-column:1/-1;color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.dc-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;border-top:1px solid var(--line);padding-top:10px}
+.lf2{display:grid;gap:3px;min-width:0}
+.lf2>span{font-size:calc(11.5px*var(--fz));color:var(--muted)}
+.lf2 .seg{justify-self:start}
+.dc-x{display:flex;align-items:center;gap:2px;align-self:end;color:var(--muted);font-size:calc(12px*var(--fz))}
+.pay-rem{display:flex;justify-content:space-between;align-items:center;gap:8px 14px;flex-wrap:wrap;background:var(--warn-bg);color:var(--warn-fg);border-radius:16px;padding:10px 14px;font-size:calc(13px*var(--fz));line-height:1.45}
+.pay-rem small{opacity:.85}
+.lim-f{display:flex;flex-wrap:wrap;gap:4px 12px;padding:8px 2px 10px;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line)}
+.lim-f b{color:var(--ink);font-weight:600}
+.cl{display:grid;border-top:1px solid var(--line)}
+.cl-r{display:grid;grid-template-columns:minmax(90px,150px) minmax(40px,1fr) 150px 92px;gap:6px 12px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.cl-n{font-size:calc(14px*var(--fz));min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-b{position:relative;height:8px;border-radius:99px;background:var(--soft-2)}
+.cl-b i{display:block;height:100%;border-radius:99px;background:var(--s-save)}
+.cl-b u{position:absolute;top:-4px;width:2px;height:16px;border-radius:2px;background:var(--ink);transform:translateX(-1px)}
+.cl-r.warn .cl-b i{background:#E0A526}
+.cl-r.over .cl-b i{background:var(--danger)}
+.cl-a{display:grid;text-align:right;font-weight:500}
+.cl-a small{font-weight:400;color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.cl-r.over .cl-a small{color:var(--danger)}
+.cl-p{justify-self:end;text-align:right}
+.cl-p small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.cl-p .tag{margin:0}
+.cl-e{grid-column:1/-1;display:flex;justify-content:flex-end}
+.cl-e .inp{max-width:160px}
+.sp-e .nt .fx{display:inline-block;border-radius:99px;padding:0 7px;background:var(--soft-2);color:var(--muted);font-size:calc(11px*var(--fz))}
+.fx-n{color:var(--muted);font-weight:400;font-size:calc(11.5px*var(--fz))}
+.bk-fee{display:grid;gap:2px;background:var(--warn-bg);color:var(--warn-fg);border-radius:12px;padding:10px 12px;font-size:calc(12.5px*var(--fz));line-height:1.4;font-variant-numeric:tabular-nums}
+.bk-fee b{font-weight:600;font-size:calc(13px*var(--fz))}
+.bk-fee small{opacity:.85;margin-top:2px}
+.sum-l li.fee{color:var(--warn-fg)}
+.rec .btn.ghost{background:var(--surface);border:1px solid var(--line)}
+.day-all{justify-self:start;margin-top:-4px}
+@media (max-width:640px){
+  .kv-r{grid-template-columns:minmax(0,1fr) 112px 30px}
+  .rec-r{grid-template-columns:minmax(0,1fr) auto 30px}
+  .rec-r .btn{grid-column:1/-1;grid-row:2;justify-self:start}
+  .dc-f{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .cl-r{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n a" "b b" "p p"}
+  .cl-n{grid-area:n}.cl-b{grid-area:b}.cl-a{grid-area:a}.cl-p{grid-area:p;justify-self:start}
+  .ds-i>b{font-size:calc(16px*var(--fz))}
+  .dtop{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+  .tiles{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .tiles .tile{padding:12px 14px;border-radius:18px}
+  .tiles .tile:first-child{grid-column:1/-1}
+  .tiles .tile:not(:first-child) .val{font-size:calc(19px*var(--fz))}
+  .ds-i{padding:8px 10px}
+  .ds-i>small{font-size:calc(11px*var(--fz))}
+}
 </style>
 </head>
 <body>
@@ -329,23 +427,39 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function dKey(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
   function dimK(k){return new Date(+k.slice(0,4),+k.slice(5,7),0).getDate()}
   function daySum(f,dk){var s=0,o=(f.days||{})[dk]||{};Object.keys(o).forEach(function(id){s+=num(o[id].a)});return s}
-  function spendPlanM(f,mk){return Math.max(0,num((f.spend||{}).day))*dimK(mk)}
+  function spendPlanM(f,mk){return dayLim(f,mk)*dimK(mk)}
+  /* ---- лимит на день: вручную или сам из базы дохода ----
+     авто: (доход-база + доп. источники − обязательные расходы − на долги в месяц − отложить) / дней в месяце */
+  function isLoan(d){return d&&d.k==='loan'}
+  function minPays(f,loans){var s=0;list(f.debts).forEach(function(d){if(num(d.bal)>0&&!!isLoan(d)===!!loans)s+=Math.min(Math.max(0,num(d.min)),num(d.bal))});return s}
+  /* на долги в месяц: своё правило для кредиток (не меньше минимальных платежей банка) плюс минимальные платежи по кредитам */
+  function debtPayM(f){return Math.max(Math.max(0,num((f.cc||{}).min)),minPays(f,false))+minPays(f,true)}
+  function autoBudget(f){return Math.max(0,incomeOf(f)+sidesInPlan(f)-expOf(f)-debtPayM(f)-Math.max(0,num((f.spend||{}).keep)))}
+  function limAuto(f){return (f.spend||{}).mode!=='hand'}
+  function dayLim(f,mk){var s=f.spend||{};return limAuto(f)?autoBudget(f)/dimK(mk):Math.max(0,num(s.day))}
+  /* ключ магазина: без цифр и хвостов, первые два слова. Тот же, что у выписок, поэтому обязательный платёж узнаётся в тратах */
+  function nKey(s){return String(s||'').toUpperCase().replace(/^ВОЗВРАТ:\s*/,'').replace(/[^A-ZА-ЯЁ ]+/g,' ').replace(/\b(MOSCOW|MOSKVA|MOSKVA G|RUS|RU|SANKT|PETERBURG|SPB|G|OOO|ООО|ИП|АО|ПАО)\b/g,' ').replace(/\s+/g,' ').trim().split(' ').slice(0,2).join(' ')}
+  /* траты, которые уже стоят в обязательных расходах (добавлены из «похоже на регулярные»), в дневной лимит не идут, чтобы не считать дважды */
+  function fxKeys(f){var m=null;list(f.exp).forEach(function(x){if(x.k&&!x.off){m=m||{};m[x.k]=1}});return m}
   /* сводка месяца: план на прошедшие дни, сколько потрачено и разница. Плюс: запас, минус: перерасход.
      today — сегодняшний день «ГГГГ-ММ-ДД»; для прошлых месяцев считается весь месяц, для будущих ничего */
   /* с какого дня идёт счёт: с самого раннего дня, за который есть траты. Дни до него в план не входят,
      иначе у начавшего в середине месяца сразу был бы большой «запас» за дни, которые он не записывал */
   function spendFrom(f,today){var m=today;Object.keys(f.days||{}).forEach(function(k){if(/^\d{4}-\d\d-\d\d$/.test(k)&&k<m&&Object.keys(f.days[k]||{}).length)m=k});return m}
   function spendMonth(f,mk,today){
-    var lim=Math.max(0,num((f.spend||{}).day)),n=dimK(mk),tm=today.slice(0,7),upto=mk===tm?+today.slice(8):mk<tm?n:0,days=[],spent=0,all=0,cats={};
+    var lim=dayLim(f,mk),n=dimK(mk),tm=today.slice(0,7),upto=mk===tm?+today.slice(8):mk<tm?n:0,days=[],spent=0,all=0,cats={},fk=fxKeys(f),fixAll=0;
     var from=spendFrom(f,today),fm=from.slice(0,7),s0=fm<mk?1:fm===mk?+from.slice(8):n+1,cnt=Math.max(0,upto-s0+1),left=Math.max(0,n-s0+1);
     for(var d=1;d<=n;d++){
-      var dk=mk+'-'+p2(d),o=(f.days||{})[dk]||{},s=0;
-      Object.keys(o).forEach(function(id){var a=num(o[id].a);s+=a;var c=o[id].c||'Другое';cats[c]=(cats[c]||0)+a});
-      all+=s;if(d<=upto)spent+=s;
-      days.push({k:dk,d:d,sum:s,past:d<=upto&&d>=s0,n:Object.keys(o).length});
+      var dk=mk+'-'+p2(d),o=(f.days||{})[dk]||{},s=0,fx=0;
+      Object.keys(o).forEach(function(id){var e=o[id],a=num(e.a);if(fk&&e.n&&fk[nKey(e.n)]){fx+=a;return}s+=a;var c=e.c||'Другое';cats[c]=(cats[c]||0)+a});
+      all+=s;fixAll+=fx;if(d<=upto)spent+=s;
+      days.push({k:dk,d:d,sum:s,fix:fx,past:d<=upto&&d>=s0,n:Object.keys(o).length});
     }
+    /* сколько можно сегодня: остаток бюджета месяца без вчерашних трат, поделённый на оставшиеся дни вместе с сегодняшним */
+    var before=0;for(var q=Math.max(1,s0);q<upto;q++)before+=days[q-1].sum;
+    var tdy=mk===tm&&lim>0?Math.max(0,(lim*left-before)/Math.max(1,n-upto+1)):lim;
     var cl=Object.keys(cats).map(function(c){return{n:c,a:cats[c]}}).sort(function(a,b){return b.a-a.a});
-    return{mk:mk,lim:lim,n:n,upto:upto,s0:s0,cnt:cnt,days:days,spent:spent,all:all,plan:lim*cnt,bal:lim*cnt-spent,budget:lim*left,avg:cnt?spent/cnt:0,
+    return{mk:mk,lim:lim,today:tdy,fix:fixAll,n:n,upto:upto,s0:s0,cnt:cnt,days:days,spent:spent,all:all,plan:lim*cnt,bal:lim*cnt-spent,budget:lim*left,avg:cnt?spent/cnt:0,
       next:lim>0&&n>upto?(lim*left-all)/(n-upto):null,cats:cl};
   }
   function sideNet(s){return num(s.inc)-num(s.cost)}
@@ -362,7 +476,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     var job=incomeOf(f),sd=sidesInPlan(f),extra=num(o.extra!=null?o.extra:p.extra);
     /* расходы плана: обязательные платежи месяца плюс план ежедневных трат */
     var fixed=expOf(f),daily=spendPlanM(f,now),income=job+sd+extra,exp=fixed+daily,free=income-exp;
-    var floor=Math.max(0,num((f.cc||{}).min)),strat=o.strat||p.strat||'aval',mode=o.mode||p.mode||'debts',share=mode==='debts'?1:mode==='goals'?0:Math.min(100,Math.max(0,num(p.split!=null?p.split:50)))/100,even=(p.goals||'seq')==='even';
+    var floor=num((f.cc||{}).min)>0?debtPayM(f):0,strat=o.strat||p.strat||'aval',mode=o.mode||p.mode||'debts',share=mode==='debts'?1:mode==='goals'?0:Math.min(100,Math.max(0,num(p.split!=null?p.split:50)))/100,even=(p.goals||'seq')==='even';
     var debts=list(f.debts).filter(function(d){return num(d.bal)>0}).map(function(d){return{id:d.id,n:d.n||'Долг',bal:num(d.bal),apr:Math.max(0,num(d.apr)),min:Math.max(0,num(d.min)),o:d.o||0,int:0,paid:0}});
     var goals=list(f.goals).filter(function(g){return num(g.target)-num(g.saved)>0}).map(function(g){return{id:g.id,n:g.n||'Цель',left:num(g.target)-num(g.saved),target:num(g.target),due:/^\d{4}-\d\d$/.test(g.due||'')?g.due:'',o:g.o||0}});
     var R={floor:floor,now:now,income:income,job:job,sides:sd,extra:extra,exp:exp,fixed:fixed,daily:daily,free:free,months:[],events:[],interest:0,debtStart:0,goalStart:0,savedStart:0,debtFree:null,goalsDone:null,short:false,never:false,strat:strat,mode:mode,done:{},need:{}};
@@ -440,8 +554,63 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       if(x.k==='cash')cash+=Math.abs(a);
     });
     var income=base+bonus+sides,ccMin=Math.max(0,num((f.cc||{}).min));
-    return{mk:mk,M:M,spent:M.all,fee:fee,cc:cc,hold:hold,holdN:holdN,base:base,bonus:bonus,sides:sides,income:income,pay:pay,pays:pays,byAc:byAc,ccMin:ccMin,inc:inc,incs:incs,open:open,ask:ask,cash:cash,net:income-M.all,debtChg:cc-pay};
+    return{mk:mk,M:M,spent:M.all+M.fix,fee:fee,cc:cc,hold:hold,holdN:holdN,base:base,bonus:bonus,sides:sides,income:income,pay:pay,pays:pays,byAc:byAc,ccMin:ccMin,inc:inc,incs:incs,open:open,ask:ask,cash:cash,net:income-M.all,debtChg:cc-pay};
   }
+  /* ---- платёж по долгу: ближайшая дата по дню платежа ---- */
+  function nextPayDay(d,today){
+    var pd=Math.round(num(d.pday));if(pd<1||pd>31)return null;
+    var mk=today.slice(0,7),k=mk+'-'+p2(Math.min(pd,dimK(mk)));
+    if(k<today){mk=mAddK(mk,1);k=mk+'-'+p2(Math.min(pd,dimK(mk)))}
+    return{d:k,left:fDd(today,k)};
+  }
+  /* ---- закрыть все долги к сроку: сколько вносить в месяц (по процентам каждого долга, сначала дорогие) ---- */
+  function payToClose(f,due,now){
+    var m=mDiff(now,due)+1,ds=list(f.debts).filter(function(d){return num(d.bal)>0}).map(function(d){return{bal:num(d.bal),apr:Math.max(0,num(d.apr)),min:Math.max(0,num(d.min))}});
+    if(!ds.length||m<1)return null;
+    ds.sort(function(a,b){return b.apr-a.apr});
+    function ok(P){
+      var b=ds.map(function(d){return d.bal});
+      for(var i=0;i<m;i++){
+        var left=P;b.forEach(function(v,j){if(v>0)b[j]=v*(1+ds[j].apr/1200)});
+        b.forEach(function(v,j){if(v>0){var a=Math.min(ds[j].min,v,left);b[j]-=a;left-=a}});
+        b.forEach(function(v,j){if(v>0&&left>0){var a=Math.min(v,left);b[j]-=a;left-=a}});
+        if(b.every(function(v){return v<=0.5}))return true;
+      }
+      return false;
+    }
+    var lo=0,hi=1;ds.forEach(function(d){hi+=d.bal*Math.pow(1+d.apr/1200,m)});
+    if(!ok(hi))return null;
+    for(var it=0;it<50;it++){var mid=(lo+hi)/2;if(ok(mid))hi=mid;else lo=mid}
+    return{pay:Math.ceil(hi/100)*100,months:m};
+  }
+  /* ---- плата банку (проценты, страховка, комиссии) за период ---- */
+  var FEEC='Проценты и комиссии';
+  function isFee(e){return !!e&&(e.fee||e.c===FEEC)}
+  function feeSum(f,from,to){
+    var t=0,by={},l=[];
+    Object.keys(f.days||{}).forEach(function(dk){if(dk<from||dk>to)return;var o=f.days[dk];Object.keys(o).forEach(function(id){var e=o[id];if(!isFee(e))return;var a=num(e.a),b=e.bk||'вручную';t+=a;by[b]=(by[b]||0)+a;l.push({d:dk,n:e.n||'',a:a,bk:b})})});
+    l.sort(function(a,b){return a.d<b.d?1:-1});
+    return{sum:t,by:by,list:l};
+  }
+  /* ---- похоже на регулярный платёж: тот же магазин в разных месяцах на похожую сумму, или подписка, связь, фитнес ---- */
+  var SUBS=/подписк|абонемент|\bPLUS\b|PREMIUM|SPOTIFY|KINOPOISK|КИНОПОИСК|\bIVI\b|OKKO|YOUTUBE|APPLE\.COM|ICLOUD|GOOGLE\s*\*|NETFLIX|BOOSTY|PATREON|TELEGRAM|\bMTS\b|МТС|BEELINE|БИЛАЙН|MEGAFON|МЕГАФОН|TELE2|ТЕЛЕ2|YOTA|ROSTELECOM|РОСТЕЛЕКОМ|ИНТЕРНЕТ|SPIRITFIT|FITNESS|ФИТНЕС|WORLD\s*CLASS|\bDDX\b|АРЕНД|ЖКХ|КОММУНАЛ/i;
+  function recurFind(f,today){
+    var from=dShiftK(today,-120),g={},no=f.recno||{},have={};
+    list(f.exp).forEach(function(x){if(x.k)have[x.k]=1;var k2=nKey(x.n);if(k2)have[k2]=1});
+    Object.keys(f.days||{}).forEach(function(dk){if(dk<from||dk>today)return;var o=f.days[dk];Object.keys(o).forEach(function(id){var e=o[id],a=num(e.a);if(a<=0||isFee(e)||e.c==='Переводы людям'||!e.n)return;var k=nKey(e.n);if(!k||k.length<3)return;(g[k]=g[k]||{k:k,n:e.n,l:[],daily:0}).l.push({d:dk,a:a});if(/^(Еда|Кафе|Транспорт|Продукты)$/.test(e.c||''))g[k].daily=1})});
+    var out=[];
+    Object.keys(g).forEach(function(k){
+      if(no[k]||have[k])return;var x=g[k],mon={};x.l.forEach(function(e){var m=e.d.slice(0,7);mon[m]=(mon[m]||0)+e.a});
+      var ms=Object.keys(mon),per=ms.map(function(m){return mon[m]}).sort(function(a,b){return a-b}),med=per[Math.floor(per.length/2)],cnt={};x.l.forEach(function(e){var m=e.d.slice(0,7);cnt[m]=(cnt[m]||0)+1});
+      var maxc=0;ms.forEach(function(m){maxc=Math.max(maxc,cnt[m])});
+      /* один платёж в месяц на почти ту же сумму; магазины еды, кафе и такси сюда не попадают — это траты дня */
+      var steady=!x.daily&&ms.length>=2&&maxc<=1&&per.every(function(v){return Math.abs(v-med)<=med*0.15});
+      var sub=SUBS.test(x.n)&&maxc<=3;
+      if(steady||sub)out.push({k:k,n:x.n.replace(/^возврат:\s*/i,'').slice(0,40),a:Math.round(med),m:ms.length,why:steady?'каждый месяц':'похоже на подписку или абонемент'});
+    });
+    return out.sort(function(a,b){return b.a-a.a}).slice(0,8);
+  }
+  function dShiftK(dk,n){var d=new Date(+dk.slice(0,4),+dk.slice(5,7)-1,+dk.slice(8));d.setDate(d.getDate()+n);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
   /* ---- общее с главным сайтом ---- */
   function syStr(v){
     if(v===undefined)return 'undefined';
@@ -1246,12 +1415,13 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     var lst=bkDlg&&bkDlg.querySelector('.bk-list'),sc=lst?lst.scrollTop:0;
     var ok=BK.files.filter(function(x){return !x.err}),banks=[];ok.forEach(function(x){var b=x.bank||'Другой банк';if(banks.indexOf(b)<0)banks.push(b)});
     BK.many=banks.length>1;
-    var fees=0,inc=0;BK.rows.forEach(function(r){if(r.kind==='fee'&&!r.have)fees+=r.a;if(r.kind==='in'&&!r.have)inc++});
+    var fees=0,inc=0;BK.rows.forEach(function(r){if(r.kind==='fee')fees+=r.a;if(r.kind==='in'&&!r.have)inc++});
     var h='<div class="box-h"><span>'+(ok.length>1?'Выписки':'Выписка')+(banks.length?': '+esc(banks.join(', ')):'')+'</span><button type="button" class="ib" data-bkx aria-label="Закрыть">×</button></div>'+
       '<div class="bk-files">'+BK.files.map(function(x,i){return '<div class="bk-f"><span>«'+esc(x.file)+'»'+(x.err?' <span class="bk-err">'+esc(BKMSG[x.err.code]||BKMSG.none)+'</span>':' · <b>'+esc(x.ac||x.bank||'банк не узнан')+'</b> · '+(x.from?bkSpan(x.from,x.to):'')+(x.acct&&x.acct.debt!=null?' · долг по выписке '+money(x.acct.debt):'')+(x.dupN&&x.dupN>=x.rows.length-1?' · <span class="bk-tag">та же выписка ещё раз, повторы не добавятся</span>':''))+'</span>'+
         (x.err?'':'<label class="bk-cr"><input type="checkbox" data-bkcr="'+i+'"'+(x.cr?' checked':'')+'> кредитка</label>')+'</div>'}).join('')+'</div>'+
       '<p class="note">'+(ok.length>1?'Всего':'')+' '+bkRange(BK.rows)+' · трат '+main.length+(more.length?', переводов и поступлений '+more.length:'')+(fees?'. Плата банку (проценты, страховка, комиссии): '+money(fees):'')+'</p>'+
       ok.filter(function(x){return x.warn}).map(function(x){return '<p class="banner">'+(ok.length>1?'«'+esc(x.file)+'»: ':'')+esc(x.warn)+'</p>'}).join('')+
+      (fees?'<div class="bk-fee"><b>Банк снял за проценты, страховку и комиссии: '+money(fees)+'</b>'+BK.rows.filter(function(r){return r.kind==='fee'}).map(function(r){return '<span>'+bkDm(r.d)+' · '+esc(r.bank||'')+' · '+esc(r.desc)+' — '+money(r.a)+'</span>'}).join('')+'<small>Это чистые потери. Страховку обычно можно отключить в приложении банка, а проценты меньше, если гасить кредитку до конца льготного периода.</small></div>':'')+
       (ask?'<p class="banner">Есть '+(ask===1?'перевод':'переводы')+' по номеру: отметь, '+(ask===1?'это твой другой счёт или другой человек':'куда они ушли')+'. Перевод себе не трата, перевод человеку — трата. Ответ запомнится для этого номера.</p>':'')+
       (hold.length?'<p class="note">'+hold.length+' '+plural(hold.length,'покупка','покупки','покупок')+' ещё не '+plural(hold.length,'проведена','проведены','проведены')+' банком (деньги уже заблокированы) — считаю их тратами. Когда загрузишь следующую выписку, они заменятся проведёнными без повторов.</p>':'')+
       (have||dup||fix?'<p class="note">'+(have?'Уже загружено раньше: '+have+'. ':'')+(fix?'Обновлю загруженное раньше: '+fix+' (уточнились банк, названия или покупка провелась). ':'')+(dup?'Похоже, уже вписано вручную: '+dup+' (галочки сняты, чтобы не задвоить).':'')+'</p>':'')+
@@ -1330,7 +1500,9 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       if(cc)x.cc=1;if(r.to)x.to=r.to;if(r.self||r.kind==='move')x.self=1;if(r.kind==='p2p'&&!r.self)x.ask=1;
       F.flow[r.id]=x;fl++;
       /* платёж по кредитке, вписанный руками, заменяется тем же платежом из выписки */
-      if(x.k==='in'&&x.cc)Object.keys(F.flow).some(function(id){var y=F.flow[id];if(!y||!y.man||y.k!=='in'||(y.ac&&y.ac!==x.ac)||Math.abs(num(y.a)-x.a)>=0.01||Math.abs(bkDd(y.d,x.d))>5)return false;delete F.flow[id];return true});
+      if(x.k==='in'&&x.cc)Object.keys(F.flow).some(function(id){var y=F.flow[id];if(!y||!y.man||y.k!=='in'||(y.ac&&y.ac!==x.ac)||(!y.ac&&y.db&&(debtFor(x.ac)||{}).id!==y.db)||Math.abs(num(y.a)-x.a)>=0.01||Math.abs(bkDd(y.d,x.d))>5)return false;
+        /* остаток долга уже уменьшен ручной записью: пометка переходит на платёж из выписки */
+        if(y.ap){x.ap=y.ap;x.db=y.db}delete F.flow[id];return true});
     });
     /* блокировка, которая так и не провелась: выписка уже покрывает дни после неё, а покупки нет — блокировку сняли */
     BK.files.forEach(function(x){
@@ -1420,10 +1592,12 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   var MN=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'],MS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   function mName(k,short){var m=+k.slice(5)-1;return(short?MS[m]:MN[m])+' '+k.slice(0,4)}
+  var MP=['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
+  function mIn(k){return 'в '+MP[+k.slice(5)-1]+' '+k.slice(0,4)}
   var NOW=mKey(new Date()),TODAY=dKey(new Date()),tab='spend',recM=NOW,savedAt=0,saveErr=false,askDel='';
   /* категории трат по умолчанию: у них постоянные номера, поэтому на двух устройствах они не двоятся */
   var CATS0=['Еда','Кафе','Транспорт','Покупки','Развлечения','Здоровье','Другое'];
-  function blank(){var c={};CATS0.forEach(function(n,i){c['c'+(i+1)]={id:'c'+(i+1),n:n,o:i+1}});return{v:1,cur:'₽',inc:{},exp:{},debts:{},goals:{},sides:{},months:{},days:{},cats:c,spend:{day:0},plan:{mode:'debts',split:50,strat:'aval',goals:'seq',extra:0}}}
+  function blank(){var c={};CATS0.forEach(function(n,i){c['c'+(i+1)]={id:'c'+(i+1),n:n,o:i+1}});return{v:1,cur:'₽',inc:{},exp:{},debts:{},goals:{},sides:{},months:{},days:{},cats:c,spend:{day:0,mode:'auto',keep:0},plan:{mode:'debts',split:50,strat:'aval',goals:'seq',extra:0,due:''}}}
   function isO(x){return !!x&&typeof x==='object'&&!Array.isArray(x)}
   function norm(f){
     var b=blank();f=isO(f)?f:{};
@@ -1435,6 +1609,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       var bi=Object.keys(f.inc).filter(function(id){var x=f.inc[id];return isO(x)&&(/зарплат|оклад|баз/i.test(x.n||'')||num(x.a)===BASE0)})[0];
       if(bi)delete f.inc[bi];f.base=BASE0;
     }
+    Object.keys(f.debts).forEach(function(id){var d=f.debts[id];if(isO(d)&&d.k!=='loan'&&d.k!=='card')d.k='card'});
     if(typeof f.cur!=='string'||!f.cur)f.cur='₽';f.v=1;return f;
   }
   var F=norm((function(){try{return JSON.parse(localStorage.getItem(LSK)||'null')}catch(_){return null}})());
@@ -1466,6 +1641,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     if(!hasData())return '<div class="empty"><h2>С чего начать</h2><ol><li>Впиши доход и обязательные расходы в месяц. План ежедневных трат ставится во вкладке «Траты».</li><li>Добавь кредитки и кредиты: остаток, ставку, минимальный платёж.</li><li>Добавь цели: сколько нужно и сколько уже есть.</li></ol><p class="note">После этого здесь появится план: сколько и куда нести каждый месяц и когда всё закроется.</p><button type="button" class="btn" data-go="money">Заполнить</button></div>';
     var R=finPlan(F,{now:NOW}),p=F.plan,h='',nd=list(F.debts).filter(function(d){return num(d.bal)>0}).length,ng=list(F.goals).filter(function(g){return num(g.target)>num(g.saved)}).length;
     var dv=R.debtFree===-1?'долгов нет':R.debtFree==null?(R.never?'не гасится':'—'):when(R,R.debtFree),ds=R.debtFree===-1?'':R.debtFree==null?'остаток '+money(R.debtStart):inMon(R.debtFree)+' · проценты '+money(R.interest);
+    if(F.plan.due&&R.debtStart>0){var pcl=payToClose(F,F.plan.due,NOW);ds+=(ds?' · ':'')+'цель — '+mName(F.plan.due)+(pcl?' — нужно '+money(pcl.pay)+' в месяц':' — не успеть')}
     var gv=R.goalsDone===-1?'целей нет':R.goalsDone==null?'—':when(R,R.goalsDone),gs=R.goalsDone===-1?'':R.goalsDone==null?'осталось накопить '+money(R.goalStart):inMon(R.goalsDone)+' · осталось накопить '+money(R.goalStart);
     h+='<div class="tiles"><div class="tile'+(R.free<=0?' neg':'')+'"><span class="lab">Свободно в месяц</span><span class="val">'+money(R.free)+'</span><span class="sub">доход '+money(R.income)+' − расходы '+money(R.exp)+'</span></div>'+
       '<div class="tile"><span class="lab">Без долгов</span><span class="val">'+dv+'</span><span class="sub">'+ds+'</span></div>'+
@@ -1521,23 +1697,22 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   /* ---------- вкладка «Деньги»: всё, из чего строится план ---------- */
   function renderMoney(){
     var inc=list(F.inc),ex=list(F.exp),db=list(F.debts),gl=list(F.goals),sd=sidesInPlan(F),dl=spendPlanM(F,NOW),dt=0;db.forEach(function(d){dt+=Math.max(0,num(d.bal))});
-    var bn=num((F.bonus||{})[NOW]);
-    var h='<div class="grid2"><div class="box"><div class="box-h"><span>Доход в месяц</span><small>'+money(incomeOf(F)+sd)+(bn?' + премия '+money(bn):'')+'</small></div><div class="rows">'+
-      '<div class="r c2 fix"><span class="fixl">Зарплата, база<small>каждый месяц, без премии</small></span>'+fNum('base','0','Зарплата, база в месяц')+'<span></span></div>'+
-      '<div class="r c2 fix"><span class="fixl">Премия за '+MN[+NOW.slice(5)-1]+'<small>вносишь сам, когда пришла</small></span>'+fNum('bonus.'+NOW,'0','Премия за этот месяц')+'<span></span></div>'+
-      inc.map(function(x){return '<div class="r c2">'+fTxt('inc.'+x.id+'.n','Другой постоянный доход','Источник дохода')+fNum('inc.'+x.id+'.a','0','Сумма в месяц')+delB('inc.'+x.id)+'</div>'}).join('')+'</div>'+
-      (sd?'<div class="gline"><span>Доп. источники в плане: '+money(sd)+' · меняется во вкладке «Доп. источники»</span></div>':'')+
-      '<p class="note">План на будущие месяцы считается от базы, премия идёт сверху. Премии за прошлые месяцы — во вкладке «Месяцы» → «Сводка месяца».</p>'+
-      '<div><button type="button" class="btn ghost" data-add="inc">+ Другой доход</button></div></div>'+
-      '<div class="box"><div class="box-h"><span>Обязательные расходы в месяц</span><small>'+money(expOf(F)+dl)+'</small></div><div class="rows">'+
-      ex.map(function(x){return '<div class="r c2">'+fTxt('exp.'+x.id+'.n','На что: жильё, связь, подписки','Статья расходов')+fNum('exp.'+x.id+'.a','0','Сумма в месяц')+delB('exp.'+x.id)+'</div>'}).join('')+'</div>'+
-      '<div class="gline"><span>'+(dl?'Траты по дням: '+money(dl)+' в месяц ('+money(num(F.spend.day))+' в день) · меняется во вкладке «Траты»':'План трат по дням не задан: он ставится во вкладке «Траты» и тоже идёт в расходы')+'</span></div>'+
-      '<p class="note">Сюда идут постоянные платежи месяца: жильё, связь, подписки. Ежедневные траты (еда, транспорт, покупки) ведутся во вкладке «Траты», платежи по долгам считаются отдельно.</p><div><button type="button" class="btn ghost" data-add="exp">+ Расход</button></div></div>'+
-      '<div class="box"><div class="box-h"><span>Долги и кредитки</span><small>'+money(dt)+'</small></div><div class="rows">'+(db.length?'<div class="r c4 hd"><span class="l">Название</span><span>Остаток</span><span>% годовых</span><span>Мин. платёж</span><span></span></div>':'')+
-      db.map(function(x){return '<div class="r c4">'+fTxt('debts.'+x.id+'.n','Карта или кредит','Название долга')+lf('Остаток',fNum('debts.'+x.id+'.bal','0','Остаток долга'))+lf('% годовых',fDec('debts.'+x.id+'.apr','0','Ставка, % годовых'))+lf('Мин. платёж',fNum('debts.'+x.id+'.min','0','Минимальный платёж в месяц'))+delB('debts.'+x.id)+'</div>'}).join('')+'</div>'+
-      '<div class="opt cc-min"><span>Вносить на кредитки в месяц, минимум<small>своё правило сверх минимальных платежей банка. План его соблюдает, а в сводке месяца видно, сколько уже внесено</small></span><span class="ctl">'+fNum('cc.min','0','Минимум на кредитки в месяц')+'</span></div>'+
-      '<p class="note">Остаток и ставку смотри в приложении банка или бери из выписки: в сводке месяца есть кнопка «Обновить в «Долгах»». Когда платишь, остаток можно поправить здесь или записать месяц во вкладке «Месяцы».</p><div><button type="button" class="btn ghost" data-add="debts">+ Долг</button></div></div>'+
-      '<div class="box"><div class="box-h"><span>Цели</span><small>'+gl.length+'</small></div><div class="rows">'+(gl.length?'<div class="r g4 hd"><span class="l">На что</span><span>Нужно</span><span>Уже есть</span><span>Срок</span><span></span></div>':'')+
+    var bn=num((F.bonus||{})[NOW]),rc=recurFind(F,TODAY);
+    /* доход: компактные строки «подпись — сумма» */
+    var h='<div class="grid2"><div class="box"><div class="box-h"><span>Доход в месяц</span><small>'+money(incomeOf(F)+sd)+(bn?' + премия '+money(bn):'')+'</small></div><div class="kv">'+
+      '<div class="kv-r"><span>Зарплата, база<small>каждый месяц, без премии</small></span>'+fNum('base','0','Зарплата, база в месяц')+'<span></span></div>'+
+      '<div class="kv-r"><span>Премия за '+MN[+NOW.slice(5)-1]+'<small>когда пришла; в план не идёт</small></span>'+fNum('bonus.'+NOW,'0','Премия за этот месяц')+'<span></span></div>'+
+      inc.map(function(x){return '<div class="kv-r">'+fTxt('inc.'+x.id+'.n','Другой доход','Источник дохода')+fNum('inc.'+x.id+'.a','0','Сумма в месяц')+delB('inc.'+x.id)+'</div>'}).join('')+
+      (sd?'<div class="kv-r ro"><span>Доп. источники в плане<small>меняются во вкладке «Доп. источники»</small></span><b>'+money(sd)+'</b><span></span></div>':'')+'</div>'+
+      '<div class="box-f"><button type="button" class="lnk" data-add="inc">+ другой доход</button></div></div>'+
+      /* обязательные расходы и подсказки «похоже на регулярные» из трат */
+      '<div class="box"><div class="box-h"><span>Обязательные в месяц</span><small>'+money(expOf(F))+'</small></div><div class="kv">'+
+      ex.map(function(x){return '<div class="kv-r">'+fTxt('exp.'+x.id+'.n','Жильё, связь, подписка','Статья расходов')+fNum('exp.'+x.id+'.a','0','Сумма в месяц')+delB('exp.'+x.id)+'</div>'}).join('')+
+      (ex.length?'':'<p class="note">Жильё, связь, подписки, абонементы — то, что уходит каждый месяц. В лимит дня они не входят.</p>')+'</div>'+
+      (rc.length?'<div class="rec"><span class="rec-h">Похоже на регулярные (из трат за 4 месяца)</span>'+rc.map(function(x){return '<div class="rec-r"><span>'+esc(x.n)+'<small>'+x.why+'</small></span><b>~'+money(x.a)+'</b><button type="button" class="btn ghost sm" data-act="recadd" data-k="'+esc(x.k)+'">В обязательные</button><button type="button" class="ib" data-act="recno" data-k="'+esc(x.k)+'" aria-label="Не регулярный" title="Не регулярный, не предлагать">×</button></div>'}).join('')+'</div>':'')+
+      '<div class="box-f"><button type="button" class="lnk" data-add="exp">+ расход</button></div></div></div>'+
+      debtSecH()+
+      '<div class="grid2"><div class="box"><div class="box-h"><span>Цели</span><small>'+gl.length+'</small></div><div class="rows">'+(gl.length?'<div class="r g4 hd"><span class="l">На что</span><span>Нужно</span><span>Уже есть</span><span>Срок</span><span></span></div>':'')+
       gl.map(function(x){var pc=num(x.target)>0?Math.min(100,num(x.saved)/num(x.target)*100):0;
         return '<div class="r g4">'+fTxt('goals.'+x.id+'.n','Подушка, техника, поездка','Название цели')+lf('Нужно',fNum('goals.'+x.id+'.target','0','Сколько нужно'))+lf('Уже есть',fNum('goals.'+x.id+'.saved','0','Сколько уже есть'))+
           lf('Срок, необязательно','<input class="inp" type="month" id="i-goals.'+x.id+'.due" data-p="goals.'+x.id+'.due" data-t="txt" value="'+esc(x.due||'')+'" min="'+NOW+'" aria-label="Срок, необязательно">')+delB('goals.'+x.id)+'</div>'+
@@ -1546,6 +1721,81 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       '<section class="sec"><div class="opts"><div class="opt"><span>Валюта<small>только значок рядом с суммами</small></span><span class="ctl">'+seg('cur',[['₽','₽'],['$','$'],['€','€'],['USDT','USDT']])+'</span></div>'+
       '<div class="opt"><span>Копия записей<small>файл со всеми числами этого сайта; пригодится как запас</small></span><span class="ctl"><button type="button" class="btn ghost" data-act="exp">Скачать</button><button type="button" class="btn ghost" data-act="imp">Загрузить</button><input type="file" id="imp-file" accept=".json,application/json" hidden></span></div></div></section>';
     return h;
+  }
+
+  /* ---------- кредитки и кредиты: карточка на каждый долг ---------- */
+  var dcOpen={},dcPayOpen={};
+  /* сколько внесено на долг за месяц: платежи из выписок по счёту этой карты и вписанные руками */
+  function paidFor(d,mk){
+    var s=0;Object.keys(F.flow||{}).forEach(function(id){var x=F.flow[id];if(!x||x.k!=='in'||!x.cc||String(x.d||'').slice(0,7)!==mk)return;
+      if(x.db?x.db===d.id:(x.ac&&(debtFor(x.ac)||{}).id===d.id))s+=num(x.a)});
+    return s;
+  }
+  /* платёж по кредитке вписан руками: остаток долга сразу уменьшается, а платёж из выписки потом заменит эту запись */
+  function ccPay(a,o){
+    var d=o.db?F.debts[o.db]:o.ac?debtFor(o.ac):null,acx=o.ac||(d&&d.ac)||'',A=(F.accts||{})[acx];
+    var x={d:o.d||TODAY,a:Math.round(a*100)/100,k:'in',cc:1,man:1,ac:acx,b:A?A.b:'',n:'Платёж по кредитке, вписан руками'};
+    if(d){x.db=d.id;x.ap=d.id;d.bal=Math.max(0,Math.round((num(d.bal)-a)*100)/100)}
+    F.flow[nid('m')]=x;return d;
+  }
+  function planPay(R,d,mk){var i=mDiff(NOW,mk),row=R.months[i];return row&&row.pay[d.id]||0}
+  function dcInfo(d,R){
+    var np=nextPayDay(d,TODAY),mk=np?np.d.slice(0,7):NOW,plan=planPay(R,d,mk),mn=Math.min(Math.max(0,num(d.min)),num(d.bal)),paid=paidFor(d,mk),want=Math.max(plan,mn);
+    return{np:np,mk:mk,plan:plan,min:mn,paid:paid,need:Math.max(0,want-paid),want:want,int:num(d.bal)*Math.max(0,num(d.apr))/1200};
+  }
+  function payRemH(){
+    var R=null,out='';
+    list(F.debts).forEach(function(d){
+      if(num(d.bal)<=0)return;var np=nextPayDay(d,TODAY);if(!np||np.left>3)return;
+      R=R||finPlan(F,{now:NOW});var I=dcInfo(d,R);if(I.need<1)return;
+      out+='<div class="pay-rem"><span><b>'+(np.left===0?'Сегодня':np.left===1?'Завтра':'Через '+np.left+' '+plural(np.left,'день','дня','дней'))+', '+dmy(np.d)+'</b> — платёж по «'+esc(d.n||'кредитка')+'»: внести ещё <b>'+money(I.need)+'</b>'+
+        ' <small>('+(I.plan>I.min?'по плану '+money(I.plan)+', ':'')+'минимум '+money(I.min)+(I.paid?', уже внесено '+money(I.paid):'')+')</small></span><button type="button" class="btn sm" data-act="dcpayopen" data-id="'+d.id+'">Внёс</button></div>';
+    });
+    return out;
+  }
+  function debtSecH(){
+    var db=list(F.debts),R=finPlan(F,{now:NOW}),dt=0,it=0,cards=0;db.forEach(function(d){var b=Math.max(0,num(d.bal));dt+=b;it+=b*Math.max(0,num(d.apr))/1200;if(!isLoan(d))cards++});
+    var fy=feeSum(F,dShift(TODAY,-365),TODAY),due=F.plan.due||'',pc=due?payToClose(F,due,NOW):null,cur=debtPayM(F);
+    var h='<section class="box dsec"><div class="box-h"><span>Кредитки и кредиты</span><small>долг '+money(dt)+'</small></div>'+
+      '<div class="dtop">'+
+        '<div class="ds-i"><span>Проценты сейчас</span><b>≈ '+money(it)+'<small> в месяц</small></b></div>'+
+        '<div class="ds-i"><span>Банку за 12 мес.</span><b>'+money(fy.sum)+'</b><small>проценты, страховки, комиссии из выписок</small></div>'+
+        '<div class="ds-i ed"><span>На кредитки в месяц, минимум</span>'+fNum('cc.min','0','Минимум на кредитки в месяц','sm')+'<small>своё правило сверх минимальных платежей</small></div>'+
+        '<div class="ds-i ed"><span>Закрыть все долги к</span><input class="inp sm" type="month" id="i-plan.due" data-p="plan.due" data-t="txt" value="'+esc(due)+'" min="'+mAddK(NOW,1)+'" aria-label="Закрыть все долги к месяцу"><small>'+
+          (!dt?'долгов нет':!due?'выбери месяц — посчитаю, сколько вносить':pc?'нужно <b>'+money(pc.pay)+'</b> в месяц на все долги'+(pc.pay>cur+50?' (сейчас '+money(cur)+')':' — текущего правила хватает'):'не получается: проценты больше любого платежа')+'</small>'+
+          (pc&&pc.pay>cur+50?'<button type="button" class="lnk" data-act="ccfloor">Сделать минимумом</button>':'')+'</div>'+
+      '</div>'+
+      (dt?'<p class="note ds-n">'+(R.debtFree>=0?'При '+money(cur)+' в месяц на долги всё закроется '+mIn(mAddK(NOW,R.debtFree))+', процентов по пути ≈ '+money(R.interest)+'.':R.never?'При '+money(cur)+' в месяц долг не уменьшается: проценты съедают платёж.':'')+(db.some(function(d){return !num(d.apr)})?' У части долгов не вписана ставка: проценты по ним не считаются.':'')+'</p>':'')+
+      '<div class="dcs">'+db.map(function(d){return dcH(d,R)}).join('')+'</div>'+
+      '<div class="box-f"><button type="button" class="lnk" data-add="debts" data-k="card">+ кредитка</button><button type="button" class="lnk" data-add="debts" data-k="loan">+ кредит</button><span class="note">Остаток бери из приложения банка или из выписки (в сводке месяца кнопка «Обновить в «Долгах»»).</span></div></section>';
+    return h;
+  }
+  function dcH(d,R){
+    var I=dcInfo(d,R),p='debts.'+d.id,op=!!dcOpen[d.id]||!d.n,loan=isLoan(d),lim=num(d.lim),bal=Math.max(0,num(d.bal)),pp=I.want?Math.min(100,I.paid/I.want*100):0;
+    var soon=I.np&&I.np.left<=3&&I.need>=1;
+    var h='<div class="dc'+(soon?' soon':'')+'"><div class="dc-t"><button type="button" class="dc-h" data-act="dcx" data-id="'+d.id+'" aria-expanded="'+op+'"><b>'+esc(d.n||'Новый долг')+'</b><small>'+(loan?'кредит':'кредитка')+(num(d.apr)?' · '+String(num(d.apr)).replace('.',',')+'%':'')+(I.min?' · мин. '+money(I.min):'')+(d.pday?' · платёж '+d.pday+'-го':'')+(num(d.grace)?' · льготный '+num(d.grace)+' дн.':'')+'</small></button>'+
+      '<span class="dc-b">'+money(bal)+'</span></div>';
+    if(bal>0){
+      h+='<div class="dc-p"><span>'+(I.np?(soon?'<span class="tag bad">'+(I.np.left===0?'сегодня':I.np.left===1?'завтра':'через '+I.np.left+' '+plural(I.np.left,'день','дня','дней'))+'</span> ':'')+'до '+dmy(I.np.d)+': ':'в этом месяце: ')+
+        (I.want?'внести '+money(I.want)+(I.plan>I.min&&I.min?' <small>(мин. '+money(I.min)+')</small>':''):'платёж не задан')+'</span><span class="dc-pd">'+(I.paid?'внесено '+money(I.paid):'')+'</span></div>'+
+        (I.want?'<div class="bar"><i style="width:'+pp.toFixed(1)+'%"></i></div>':'')+
+        (I.int>0?'<p class="dc-i">Проценты ≈ '+money(I.int)+' в месяц'+(I.want?'; внесёшь '+money(I.want)+' — в следующем ≈ '+money(Math.max(0,bal-I.want)*num(d.apr)/1200):'')+'</p>':'');
+      if(lim&&!loan)h+='<div class="dc-l"><span>занято '+money(bal)+' из '+money(lim)+'</span><div class="bar lm"><i style="width:'+Math.min(100,bal/lim*100).toFixed(1)+'%"></i></div></div>';
+    }else h+='<p class="dc-i">Закрыт. Можно удалить или оставить для истории.</p>';
+    h+='<div class="dc-a">'+(bal>0?'<button type="button" class="btn ghost sm" data-act="dcpayopen" data-id="'+d.id+'">Внёс платёж</button>':'')+'<button type="button" class="lnk" data-act="dcx" data-id="'+d.id+'">'+(op?'Свернуть':'Изменить')+'</button></div>';
+    if(dcPayOpen[d.id])h+='<div class="dc-pay"><input class="inp num keep" id="dcp-'+d.id+'" inputmode="decimal" autocomplete="off" placeholder="'+(I.need?money(I.need,1):'Сумма')+'" aria-label="Сколько внёс"><button type="button" class="btn sm" data-act="dcpay" data-id="'+d.id+'">Записать</button><small>остаток долга уменьшится сразу; платёж из выписки потом заменит эту запись</small></div>';
+    if(op)h+='<div class="dc-f">'+lf2('Название',fTxt(p+'.n','Т-Банк, Альфа…','Название'))+lf2('Тип',seg(p+'.k',[['card','Кредитка'],['loan','Кредит']]))+
+      lf2('Долг',fNum(p+'.bal','0','Долг'))+lf2('Ставка, % годовых',fDec(p+'.apr','0','Ставка, % годовых'))+lf2('Мин. платёж',fNum(p+'.min','0','Минимальный платёж'))+
+      lf2('День платежа','<input class="inp num" id="i-'+p+'.pday" data-p="'+p+'.pday" data-t="num" inputmode="numeric" autocomplete="off" value="'+(num(d.pday)||'')+'" placeholder="1–31" aria-label="День платежа">')+
+      (loan?'':lf2('Льготный период, дней','<input class="inp num" id="i-'+p+'.grace" data-p="'+p+'.grace" data-t="num" inputmode="numeric" autocomplete="off" value="'+(num(d.grace)||'')+'" placeholder="0" aria-label="Льготный период, дней">')+lf2('Кредитный лимит',fNum(p+'.lim','0','Кредитный лимит')))+
+      '<div class="dc-x">'+delB(p,'Удалить долг')+'<small>удалить</small></div></div>';
+    return h+'</div>';
+  }
+  function lf2(t,h){return '<label class="lf2"><span>'+t+'</span>'+h+'</label>'}
+  function dcPay(id){
+    var i=$('dcp-'+id),a=i?parseNum(i.value):0,d=F.debts[id];if(!d)return;
+    if(!(a>0)){toast('Впиши, сколько внёс.');if(i)i.focus();return}
+    ccPay(a,{db:id});dcPayOpen[id]=false;flowLink(F);save();render();toast('Записано: '+money(a)+' на «'+(d.n||'долг')+'». Остаток теперь '+money(d.bal)+'.');
   }
 
   /* ---------- вкладка «Траты»: что потрачено за день и как это ложится в план ---------- */
@@ -1557,39 +1807,78 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function catList(){return list(F.cats).map(function(c){return c.n}).filter(Boolean)}
   function signed(n){n=Math.round(n);return(n>0?'+':n<0?'−':'')+money(Math.abs(n))}
   function renderSpend(){
-    var mk=spD.slice(0,7),M=spendMonth(F,mk,TODAY),lim=M.lim,ds=daySum(F,spD),isT=spD===TODAY,curM=mk===TODAY.slice(0,7),cats=catList();
+    var mk=spD.slice(0,7),M=spendMonth(F,mk,TODAY),lim=M.lim,dI=M.days[+spD.slice(8)-1]||{sum:0,fix:0},ds=dI.sum,isT=spD===TODAY,curM=mk===TODAY.slice(0,7),cats=catList(),tl=isT?M.today:lim;
     if(cats.indexOf(spCat)<0)spCat=cats[0]||'Другое';
-    var h='<div class="tiles"><div class="tile'+(lim&&ds>lim?' neg':'')+'"><span class="lab">'+(isT?'Потрачено сегодня':'Потрачено: '+dLabel(spD).toLowerCase())+'</span><span class="val">'+money(ds)+'</span><span class="sub">'+(lim?(ds<=lim?'из '+money(lim)+' · осталось '+money(lim-ds):'из '+money(lim)+' · сверх плана '+money(ds-lim)):'план на день не задан')+'</span></div>'+
+    /* платёж по кредитке через 3 дня и ближе: напоминание сверху */
+    var h=payRemH();
+    h+='<div class="tiles"><div class="tile'+(tl&&ds>tl?' neg':'')+'">'+(isT&&tl?'<span class="lab">Можно сегодня</span><span class="val">'+(ds<=tl?money(tl-ds):'−'+money(ds-tl))+'</span><span class="sub">'+(ds<=tl?'потрачено '+money(ds)+' из '+money(tl):'сверх на '+money(ds-tl)+': потрачено '+money(ds)+' из '+money(tl))+(Math.abs(tl-lim)>1?' · обычно '+money(lim)+' в день':'')+'</span>':
+      '<span class="lab">'+(isT?'Потрачено сегодня':'Потрачено: '+dLabel(spD).toLowerCase())+'</span><span class="val">'+money(ds)+'</span><span class="sub">'+(lim?(ds<=lim?'из '+money(lim)+' · осталось '+money(lim-ds):'из '+money(lim)+' · сверх плана '+money(ds-lim)):'лимит на день не задан')+'</span>')+'</div>'+
       '<div class="tile'+(lim&&M.bal<0?' neg':'')+'"><span class="lab">'+(curM?(M.s0>1?'Итог с '+M.s0+'-го числа':'Итог с начала месяца'):'Итог за '+mName(mk))+'</span><span class="val">'+(lim?signed(M.bal):'—')+'</span><span class="sub">'+(lim?(M.bal>=0?'идёшь с запасом':'перерасход')+' · план '+money(M.plan)+' за '+M.cnt+' '+plural(M.cnt,'день','дня','дней')+', потрачено '+money(M.spent):'задай план на день, и здесь будет видно, в плюсе ты или в минусе')+'</span></div>'+
       '<div class="tile"><span class="lab">В среднем в день</span><span class="val">'+money(M.avg)+'</span><span class="sub">'+(lim?'план '+money(lim)+(curM&&M.next!=null?(M.next>0?' · дальше можно по '+money(M.next)+' в день':' · бюджет месяца уже потрачен'):''):'за '+M.cnt+' '+plural(M.cnt,'день','дня','дней'))+'</span></div></div>';
     /* коротко о месяце: кредитки, плата банку, переводы без ответа — подробности в сводке */
     var SM=monthSum(F,mk,TODAY),st=[];
     if(SM.ccMin)st.push('на кредитки внесено '+money(SM.pay)+' из '+money(SM.ccMin));else if(SM.pay)st.push('на кредитки внесено '+money(SM.pay));
     if(SM.fee)st.push('плата банку '+money(SM.fee));
+    catLims(mk).filter(function(c){return c.lim&&c.a>c.lim}).forEach(function(c){st.push(c.n+': лимит превышен на '+money(c.a-c.lim))});
     if(SM.ask.length)st.push('переводов без ответа «кому»: '+SM.ask.length);
     if(SM.open.length)st.push('переводов себе без второй выписки: '+SM.open.length);
     h+='<div class="sum-strip"><span>'+(st.length?mName(mk).replace(/ \d+$/,'').replace(/^./,function(c){return c.toUpperCase()})+': '+st.join(' · '):'Доход, премия, платежи по кредиткам и переводы себе — в сводке месяца')+'</span><button type="button" class="lnk" data-go="months" data-mk="'+mk+'">Сводка месяца →</button></div>';
     /* выписка банка: траты из файла */
     h+='<div class="bk-in"><button type="button" class="btn ghost" data-act="bkopen">Загрузить выписку банка</button><span class="note">Т-Банк, Сбер, Альфа и другие: Excel, CSV, OFX или PDF. Можно сразу несколько файлов из разных банков, можно просто перетащить их на страницу.</span><button type="button" class="lnk" data-act="bkhow" aria-expanded="'+!!bkHow+'">Как скачать выписку</button></div>'+(bkHow?bkHowH():'')+bkCovH();
     /* день: ввод трат */
-    var o=F.days[spD]||{},ids=Object.keys(o).sort(function(x,y){return(o[x].t||0)-(o[y].t||0)});
+    var o=F.days[spD]||{},ids=Object.keys(o).sort(function(x,y){return(o[x].t||0)-(o[y].t||0)}),fk=fxKeys(F);
     h+='<section class="sec"><div class="row between"><h2>'+dLabel(spD)+'</h2><span class="ctl"><button type="button" class="ib" data-day="-1" aria-label="Предыдущий день">‹</button><input class="inp" type="date" id="sp-date" value="'+spD+'" max="'+TODAY+'" aria-label="Выбрать день"><button type="button" class="ib" data-day="1" aria-label="Следующий день"'+(spD>=TODAY?' disabled':'')+'>›</button>'+(isT?'':'<button type="button" class="btn ghost" data-day="0">Сегодня</button>')+'</span></div>'+
       '<div class="chips" role="group" aria-label="Категория">'+cats.map(function(c){return '<button type="button" class="chip" data-cat="'+esc(c)+'" aria-pressed="'+(c===spCat)+'">'+esc(c)+(spEdit?' <i aria-hidden="true">×</i>':'')+'</button>'}).join('')+
       (spNewCat?'<span class="row"><input class="inp keep" id="sp-newcat" maxlength="24" placeholder="Новая категория" aria-label="Новая категория"><button type="button" class="btn ghost" data-act="catok">Добавить</button></span>':'<button type="button" class="chip add" data-act="catnew">+ категория</button>'+(cats.length?'<button type="button" class="chip add" data-act="catedit" aria-pressed="'+spEdit+'">'+(spEdit?'Готово':'Убрать лишние')+'</button>':''))+'</div>'+
       (spEdit?'<p class="note">Нажми на категорию, чтобы убрать её из списка. Уже записанные траты останутся.</p>':
       '<div class="addrow"><input class="inp num keep" id="sp-a" inputmode="decimal" autocomplete="off" placeholder="Сумма" aria-label="Сумма траты"><input class="inp keep" id="sp-n" maxlength="60" autocomplete="off" placeholder="На что, необязательно" aria-label="На что потрачено"><button type="button" class="btn" data-act="spadd">Добавить</button></div>')+
-      (ids.length?'<div class="sp-l">'+ids.map(function(id){var e=o[id];return '<div class="sp-e"><span class="tagc">'+esc(e.c||'Другое')+'</span><span class="nt">'+esc(e.n||'')+(e.ho?' <small class="ho" title="Банк ещё не провёл покупку, деньги заблокированы">не проведено</small>':'')+'</span><b>'+money(e.a)+'</b><button type="button" class="ib" data-spdel="'+id+'" aria-label="Удалить трату">×</button></div>'}).join('')+'<div class="sp-e tot"><span>Всего за день</span><span></span><b>'+money(ds)+'</b><span></span></div></div>':'<p class="note">'+(isT?'За сегодня трат пока нет. Выбери категорию, впиши сумму и нажми «Добавить».':'За этот день трат нет.')+'</p>')+'</section>';
+      (ids.length?'<div class="sp-l">'+ids.map(function(id){var e=o[id];return '<div class="sp-e"><span class="tagc">'+esc(e.c||'Другое')+'</span><span class="nt">'+esc(e.n||'')+(e.ho?' <small class="ho" title="Банк ещё не провёл покупку, деньги заблокированы">не проведено</small>':'')+(fk&&e.n&&fk[nKey(e.n)]?' <small class="fx" title="Стоит в обязательных расходах, в лимит дня не идёт">обязательный</small>':'')+'</span><b>'+money(e.a)+'</b><button type="button" class="ib" data-spdel="'+id+'" aria-label="Удалить трату">×</button></div>'}).join('')+'<div class="sp-e tot"><span>Всего за день</span><span>'+(dI.fix?'<small class="fx-n">в лимит идёт '+money(ds)+', обязательные '+money(dI.fix)+'</small>':'')+'</span><b>'+money(ds+dI.fix)+'</b><span></span></div></div>':'<p class="note">'+(isT?'За сегодня трат пока нет. Выбери категорию, впиши сумму и нажми «Добавить».':'За этот день трат нет.')+'</p>')+'</section>';
     /* план на день */
-    h+='<section class="sec"><div class="opts"><div class="opt"><span>План трат на день<small>'+(lim?'это '+money(lim*M.n)+' за '+mName(mk)+'. Сумма входит в расходы плана накоплений':'сколько в среднем можно тратить в день. От этой суммы считается итог: в плюсе ты или в минусе')+'</small></span><span class="ctl">'+fNum('spend.day','0','План трат на день')+'</span></div></div></section>';
+    h+=limSetH(mk);
     /* дни месяца */
     var last=curM?M.upto:mk<TODAY.slice(0,7)?M.n:0,mx=lim;M.days.forEach(function(d){if(d.sum>mx)mx=d.sum});mx=mx||1;
-    var rows='';for(var i=last;i>=Math.max(1,M.s0);i--){var d=M.days[i-1],df=lim-d.sum,dd=dDate(d.k);
+    /* по умолчанию последние 7 дней (и выбранный день), весь месяц — по кнопке */
+    var rows='',shown=0,total=Math.max(0,last-Math.max(1,M.s0)+1);
+    for(var i=last;i>=Math.max(1,M.s0);i--){var d=M.days[i-1],df=lim-d.sum,dd=dDate(d.k);
+      if(!dayAll&&shown>=7&&d.k!==spD)continue;shown++;
       rows+='<button type="button" class="dayr" data-pick="'+d.k+'"'+(d.k===spD?' aria-current="true"':'')+'><span class="dn">'+d.d+' <small>'+WD[dd.getDay()]+'</small></span><span class="db"><i style="width:'+(d.sum/mx*100).toFixed(1)+'%"></i>'+(lim?'<u style="left:'+(lim/mx*100).toFixed(1)+'%"></u>':'')+'</span><span class="dsum">'+money(d.sum)+'</span>'+(lim?'<span class="tag '+(df>=0?'ok':'bad')+'">'+signed(df)+'</span>':'<span></span>')+'</button>'}
     h+='<section class="sec"><div class="row between"><h2>Дни: '+mName(mk)+'</h2><span class="ctl"><button type="button" class="ib" data-mon="-1" aria-label="Предыдущий месяц">‹</button><button type="button" class="ib" data-mon="1" aria-label="Следующий месяц"'+(curM||mk>TODAY.slice(0,7)?' disabled':'')+'>›</button></span></div>'+
       (lim?'<p class="note">Зелёная метка: сколько осталось от плана за день. Жёлтая: на сколько день вышел за план. Черта на полоске показывает план.</p>':'')+
-      (rows?'<div class="dayl">'+rows+'</div>'+(M.s0>1&&M.s0<=M.n?'<p class="note">Счёт идёт с '+M.s0+'-го числа: это первый день, за который записаны траты.</p>':''):'<p class="note">За этот месяц трат не записано.</p>')+'</section>';
-    if(M.cats.length){var ct=0;M.cats.forEach(function(c){ct+=c.a});
-      h+='<section class="sec"><h2>На что ушло за '+mName(mk)+'</h2><div class="dayl">'+M.cats.map(function(c){return '<div class="dayr cat"><span class="dn">'+esc(c.n)+'</span><span class="db"><i style="width:'+(c.a/(M.cats[0].a||1)*100).toFixed(1)+'%"></i></span><span class="dsum">'+money(c.a)+'</span><span class="tag">'+(ct?Math.round(c.a/ct*100):0)+'%</span></div>'}).join('')+'</div></section>'}
+      (rows?'<div class="dayl">'+rows+'</div>'+(total>7?'<button type="button" class="lnk day-all" data-act="dayall">'+(dayAll?'Свернуть до последних 7 дней':'Показать все дни месяца ('+total+')')+'</button>':'')+(M.s0>1&&M.s0<=M.n?'<p class="note">Счёт идёт с '+M.s0+'-го числа: это первый день, за который записаны траты.</p>':''):'<p class="note">За этот месяц трат не записано.</p>')+'</section>';
+    h+=catSecH(mk,M);
+    return h;
+  }
+  /* ---- лимит на день: сам из дохода или вручную ---- */
+  function limSetH(mk){
+    var sp=F.spend,au=limAuto(F),inc=incomeOf(F)+sidesInPlan(F),ex=expOf(F),dp=debtPayM(F),kp=Math.max(0,num(sp.keep)),bud=autoBudget(F),n=dimK(mk);
+    var h='<section class="sec"><div class="opts"><div class="opt"><span>Лимит трат на день<small>'+(au?'считается сам: '+money(bud)+' на месяц / '+n+' '+plural(n,'день','дня','дней')+' = <b>'+money(bud/n)+'</b> в день':'вписываешь сам; от него считается итог, в плюсе ты или в минусе')+'</small></span><span class="ctl">'+seg('spend.mode',[['auto','Сам из дохода'],['hand','Вручную']])+(au?'':fNum('spend.day','0','Лимит трат на день'))+'</span></div>';
+    if(au)h+='<div class="lim-f"><span>Доход '+money(inc)+'</span><span>− обязательные '+money(ex)+'</span><span>− на долги '+money(dp)+'</span><span>− отложить '+money(kp)+'</span><b>= '+money(bud)+' на траты в месяц</b></div>'+
+      '<div class="opt"><span>Откладывать в месяц<small>на цели или подушку, в лимит трат не идёт. Премия в лимит тоже не идёт: её можно направить на долги или цели</small></span><span class="ctl">'+fNum('spend.keep','0','Откладывать в месяц')+'</span></div>';
+    return h+'</div>'+(au&&bud<=0?'<p class="banner">На траты ничего не остаётся: обязательные расходы и платежи по долгам съедают весь доход. Проверь суммы во вкладке «Деньги».</p>':'')+'</section>';
+  }
+  /* ---- категории: сколько ушло, лимит на месяц, сравнение с прошлым месяцем ---- */
+  var catEd=false,dayAll=false;
+  function catByName(n){var r=null;list(F.cats).some(function(x){if(x.n===n){r=x;return true}return false});return r}
+  function catLims(mk){
+    var M=spendMonth(F,mk,TODAY),P=spendMonth(F,mAddK(mk,-1),TODAY),pm={},seen={},out=[];
+    P.cats.forEach(function(c){pm[c.n]=c.a});
+    M.cats.forEach(function(c){seen[c.n]=1;var x=catByName(c.n);out.push({n:c.n,a:c.a,lim:x?Math.max(0,num(x.lim)):0,prev:pm[c.n]||0,id:x?x.id:''})});
+    list(F.cats).forEach(function(x){if(!seen[x.n]&&(num(x.lim)>0||catEd))out.push({n:x.n,a:0,lim:Math.max(0,num(x.lim)),prev:pm[x.n]||0,id:x.id})});
+    return out;
+  }
+  function catSecH(mk,M){
+    var l=catLims(mk);if(!l.length&&!M.fix)return '';
+    var tot=0,mx=1,curM=mk===TODAY.slice(0,7),frac=curM?Math.min(1,M.upto/M.n):1;l.forEach(function(c){tot+=c.a;mx=Math.max(mx,c.a)});
+    var h='<section class="sec"><div class="row between"><h2>На что ушло за '+mName(mk)+'</h2><button type="button" class="btn ghost" data-act="catlim" aria-pressed="'+catEd+'">'+(catEd?'Готово':'Лимиты по категориям')+'</button></div>'+
+      (catEd?'<p class="note">Лимит на месяц для категории. Серое число в поле — сколько ушло в прошлом месяце. Пусто — без лимита.</p>':'')+'<div class="cl">';
+    l.forEach(function(c){
+      var w=c.lim?Math.min(100,c.a/c.lim*100):c.a/mx*100,over=c.lim&&c.a>c.lim,warn=c.lim&&!over&&c.a>c.lim*frac*1.1,d=c.prev?Math.round((c.a-c.prev)/c.prev*100):null;
+      h+='<div class="cl-r'+(over?' over':warn?' warn':'')+(c.lim?' lim':'')+'"><span class="cl-n">'+esc(c.n)+'</span><span class="cl-b"><i style="width:'+w.toFixed(1)+'%"></i>'+(c.lim&&curM?'<u style="left:'+(frac*100).toFixed(1)+'%"></u>':'')+'</span>'+
+        '<span class="cl-a">'+money(c.a)+(c.lim?'<small>из '+money(c.lim)+(over?' · сверх '+money(c.a-c.lim):' · осталось '+money(c.lim-c.a))+'</small>':'<small>'+(tot?Math.round(c.a/tot*100):0)+'% трат</small>')+'</span>'+
+        '<span class="cl-p">'+(d==null?'<small>в прошлом месяце не было</small>':'<span class="tag '+(d>10?'bad':d<-10?'ok':'')+'" title="в прошлом месяце '+money(c.prev)+'">'+(d>0?'↑ +':d<0?'↓ ':'')+d+'%</span>')+'</span>'+
+        (catEd&&c.id?'<span class="cl-e">'+fNum('cats.'+c.id+'.lim',c.prev?money(c.prev,1):'без лимита','Лимит на месяц: '+c.n)+'</span>':'')+'</div>';
+    });
+    h+='</div>'+(M.fix?'<p class="note">Ещё '+money(M.fix)+' — обязательные платежи из выписок (стоят во вкладке «Деньги»): в лимит дня и в категории не идут.</p>':'')+(curM&&l.some(function(c){return c.lim})?'<p class="note">Черта на полоске показывает, где она должна быть к сегодняшнему дню, если тратить ровно. Жёлтая — идёшь быстрее, красная — лимит превышен.</p>':'')+'</section>';
     return h;
   }
   function spAdd(){
@@ -1668,6 +1957,8 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     S.ask.forEach(function(x){li.push('<li class="ask"><span>'+dmy(x.d)+' · '+esc(x.b||'')+': '+esc(x.n||'перевод')+' — <b>'+money(Math.abs(num(x.a)))+'</b></span><span class="bk-who" role="group" aria-label="Кому перевод"><button type="button" data-fwho="me" data-id="'+x.id+'">Это я, другой мой счёт</button><button type="button" data-fwho="o" data-id="'+x.id+'">Другому человеку</button></span></li>')});
     S.open.forEach(function(x){li.push('<li><span>'+dmy(x.d)+' · '+esc(acName(x.ac)||x.b)+': '+(num(x.a)>0?'пришло <b>'+money(x.a)+'</b> с твоего другого счёта':'ушло <b>'+money(Math.abs(num(x.a)))+'</b> на твой другой счёт')+' («'+esc(x.n||'перевод себе')+'»). Выписки того счёта нет: загрузи её, иначе траты с той карты не видны.</span></li>')});
     if(S.incs.length)li.push('<li><span>Поступления по выпискам: <b>'+money(S.inc)+'</b> ('+S.incs.slice(0,4).map(function(x){return dmy(x.d)+' '+esc(x.n||'поступление')+' '+money(x.a)}).join('; ')+(S.incs.length>4?' и ещё '+(S.incs.length-4):'')+'). Сверь с базой и премией: если пришло больше или меньше, поправь премию.</span></li>');
+    if(S.fee){var fm=feeSum(F,mk+'-01',mk+'-'+p2(dimK(mk))),fy=feeSum(F,dShift(TODAY,-365),TODAY);
+      li.push('<li class="fee"><span>Плата банку за месяц: <b>'+money(S.fee)+'</b> ('+fm.list.slice(0,5).map(function(x){return dmy(x.d)+' '+esc(x.n)+' '+money(x.a)}).join('; ')+(fm.list.length>5?' и ещё '+(fm.list.length-5):'')+'). За 12 месяцев: '+money(fy.sum)+'.</span></li>')}
     if(S.holdN)li.push('<li><span>Ещё не проведено банком: '+money(S.hold)+' ('+S.holdN+' '+plural(S.holdN,'покупка','покупки','покупок')+'). Уже в тратах; со следующей выпиской заменятся проведёнными.</span></li>');
     var cov=covMonth(mk);
     if(cov.length)li.push('<li><span>Выписки за месяц: '+cov.map(function(c){return esc(c.b)+' '+c.p.map(function(x){return x[0]===x[1]?dmy(x[0]):+x[0].slice(8)+'–'+dmy(x[1])}).join(', ')}).join('; ')+'. Траты с карт, выписок которых нет, видны, только если вписаны руками.</span></li>');
@@ -1799,7 +2090,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     if((b=t.closest('[data-day]'))){var dn=+b.dataset.day,nd=dn===0?TODAY:dShift(spD,dn);if(nd<=TODAY){spD=nd;render()}return}
     if((b=t.closest('[data-mon]'))){var nm=mAddK(spD.slice(0,7),+b.dataset.mon);if(nm<=TODAY.slice(0,7)){spD=nm===TODAY.slice(0,7)?TODAY:nm+'-'+p2(dimK(nm));render()}return}
     if((b=t.closest('[data-pick]'))){spD=b.dataset.pick;render();window.scrollTo({top:0,behavior:'smooth'});return}
-    if((b=t.closest('[data-add]'))){var c=b.dataset.add,id=nid(c.charAt(0)),o=ADD[c](),mx=0;list(F[c]).forEach(function(x){mx=Math.max(mx,x.o||0)});o.o=mx+1;F[c][id]=o;save();render();var f=$('i-'+c+'.'+id+'.n');if(f)f.focus();return}
+    if((b=t.closest('[data-add]'))){var c=b.dataset.add,id=nid(c.charAt(0)),o=ADD[c](),mx=0;list(F[c]).forEach(function(x){mx=Math.max(mx,x.o||0)});o.o=mx+1;if(b.dataset.k)o.k=b.dataset.k;F[c][id]=o;if(c==='debts')dcOpen[id]=true;save();render();var f=$('i-'+c+'.'+id+'.n');if(f)f.focus();return}
     if((b=t.closest('[data-del]'))){delP(b.dataset.del);save();render();return}
     if((b=t.closest('.seg [data-p]'))){setP(b.dataset.p,b.dataset.v);save();render();return}
     if((b=t.closest('[data-sw]'))){setP(b.dataset.sw,getP(b.dataset.sw)?0:1);save();render();return}
@@ -1814,22 +2105,30 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     else if(a==='bkdel')bkDel(b.dataset.bank);
     else if(a==='bknodel'){bkAsk='';render()}
     else if(a==='catedit'){spEdit=!spEdit;render()}
+    else if(a==='catlim'){catEd=!catEd;render()}
+    else if(a==='dayall'){dayAll=!dayAll;render()}
+    else if(a==='dcx'){var dx=b.dataset.id;dcOpen[dx]=!dcOpen[dx];render()}
+    else if(a==='dcpay'){dcPay(b.dataset.id)}
+    else if(a==='recadd'){var rc=recurFind(F,TODAY).filter(function(x){return x.k===b.dataset.k})[0];if(rc){var mo=0;list(F.exp).forEach(function(x){mo=Math.max(mo,x.o||0)});F.exp[nid('e')]={n:rc.n,a:rc.a,k:rc.k,o:mo+1};save();render();toast('«'+rc.n+'» теперь в обязательных: '+money(rc.a)+' в месяц. Эти траты больше не идут в лимит дня.')}}
+    else if(a==='recno'){if(!isO(F.recno))F.recno={};F.recno[b.dataset.k]=1;save();render()}
+    else if(a==='ccfloor'){var pc=payToClose(F,F.plan.due,NOW);if(pc){if(!isO(F.cc))F.cc={};F.cc.min=Math.max(0,pc.pay-minPays(F,true));save();render();toast('Минимум на кредитки теперь '+money(F.cc.min)+' в месяц.')}}
     else if(a==='fill'){
       /* из сводки: доход (база + премия), траты, платежи по кредиткам на свои долги; в цели — по плану, если месяц текущий */
       var S=monthSum(F,recM,TODAY),R=finPlan(F,{now:NOW}),row=recM===NOW?R.months[0]:null;draft={};
       draft.inc=Math.round(S.income);draft.exp=Math.round(factExp(recM));
-      Object.keys(S.byAc).forEach(function(k){var d=debtFor(k);if(d)draft['p.'+d.id]=Math.round((draft['p.'+d.id]||0)+S.byAc[k])});
+      /* платежи, которые уже уменьшили остаток долга (вписаны руками на карточке), второй раз не подставляются */
+      S.pays.forEach(function(x){if(x.ap)return;var d=x.db?F.debts[x.db]:debtFor(x.ac);if(d)draft['p.'+d.id]=Math.round((draft['p.'+d.id]||0)+num(x.a))});
       if(row)Object.keys(row.save).forEach(function(id){draft['s.'+id]=Math.round(row.save[id])});
       render();toast('Подставлено из сводки: проверь и нажми «Записать месяц».');
     }
     else if(a==='ccpay'){
       var ci=$('cc-a'),ca=ci?parseNum(ci.value):0,ck=($('cc-ac')||{}).value||'';
       if(!(ca>0)){toast('Впиши, сколько внёс на кредитку.');if(ci)ci.focus();return}
-      var cd=recM===NOW?TODAY:recM+'-'+p2(dimK(recM)),ac0=(F.accts||{})[ck];
-      F.flow[nid('m')]={d:cd,a:Math.round(ca*100)/100,k:'in',cc:1,man:1,ac:ck,b:ac0?ac0.b:'',n:'Платёж по кредитке, вписан руками'};
-      ci.value='';save();render();toast('Записано: '+money(ca)+' на кредитку.');
+      var cd=recM===NOW?TODAY:recM+'-'+p2(dimK(recM)),dd0=ccPay(ca,{ac:ck,d:cd});
+      ci.value='';save();render();toast('Записано: '+money(ca)+' на кредитку.'+(dd0?' Остаток «'+(dd0.n||'долг')+'» теперь '+money(dd0.bal)+'.':''));
     }
-    else if(a==='ccdel'){delete F.flow[b.dataset.id];save();render()}
+    else if(a==='ccdel'){var xf=F.flow[b.dataset.id];if(xf&&xf.ap&&F.debts[xf.ap])F.debts[xf.ap].bal=num(F.debts[xf.ap].bal)+num(xf.a);delete F.flow[b.dataset.id];save();render()}
+    else if(a==='dcpayopen'){var pid=b.dataset.id;dcPayOpen[pid]=true;if(tab!=='money')setTab('money');else render();var pin=$('dcp-'+pid);if(pin){pin.focus();try{pin.scrollIntoView({block:'center'})}catch(_){}}}
     else if(a==='debtsync'){
       var k2=b.dataset.k,A=(F.accts||{})[k2];if(!A||A.debt==null)return;var d2=debtFor(k2);
       if(d2){F.debts[d2.id].bal=A.debt;F.debts[d2.id].ac=k2;toast('Остаток «'+(d2.n||'долг')+'» теперь '+money(A.debt)+' (по выписке).')}
@@ -1869,7 +2168,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   var h0=(location.hash||'').slice(1);if(TABS.some(function(x){return x[0]===h0}))tab=h0;
   try{history.replaceState({tab:tab},'','#'+tab)}catch(_){}
   render();pill();fsBoot();
-  var UPD_NAME='finansy',UPD_BUILD='e8f05cda8f';
+  var UPD_NAME='finansy',UPD_BUILD='0aef5cee4f';
   function updBusy(){return fsBusy||(!!bkDlg&&!bkDlg.hidden)||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
