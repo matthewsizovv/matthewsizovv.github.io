@@ -291,6 +291,8 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   .cc-add select{grid-column:1/-1;grid-row:2}
   .sum-eq .tot b{font-size:calc(16px*var(--fz))}
 }
+.r.fix .fixl{display:grid;gap:1px;font-size:calc(14px*var(--fz));padding-left:2px}
+.r.fix .fixl small{color:var(--muted);font-size:calc(12px*var(--fz))}
 </style>
 </head>
 <body>
@@ -348,7 +350,10 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   }
   function sideNet(s){return num(s.inc)-num(s.cost)}
   function sidesInPlan(f){var s=0;list(f.sides).forEach(function(x){if(x.inPlan)s+=sideNet(x)});return s}
-  function incomeOf(f){var s=0;list(f.inc).forEach(function(x){if(!x.off)s+=num(x.a)});return s}
+  /* база дохода (зарплата без премии) — отдельное поле, по умолчанию 100 000; остальные постоянные доходы в списке inc */
+  var BASE0=100000;
+  function baseOf(f){return Math.max(0,num(f.base))}
+  function incomeOf(f){var s=baseOf(f);list(f.inc).forEach(function(x){if(!x.off)s+=num(x.a)});return s}
   function expOf(f){var s=0;list(f.exp).forEach(function(x){if(!x.off)s+=num(x.a)});return s}
   /* план по месяцам. Каждый месяц: на долги начисляются проценты, платятся минимальные платежи, остаток свободных денег
      делится между досрочным погашением и целями по выбранному правилу. Месяц 0 — текущий. */
@@ -1425,6 +1430,11 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     ['inc','exp','debts','goals','sides','months','days','flow','accts','bonus','cc'].forEach(function(k){if(!isO(f[k]))f[k]={}});
     if(!isO(f.cats))f.cats=b.cats;
     ['plan','spend'].forEach(function(k){var o=isO(f[k])?f[k]:{};Object.keys(b[k]).forEach(function(x){if(o[x]==null)o[x]=b[k][x]});f[k]=o});
+    /* база дохода: если её ещё нет, ставится 100 000. Зарплата, вписанная раньше строкой в доходах, убирается, чтобы не задвоить */
+    if(f.base==null||!isFinite(+f.base)){
+      var bi=Object.keys(f.inc).filter(function(id){var x=f.inc[id];return isO(x)&&(/зарплат|оклад|баз/i.test(x.n||'')||num(x.a)===BASE0)})[0];
+      if(bi)delete f.inc[bi];f.base=BASE0;
+    }
     if(typeof f.cur!=='string'||!f.cur)f.cur='₽';f.v=1;return f;
   }
   var F=norm((function(){try{return JSON.parse(localStorage.getItem(LSK)||'null')}catch(_){return null}})());
@@ -1450,7 +1460,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   function delB(p,lab){return '<button type="button" class="ib" data-del="'+p+'" aria-label="'+esc(lab||'Удалить')+'" title="Удалить">×</button>'}
 
   /* ---------- вкладка «План» ---------- */
-  function hasData(){return Object.keys(F.inc).length||Object.keys(F.debts).length||Object.keys(F.goals).length}
+  function hasData(){return baseOf(F)>0||Object.keys(F.inc).length||Object.keys(F.debts).length||Object.keys(F.goals).length}
   function when(R,idx){return idx==null?'':mName(mAddK(R.now,idx))}
   function renderPlan(){
     if(!hasData())return '<div class="empty"><h2>С чего начать</h2><ol><li>Впиши доход и обязательные расходы в месяц. План ежедневных трат ставится во вкладке «Траты».</li><li>Добавь кредитки и кредиты: остаток, ставку, минимальный платёж.</li><li>Добавь цели: сколько нужно и сколько уже есть.</li></ol><p class="note">После этого здесь появится план: сколько и куда нести каждый месяц и когда всё закроется.</p><button type="button" class="btn" data-go="money">Заполнить</button></div>';
@@ -1511,11 +1521,14 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   /* ---------- вкладка «Деньги»: всё, из чего строится план ---------- */
   function renderMoney(){
     var inc=list(F.inc),ex=list(F.exp),db=list(F.debts),gl=list(F.goals),sd=sidesInPlan(F),dl=spendPlanM(F,NOW),dt=0;db.forEach(function(d){dt+=Math.max(0,num(d.bal))});
-    var h='<div class="grid2"><div class="box"><div class="box-h"><span>Доход в месяц: база</span><small>'+money(incomeOf(F)+sd)+'</small></div><div class="rows">'+
-      inc.map(function(x){return '<div class="r c2">'+fTxt('inc.'+x.id+'.n','Зарплата без премии','Источник дохода')+fNum('inc.'+x.id+'.a','0','Сумма в месяц')+delB('inc.'+x.id)+'</div>'}).join('')+'</div>'+
+    var bn=num((F.bonus||{})[NOW]);
+    var h='<div class="grid2"><div class="box"><div class="box-h"><span>Доход в месяц</span><small>'+money(incomeOf(F)+sd)+(bn?' + премия '+money(bn):'')+'</small></div><div class="rows">'+
+      '<div class="r c2 fix"><span class="fixl">Зарплата, база<small>каждый месяц, без премии</small></span>'+fNum('base','0','Зарплата, база в месяц')+'<span></span></div>'+
+      '<div class="r c2 fix"><span class="fixl">Премия за '+MN[+NOW.slice(5)-1]+'<small>вносишь сам, когда пришла</small></span>'+fNum('bonus.'+NOW,'0','Премия за этот месяц')+'<span></span></div>'+
+      inc.map(function(x){return '<div class="r c2">'+fTxt('inc.'+x.id+'.n','Другой постоянный доход','Источник дохода')+fNum('inc.'+x.id+'.a','0','Сумма в месяц')+delB('inc.'+x.id)+'</div>'}).join('')+'</div>'+
       (sd?'<div class="gline"><span>Доп. источники в плане: '+money(sd)+' · меняется во вкладке «Доп. источники»</span></div>':'')+
-      '<p class="note">Сюда идёт то, что приходит каждый месяц (база). Премию вносишь отдельно за каждый месяц во вкладке «Месяцы» → «Сводка месяца»: план считается от базы, премия идёт сверху.</p>'+
-      '<div><button type="button" class="btn ghost" data-add="inc">+ Доход</button></div></div>'+
+      '<p class="note">План на будущие месяцы считается от базы, премия идёт сверху. Премии за прошлые месяцы — во вкладке «Месяцы» → «Сводка месяца».</p>'+
+      '<div><button type="button" class="btn ghost" data-add="inc">+ Другой доход</button></div></div>'+
       '<div class="box"><div class="box-h"><span>Обязательные расходы в месяц</span><small>'+money(expOf(F)+dl)+'</small></div><div class="rows">'+
       ex.map(function(x){return '<div class="r c2">'+fTxt('exp.'+x.id+'.n','На что: жильё, связь, подписки','Статья расходов')+fNum('exp.'+x.id+'.a','0','Сумма в месяц')+delB('exp.'+x.id)+'</div>'}).join('')+'</div>'+
       '<div class="gline"><span>'+(dl?'Траты по дням: '+money(dl)+' в месяц ('+money(num(F.spend.day))+' в день) · меняется во вкладке «Траты»':'План трат по дням не задан: он ставится во вкладке «Траты» и тоже идёт в расходы')+'</span></div>'+
@@ -1856,7 +1869,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   var h0=(location.hash||'').slice(1);if(TABS.some(function(x){return x[0]===h0}))tab=h0;
   try{history.replaceState({tab:tab},'','#'+tab)}catch(_){}
   render();pill();fsBoot();
-  var UPD_NAME='finansy',UPD_BUILD='d9797aae79';
+  var UPD_NAME='finansy',UPD_BUILD='e8f05cda8f';
   function updBusy(){return fsBusy||(!!bkDlg&&!bkDlg.hidden)||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
