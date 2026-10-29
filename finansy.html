@@ -523,6 +523,37 @@ button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-widt
   .cal-row{grid-template-columns:minmax(0,1fr)}
   .box.cal .cal-d{height:auto;aspect-ratio:1/0.86}
 }
+/* дни с суммами вместо плюсов, коротко о долгах (29.10, 21:55) */
+.box.cal .cal-d{box-shadow:inset 0 0 0 1px var(--line)}
+.box.cal .cal-d.off,.box.cal .cal-d.fut{background:var(--cal-bg);box-shadow:none}
+.box.cal .cal-d.sel{box-shadow:0 0 0 2px var(--accent)}
+.cal-v{font-size:calc(12px*var(--fz));font-weight:600;color:#14171F;margin-top:9px;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
+.cal-v.inv{color:#fff}
+.cal-v.z{color:#A3AAB6;font-weight:400}
+.box.cal .cal-d .cal-n{color:#737B8A}
+.box.cal .cal-d.dk .cal-n{color:rgba(255,255,255,.65)}
+.box.dmini{gap:10px}
+.dm-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.dm-top>div{display:grid;gap:3px;align-content:start;background:var(--soft);border-radius:14px;padding:10px 12px;min-width:0}
+.dm-top span{font-size:calc(12px*var(--fz));color:var(--muted)}
+.dm-top b{font-family:var(--display);font-weight:400;font-size:calc(19px*var(--fz));letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.dm-top small{font-size:calc(11.5px*var(--fz));color:var(--muted);line-height:1.35}
+.dm-top .bad b{color:var(--danger)}
+.dm-chg{margin:0;font-size:calc(13px*var(--fz));border-radius:12px;padding:8px 12px;font-variant-numeric:tabular-nums}
+.dm-chg.up{background:var(--warn-bg);color:var(--warn-fg)}.dm-chg.dn{background:var(--ok-bg);color:var(--ok-fg)}
+.dm-l{display:grid}
+.dm-r{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.dm-n{display:grid;min-width:0}.dm-n b{font-weight:600;font-size:calc(14px*var(--fz))}.dm-n small{color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.dm-p{display:grid;gap:3px}.dm-p small{color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.dm-p>i.bar{display:block}
+.dm-b{font-weight:600;font-size:calc(14px*var(--fz));white-space:nowrap}
+@media (max-width:640px){
+  .dm-top{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .dm-top>div:last-child{grid-column:1/-1}
+  .dm-r{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n b" "p p"}
+  .dm-n{grid-area:n}.dm-b{grid-area:b}.dm-p{grid-area:p}
+  .cal-v{font-size:calc(10.5px*var(--fz));margin-top:8px}
+}
 </style>
 </head>
 <body>
@@ -1906,7 +1937,7 @@ button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-widt
   function debtSecH(){
     var db=list(F.debts),R=finPlan(F,{now:NOW}),dt=0,it=0,cards=0;db.forEach(function(d){var b=Math.max(0,num(d.bal));dt+=b;it+=b*Math.max(0,num(d.apr))/1200;if(!isLoan(d))cards++});
     var fy=feeSum(F,dShift(TODAY,-365),TODAY),due=F.plan.due||'',pc=due?payToClose(F,due,NOW):null,cur=debtPayM(F);
-    var h='<section class="box dsec"><div class="box-h"><span>Кредитки и кредиты</span><small>долг '+money(dt)+'</small></div>'+
+    var h='<section class="box dsec" id="debts-sec"><div class="box-h"><span>Кредитки и кредиты</span><small>долг '+money(dt)+'</small></div>'+
       '<div class="dtop">'+
         '<div class="ds-i"><span>Проценты сейчас</span><b>≈ '+money(it)+'<small> в месяц</small></b></div>'+
         '<div class="ds-i"><span>Банку за 12 мес.</span><b>'+money(fy.sum)+'</b><small>проценты, страховки, комиссии из выписок</small></div>'+
@@ -1978,6 +2009,8 @@ button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-widt
     h+='<div class="cal-row">'+calH(mk,M)+catSecH(mk,M)+'</div>';
     /* траты за выбранный день; загрузка выписки справа сверху */
     h+=dayH(M);
+    /* ниже коротко: как закрываются долги */
+    h+=debtsMiniH();
     return h;
   }
   /* переводы по номеру, на которые ещё не ответил «это я / другому человеку»: от ответа зависит, трата это или нет */
@@ -1994,26 +2027,46 @@ button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-widt
     if(ids.length)h+='<div class="sp-l">'+ids.map(function(id){var e=o[id];return '<div class="sp-e"><span class="tagc">'+esc(e.c||'Другое')+'</span><span class="nt">'+esc(e.n||'')+(e.ho?' <small class="ho" title="Банк ещё не провёл покупку, деньги заблокированы">не проведено</small>':'')+(fk&&e.n&&fk[nKey(e.n)]?' <small class="fx" title="Стоит в обязательных расходах, в лимит дня не идёт">обязательный</small>':'')+'</span><b>'+money(e.a)+'</b><button type="button" class="ib" data-spdel="'+id+'" aria-label="Удалить трату">×</button></div>'}).join('')+'</div>';
     return h+'</section>';
   }
-  /* ---- календарь: маленький, плюсик за каждый день. Цвет плюса — сколько потрачено: белый 0 ₽, почти чёрный 20 000 ₽ и больше.
-     Наведение раскрывает ячейку и показывает сумму за сутки ---- */
+  /* ---- календарь: в каждом дне сумма трат за сутки. Фон дня — сколько потрачено: белый 0 ₽, почти чёрный 20 000 ₽ и больше
+     (на тёмных днях цифры белые). Наведение раскрывает ячейку: сумма и сколько от лимита ---- */
   var CAL_MAX=20000;
   function plusCol(sum){
     var t=Math.min(1,Math.max(0,sum/CAL_MAX)),c=function(a,b){return Math.round(a+(b-a)*t)};
     return 'rgb('+c(255,24)+','+c(255,24)+','+c(255,27)+')';
   }
+  /* сумма в ячейке: коротко, чтобы влезла — 1 850, 12,4к, 120к */
+  function calSum(n){n=Math.round(n);return n>=100000?Math.round(n/1000)+'к':n>=10000?(n/1000).toFixed(1).replace('.',',').replace(/,0$/,'')+'к':money(n,1)}
   function calH(mk,M){
     var lim=M.lim,n=M.n,off=(dDate(mk+'-01').getDay()+6)%7,curM=mk===TODAY.slice(0,7),cells='',mi=+mk.slice(5)-1;
     ['пн','вт','ср','чт','пт','сб','вс'].forEach(function(w){cells+='<span class="cal-w">'+w+'</span>'});
     for(var i=0;i<off;i++)cells+='<span class="cal-e"></span>';
     for(var d=1;d<=n;d++){
       var D=M.days[d-1],dk=D.k,fut=dk>TODAY,track=d>=M.s0&&!fut,over=lim&&D.sum>lim+0.5;
-      cells+='<button type="button" class="cal-d'+(fut?' fut':'')+(!track&&!fut?' off':'')+(dk===spD?' sel':'')+(dk===TODAY?' tdy':'')+'" data-pick="'+dk+'"'+(fut?' disabled':'')+
-        ' aria-label="'+d+' '+MG[mi]+(fut?'':': потрачено '+money(D.sum))+'"><span class="cal-n">'+d+'</span>'+
-        (track?'<svg class="pl" viewBox="0 0 24 24" aria-hidden="true"><path class="pl-o" d="M12 5v14M5 12h14"/><path class="pl-f" d="M12 5v14M5 12h14" style="stroke:'+plusCol(D.sum)+'"/></svg>':'')+
+      cells+='<button type="button" class="cal-d'+(fut?' fut':'')+(!track&&!fut?' off':'')+(dk===spD?' sel':'')+(dk===TODAY?' tdy':'')+(track&&D.sum/CAL_MAX>0.42?' dk':'')+'" data-pick="'+dk+'"'+(fut?' disabled':'')+
+        (track?' style="background:'+plusCol(D.sum)+'"':'')+' aria-label="'+d+' '+MG[mi]+(fut?'':': потрачено '+money(D.sum))+'"><span class="cal-n">'+d+'</span>'+
+        (track?'<span class="cal-v'+(D.sum/CAL_MAX>0.42?' inv':'')+(D.sum?'':' z')+'">'+(D.sum?calSum(D.sum):'0')+'</span>':'')+
         (fut?'':'<span class="cal-pop"><small>'+d+' '+MG[mi].slice(0,3)+'</small><b>'+money(D.sum)+'</b>'+(lim&&track?'<small class="'+(over?'bad':'ok')+'">'+(over?'+'+money(D.sum-lim,1)+' сверх':'из '+money(lim,1))+'</small>':'')+'</span>')+'</button>';
     }
     return '<section class="box cal" id="cal-sec"><div class="cal-h"><b>'+mName(mk).replace(/^./,function(c){return c.toUpperCase()})+'</b><span><button type="button" class="ib" data-mon="-1" aria-label="Предыдущий месяц">‹</button><button type="button" class="ib" data-mon="1" aria-label="Следующий месяц"'+(curM||mk>TODAY.slice(0,7)?' disabled':'')+'>›</button></span></div>'+
       '<div class="cal-g">'+cells+'</div><div class="cal-lg"><span>0 ₽</span><i></i><span>20 000 ₽</span></div></section>';
+  }
+  /* ---- коротко о долгах под тратами: сколько всего, сколько внесено в этом месяце, растёт или тает долг по кредиткам, когда всё закроется ---- */
+  function debtsMiniH(){
+    var db=list(F.debts).filter(function(d){return num(d.bal)>0});
+    if(!db.length)return '<section class="box dmini"><div class="cal-h"><b>Долги и кредитки</b><button type="button" class="lnk" data-act="opendebts">настройки</button></div><p class="note">Кредиток и кредитов нет. Если они есть, добавь их в настройках: здесь будет видно, как они закрываются.</p></section>';
+    var R=finPlan(F,{now:NOW}),S=monthSum(F,NOW,TODAY),dt=0,it=0;db.forEach(function(d){dt+=num(d.bal);it+=num(d.bal)*Math.max(0,num(d.apr))/1200});
+    var need=debtPayM(F),pc=need?Math.min(100,S.pay/need*100):0,chg=S.cc-S.pay,mi=MP[+NOW.slice(5)-1];
+    var free=R.debtFree>=0?mName(mAddK(NOW,R.debtFree)):R.never?'не гасится':'—';
+    var h='<section class="box dmini"><div class="cal-h"><b>Долги и кредитки</b><button type="button" class="lnk" data-act="opendebts">настройки</button></div>'+
+      '<div class="dm-top"><div><span>Всего долг</span><b>'+money(dt)+'</b><small>проценты ≈ '+money(it)+' в месяц</small></div>'+
+      '<div><span>Внесено в '+mi+'</span><b>'+money(S.pay)+'</b><div class="bar"><i style="width:'+pc.toFixed(1)+'%"></i></div><small>'+(need?(S.pay>=need?'план '+money(need)+' выполнен':'план '+money(need)+' · осталось '+money(need-S.pay)):'план на месяц не задан')+'</small></div>'+
+      '<div class="'+(R.never?'bad':'')+'"><span>Без долгов</span><b>'+free+'</b><small>'+(R.debtFree>=0?inMon(R.debtFree)+' при '+money(R.months[0]?sumO(R.months[0].pay):(need||R.minSum))+' в месяц · проценты по пути ≈ '+money(R.interest):R.never?'платёж меньше процентов':'впиши ставки и платежи в настройках')+'</small></div></div>'+
+      (S.cc||S.pay?'<p class="dm-chg '+(chg>0.5?'up':'dn')+'">Кредитки в '+mi+': потрачено '+money(S.cc)+', внесено '+money(S.pay)+' → долг '+(chg>0.5?'вырос на <b>'+money(chg)+'</b>':chg<-0.5?'уменьшился на <b>'+money(-chg)+'</b>':'не изменился')+'</p>':'')+
+      '<div class="dm-l">'+db.map(function(d){var I=dcInfo(d,R),pp=I.want?Math.min(100,I.paid/I.want*100):0,done=R.done[d.id];
+        return '<div class="dm-r"><span class="dm-n"><b>'+esc(d.n||'Долг')+'</b><small>'+(num(d.apr)?String(num(d.apr)).replace('.',',')+'% · ':'')+(done!=null?'закроется '+mName(mAddK(NOW,done),1):'срок не посчитать')+'</small></span>'+
+          '<span class="dm-p"><i class="bar"><i style="width:'+pp.toFixed(1)+'%"></i></i><small>'+(I.np?'до '+dmy(I.np.d)+': ':'')+(I.want?money(I.paid,1)+' из '+money(I.want):'платёж не задан')+'</small></span>'+
+          '<b class="dm-b">'+money(d.bal)+'</b></div>'}).join('')+'</div></section>';
+    return h;
   }
   /* ---- лимит на день: сам из дохода или вручную ---- */
   function limSetH(mk){
@@ -2293,6 +2346,7 @@ button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-widt
     else if(a==='catedit'){spEdit=!spEdit;render()}
     else if(a==='catlim'){catEd=!catEd;render()}
     else if(a==='setclose')setTab('spend');
+    else if(a==='opendebts')setTab('set',true,'debts-sec');
     else if(a==='dayall'){dayAll=!dayAll;render()}
     else if(a==='dcx'){var dx=b.dataset.id;dcOpen[dx]=!dcOpen[dx];render()}
     else if(a==='dcpay'){dcPay(b.dataset.id)}
@@ -2356,7 +2410,7 @@ button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-widt
   if(j0)setTimeout(function(){jumpTo(j0)},50);
   try{history.replaceState({tab:tab},'','#'+tab)}catch(_){}
   render();pill();fsBoot();
-  var UPD_NAME='finansy',UPD_BUILD='ff2da32d60';
+  var UPD_NAME='finansy',UPD_BUILD='94a94200ec';
   function updBusy(){return fsBusy||(!!bkDlg&&!bkDlg.hidden)||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
