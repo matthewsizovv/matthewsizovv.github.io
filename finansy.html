@@ -374,6 +374,49 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
 .bk-fee small{opacity:.85;margin-top:2px}
 .sum-l li.fee{color:var(--warn-fg)}
 .rec .btn.ghost{background:var(--surface);border:1px solid var(--line)}
+/* ---- календарь «факт / план» (29.10) ---- */
+:root{--cal-bg:#E4E7ED;--cal-o:rgba(20,23,31,.30)}
+:root[data-ui="dark"]{--cal-bg:#252A33;--cal-o:rgba(0,0,0,.45)}
+.cal-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px 16px;flex-wrap:wrap;font-size:calc(13px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.cal-top b{color:var(--ink);font-weight:600}
+.cal-top .ok{color:var(--ok-fg)}.cal-top .bad{color:var(--danger)}
+.cal-cnt{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}
+.cc{width:11px;height:11px;border-radius:3px;display:inline-block;margin-left:8px}
+.cc:first-child{margin-left:0}
+.cc.ok{background:#fff;box-shadow:inset 0 0 0 1.5px var(--faint)}
+.cc.near{background:#9AA0AA}
+.cc.bad{background:linear-gradient(90deg,rgba(239,110,110,.45),rgb(110,6,12))}
+.cal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-w{text-align:center;font-size:calc(11px*var(--fz));color:var(--muted)}
+.cal-d{position:relative;border:0;border-radius:14px;background:var(--cal-bg);height:78px;min-width:0;padding:0;color:var(--ink);display:grid;place-items:center;cursor:pointer;font-variant-numeric:tabular-nums}
+.cal-d:hover{filter:brightness(.97)}
+:root[data-ui="dark"] .cal-d:hover{filter:brightness(1.15)}
+.cal-d.sel{box-shadow:0 0 0 2px var(--ink)}
+.cal-d.fut{opacity:.35;cursor:default}
+.cal-d.off{opacity:.55}
+.cal-n{position:absolute;top:6px;left:8px;font-size:calc(11px*var(--fz));color:var(--muted)}
+.cal-d.tdy .cal-n{color:var(--ink);font-weight:700}
+.cal-s{position:absolute;bottom:5px;left:0;right:0;text-align:center;font-size:calc(10.5px*var(--fz));color:var(--muted);white-space:nowrap;overflow:hidden}
+.cal-d.st-bad .cal-s{color:var(--danger)}
+.pl{width:30px;height:30px;display:block}
+.pl path{fill:none;stroke-linecap:round}
+.pl .pl-o{stroke:var(--cal-o);stroke-width:5.6}
+.pl .pl-f{stroke-width:3.2}
+/* ---- вкладка «Месяц»: переходы к разделам ---- */
+.jump{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:-12px}
+.jump button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:calc(13px*var(--fz));font-weight:500;color:var(--ink)}
+.jump button:hover{background:var(--soft)}
+.part{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;scroll-margin-top:12px}
+.part-h{font-size:calc(24px*var(--fz));padding-top:8px;border-top:1px solid var(--line)}
+#hist-sec{display:block;height:0;margin-bottom:-28px}
+@media (max-width:640px){
+  .cal-g{gap:4px}
+  .cal-d{border-radius:10px;height:auto;aspect-ratio:1/1.08}
+  .cal-n{top:4px;left:5px;font-size:calc(10px*var(--fz))}
+  .cal-s{bottom:3px;font-size:calc(9.5px*var(--fz))}
+  .pl{width:46%;height:46%}
+  .part-h{font-size:calc(20px*var(--fz))}
+}
 .day-all{justify-self:start;margin-top:-4px}
 @media (max-width:640px){
   .kv-r{grid-template-columns:minmax(0,1fr) 112px 30px}
@@ -1574,6 +1617,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
      Здесь видно, когда следующая выгрузка и каких банков не хватает */
   function bkCheck(dk){var d=+dk.slice(8);return dk.slice(0,8)+(d>=15?'15':'01')}
   function bkNext(dk){var d=+dk.slice(8);return d<15?dk.slice(0,8)+'15':mAddK(dk.slice(0,7),1)+'-01'}
+  function bkLate(){var cv=isO(F.bkcov)?F.bkcov:{},need=dShift(bkCheck(TODAY),-1);return Object.keys(cv).filter(function(b){return Array.isArray(cv[b])&&cv[b].length&&cv[b][cv[b].length-1][1]<need})}
   function bkDueH(bs,cv){
     var cp=bkCheck(TODAY),need=dShift(cp,-1),late=bs.filter(function(b){return cv[b][cv[b].length-1][1]<need});
     if(late.length)return '<span class="bk-due">Пора загрузить выписки'+(cp===TODAY?' (сегодня '+(+cp.slice(8))+'-е)':'')+': '+late.map(function(b){return esc(b)+' — загружено до '+bkDm(cv[b][cv[b].length-1][1])}).join(', ')+'. Бери период с прошлой выгрузки по вчера, можно с запасом: повторы не добавятся.</span>';
@@ -1703,7 +1747,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
       '<div class="kv-r"><span>Зарплата, база<small>каждый месяц, без премии</small></span>'+fNum('base','0','Зарплата, база в месяц')+'<span></span></div>'+
       '<div class="kv-r"><span>Премия за '+MN[+NOW.slice(5)-1]+'<small>когда пришла; в план не идёт</small></span>'+fNum('bonus.'+NOW,'0','Премия за этот месяц')+'<span></span></div>'+
       inc.map(function(x){return '<div class="kv-r">'+fTxt('inc.'+x.id+'.n','Другой доход','Источник дохода')+fNum('inc.'+x.id+'.a','0','Сумма в месяц')+delB('inc.'+x.id)+'</div>'}).join('')+
-      (sd?'<div class="kv-r ro"><span>Доп. источники в плане<small>меняются во вкладке «Доп. источники»</small></span><b>'+money(sd)+'</b><span></span></div>':'')+'</div>'+
+      (sd?'<div class="kv-r ro"><span>Доп. источники в плане<small>меняются ниже, в «Доп. источниках дохода»</small></span><b>'+money(sd)+'</b><span></span></div>':'')+'</div>'+
       '<div class="box-f"><button type="button" class="lnk" data-add="inc">+ другой доход</button></div></div>'+
       /* обязательные расходы и подсказки «похоже на регулярные» из трат */
       '<div class="box"><div class="box-h"><span>Обязательные в месяц</span><small>'+money(expOf(F))+'</small></div><div class="kv">'+
@@ -1718,6 +1762,7 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
           lf('Срок, необязательно','<input class="inp" type="month" id="i-goals.'+x.id+'.due" data-p="goals.'+x.id+'.due" data-t="txt" value="'+esc(x.due||'')+'" min="'+NOW+'" aria-label="Срок, необязательно">')+delB('goals.'+x.id)+'</div>'+
           '<div class="gline"><div class="bar"><i style="width:'+pc.toFixed(1)+'%"></i></div></div>'}).join('')+'</div>'+
       '<p class="note">Срок необязателен. Порядок в списке: какая цель копится первой.</p><div><button type="button" class="btn ghost" data-add="goals">+ Цель</button></div></div></div>'+
+      '<div id="sides-sec" class="part">'+renderSides()+'</div>'+
       '<section class="sec"><div class="opts"><div class="opt"><span>Валюта<small>только значок рядом с суммами</small></span><span class="ctl">'+seg('cur',[['₽','₽'],['$','$'],['€','€'],['USDT','USDT']])+'</span></div>'+
       '<div class="opt"><span>Копия записей<small>файл со всеми числами этого сайта; пригодится как запас</small></span><span class="ctl"><button type="button" class="btn ghost" data-act="exp">Скачать</button><button type="button" class="btn ghost" data-act="imp">Загрузить</button><input type="file" id="imp-file" accept=".json,application/json" hidden></span></div></div></section>';
     return h;
@@ -1820,32 +1865,59 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     if(SM.ccMin)st.push('на кредитки внесено '+money(SM.pay)+' из '+money(SM.ccMin));else if(SM.pay)st.push('на кредитки внесено '+money(SM.pay));
     if(SM.fee)st.push('плата банку '+money(SM.fee));
     catLims(mk).filter(function(c){return c.lim&&c.a>c.lim}).forEach(function(c){st.push(c.n+': лимит превышен на '+money(c.a-c.lim))});
+    if(curM){var lt=bkLate();if(lt.length)st.unshift('пора загрузить выписки: '+lt.join(', '))}
     if(SM.ask.length)st.push('переводов без ответа «кому»: '+SM.ask.length);
     if(SM.open.length)st.push('переводов себе без второй выписки: '+SM.open.length);
     h+='<div class="sum-strip"><span>'+(st.length?mName(mk).replace(/ \d+$/,'').replace(/^./,function(c){return c.toUpperCase()})+': '+st.join(' · '):'Доход, премия, платежи по кредиткам и переводы себе — в сводке месяца')+'</span><button type="button" class="lnk" data-go="months" data-mk="'+mk+'">Сводка месяца →</button></div>';
-    /* выписка банка: траты из файла */
-    h+='<div class="bk-in"><button type="button" class="btn ghost" data-act="bkopen">Загрузить выписку банка</button><span class="note">Т-Банк, Сбер, Альфа и другие: Excel, CSV, OFX или PDF. Можно сразу несколько файлов из разных банков, можно просто перетащить их на страницу.</span><button type="button" class="lnk" data-act="bkhow" aria-expanded="'+!!bkHow+'">Как скачать выписку</button></div>'+(bkHow?bkHowH():'')+bkCovH();
+    /* календарь месяца: факт против плана по дням; нажатие на день открывает его ниже */
+    h+=calH(mk,M);
     /* день: ввод трат */
     var o=F.days[spD]||{},ids=Object.keys(o).sort(function(x,y){return(o[x].t||0)-(o[y].t||0)}),fk=fxKeys(F);
-    h+='<section class="sec"><div class="row between"><h2>'+dLabel(spD)+'</h2><span class="ctl"><button type="button" class="ib" data-day="-1" aria-label="Предыдущий день">‹</button><input class="inp" type="date" id="sp-date" value="'+spD+'" max="'+TODAY+'" aria-label="Выбрать день"><button type="button" class="ib" data-day="1" aria-label="Следующий день"'+(spD>=TODAY?' disabled':'')+'>›</button>'+(isT?'':'<button type="button" class="btn ghost" data-day="0">Сегодня</button>')+'</span></div>'+
+    h+='<section class="sec" id="day-sec"><div class="row between"><h2>'+dLabel(spD)+'</h2><span class="ctl"><button type="button" class="ib" data-day="-1" aria-label="Предыдущий день">‹</button><input class="inp" type="date" id="sp-date" value="'+spD+'" max="'+TODAY+'" aria-label="Выбрать день"><button type="button" class="ib" data-day="1" aria-label="Следующий день"'+(spD>=TODAY?' disabled':'')+'>›</button>'+(isT?'':'<button type="button" class="btn ghost" data-day="0">Сегодня</button>')+'</span></div>'+
       '<div class="chips" role="group" aria-label="Категория">'+cats.map(function(c){return '<button type="button" class="chip" data-cat="'+esc(c)+'" aria-pressed="'+(c===spCat)+'">'+esc(c)+(spEdit?' <i aria-hidden="true">×</i>':'')+'</button>'}).join('')+
       (spNewCat?'<span class="row"><input class="inp keep" id="sp-newcat" maxlength="24" placeholder="Новая категория" aria-label="Новая категория"><button type="button" class="btn ghost" data-act="catok">Добавить</button></span>':'<button type="button" class="chip add" data-act="catnew">+ категория</button>'+(cats.length?'<button type="button" class="chip add" data-act="catedit" aria-pressed="'+spEdit+'">'+(spEdit?'Готово':'Убрать лишние')+'</button>':''))+'</div>'+
       (spEdit?'<p class="note">Нажми на категорию, чтобы убрать её из списка. Уже записанные траты останутся.</p>':
       '<div class="addrow"><input class="inp num keep" id="sp-a" inputmode="decimal" autocomplete="off" placeholder="Сумма" aria-label="Сумма траты"><input class="inp keep" id="sp-n" maxlength="60" autocomplete="off" placeholder="На что, необязательно" aria-label="На что потрачено"><button type="button" class="btn" data-act="spadd">Добавить</button></div>')+
       (ids.length?'<div class="sp-l">'+ids.map(function(id){var e=o[id];return '<div class="sp-e"><span class="tagc">'+esc(e.c||'Другое')+'</span><span class="nt">'+esc(e.n||'')+(e.ho?' <small class="ho" title="Банк ещё не провёл покупку, деньги заблокированы">не проведено</small>':'')+(fk&&e.n&&fk[nKey(e.n)]?' <small class="fx" title="Стоит в обязательных расходах, в лимит дня не идёт">обязательный</small>':'')+'</span><b>'+money(e.a)+'</b><button type="button" class="ib" data-spdel="'+id+'" aria-label="Удалить трату">×</button></div>'}).join('')+'<div class="sp-e tot"><span>Всего за день</span><span>'+(dI.fix?'<small class="fx-n">в лимит идёт '+money(ds)+', обязательные '+money(dI.fix)+'</small>':'')+'</span><b>'+money(ds+dI.fix)+'</b><span></span></div></div>':'<p class="note">'+(isT?'За сегодня трат пока нет. Выбери категорию, впиши сумму и нажми «Добавить».':'За этот день трат нет.')+'</p>')+'</section>';
-    /* план на день */
+    /* выписка банка: траты из файла */
+    h+='<section class="sec"><div class="bk-in"><button type="button" class="btn ghost" data-act="bkopen">Загрузить выписку банка</button><span class="note">Т-Банк, Сбер, Альфа и другие: Excel, CSV, OFX или PDF. Можно сразу несколько файлов из разных банков, можно просто перетащить их на страницу.</span><button type="button" class="lnk" data-act="bkhow" aria-expanded="'+!!bkHow+'">Как скачать выписку</button></div>'+(bkHow?bkHowH():'')+bkCovH()+'</section>';
+    /* лимит на день */
     h+=limSetH(mk);
-    /* дни месяца */
-    var last=curM?M.upto:mk<TODAY.slice(0,7)?M.n:0,mx=lim;M.days.forEach(function(d){if(d.sum>mx)mx=d.sum});mx=mx||1;
-    /* по умолчанию последние 7 дней (и выбранный день), весь месяц — по кнопке */
-    var rows='',shown=0,total=Math.max(0,last-Math.max(1,M.s0)+1);
-    for(var i=last;i>=Math.max(1,M.s0);i--){var d=M.days[i-1],df=lim-d.sum,dd=dDate(d.k);
-      if(!dayAll&&shown>=7&&d.k!==spD)continue;shown++;
-      rows+='<button type="button" class="dayr" data-pick="'+d.k+'"'+(d.k===spD?' aria-current="true"':'')+'><span class="dn">'+d.d+' <small>'+WD[dd.getDay()]+'</small></span><span class="db"><i style="width:'+(d.sum/mx*100).toFixed(1)+'%"></i>'+(lim?'<u style="left:'+(lim/mx*100).toFixed(1)+'%"></u>':'')+'</span><span class="dsum">'+money(d.sum)+'</span>'+(lim?'<span class="tag '+(df>=0?'ok':'bad')+'">'+signed(df)+'</span>':'<span></span>')+'</button>'}
-    h+='<section class="sec"><div class="row between"><h2>Дни: '+mName(mk)+'</h2><span class="ctl"><button type="button" class="ib" data-mon="-1" aria-label="Предыдущий месяц">‹</button><button type="button" class="ib" data-mon="1" aria-label="Следующий месяц"'+(curM||mk>TODAY.slice(0,7)?' disabled':'')+'>›</button></span></div>'+
-      (lim?'<p class="note">Зелёная метка: сколько осталось от плана за день. Жёлтая: на сколько день вышел за план. Черта на полоске показывает план.</p>':'')+
-      (rows?'<div class="dayl">'+rows+'</div>'+(total>7?'<button type="button" class="lnk day-all" data-act="dayall">'+(dayAll?'Свернуть до последних 7 дней':'Показать все дни месяца ('+total+')')+'</button>':'')+(M.s0>1&&M.s0<=M.n?'<p class="note">Счёт идёт с '+M.s0+'-го числа: это первый день, за который записаны траты.</p>':''):'<p class="note">За этот месяц трат не записано.</p>')+'</section>';
     h+=catSecH(mk,M);
+    return h;
+  }
+  /* ---- календарь: плюсик за каждый день. Белый — уложился в лимит, серый — чуть вышел (до +15%, но не меньше 300 ₽),
+     дальше красный: от светлого полупрозрачного до тёмно-красного непрозрачного, самый тёмный — день на 10 000 ₽ и больше ---- */
+  var CAL_MAX=10000;
+  function plusSt(sum,lim){
+    if(!lim||sum<=lim+0.5)return{k:'ok'};
+    var grey=lim+Math.max(300,lim*0.15);
+    if(sum<=grey)return{k:'near'};
+    var t=Math.min(1,Math.max(0,(sum-grey)/Math.max(1,CAL_MAX-grey))),mix=function(a,b){return Math.round(a+(b-a)*t)};
+    return{k:'bad',t:t,c:'rgba('+mix(239,110)+','+mix(110,6)+','+mix(110,12)+','+(0.32+0.68*t).toFixed(2)+')'};
+  }
+  function plusSvg(st){
+    var col=st.k==='ok'?'#FFFFFF':st.k==='near'?'#9AA0AA':st.c;
+    return '<svg class="pl pl-'+st.k+'" viewBox="0 0 24 24" aria-hidden="true">'+(st.k==='ok'?'<path class="pl-o" d="M12 4.5v15M4.5 12h15"/>':'')+'<path class="pl-f" d="M12 4.5v15M4.5 12h15" style="stroke:'+col+'"/></svg>';
+  }
+  function calSum(n){n=Math.round(n);return n>=100000?Math.round(n/1000)+'к':n>=10000?(n/1000).toFixed(1).replace('.',',').replace(/,0$/,'')+'к':money(n,1)}
+  function calH(mk,M){
+    var lim=M.lim,n=M.n,off=(dDate(mk+'-01').getDay()+6)%7,curM=mk===TODAY.slice(0,7),c={ok:0,near:0,bad:0},fact=0,plan=0,cells='',mi=+mk.slice(5)-1;
+    ['пн','вт','ср','чт','пт','сб','вс'].forEach(function(w){cells+='<span class="cal-w">'+w+'</span>'});
+    for(var i=0;i<off;i++)cells+='<span class="cal-e"></span>';
+    for(var d=1;d<=n;d++){
+      var D=M.days[d-1],dk=D.k,fut=dk>TODAY,track=d>=M.s0&&!fut,st=track?plusSt(D.sum,lim):null;
+      if(track){c[st.k]++;fact+=D.sum;plan+=lim}
+      cells+='<button type="button" class="cal-d'+(fut?' fut':'')+(!track&&!fut?' off':'')+(dk===spD?' sel':'')+(dk===TODAY?' tdy':'')+(st?' st-'+st.k:'')+'" data-pick="'+dk+'"'+(fut?' disabled':'')+
+        ' aria-label="'+d+' '+MG[mi]+(fut?'':': потрачено '+money(D.sum)+(lim?' при лимите '+money(lim):''))+'"><span class="cal-n">'+d+'</span>'+(track&&lim?plusSvg(st):'<span class="pl"></span>')+'<span class="cal-s">'+(D.sum>0?calSum(D.sum):'')+'</span></button>';
+    }
+    var days=c.ok+c.near+c.bad,df=plan-fact;
+    var h='<section class="sec cal" id="cal-sec"><div class="row between"><h2>Календарь: '+mName(mk)+'</h2><span class="ctl"><button type="button" class="ib" data-mon="-1" aria-label="Предыдущий месяц">‹</button><button type="button" class="ib" data-mon="1" aria-label="Следующий месяц"'+(curM||mk>TODAY.slice(0,7)?' disabled':'')+'>›</button></span></div>';
+    if(lim&&days)h+='<div class="cal-top"><span><b>'+money(fact)+'</b> факт из <b>'+money(plan)+'</b> плана за '+days+' '+plural(days,'день','дня','дней')+' · '+(df>=0?'<span class="ok">запас '+money(df)+'</span>':'<span class="bad">перерасход '+money(-df)+'</span>')+'</span>'+
+      '<span class="cal-cnt"><i class="cc ok"></i>'+c.ok+' уложился<i class="cc near"></i>'+c.near+' чуть выше<i class="cc bad"></i>'+c.bad+' перерасход</span></div>';
+    h+='<div class="cal-g">'+cells+'</div>'+
+      (lim?'<p class="note">Лимит '+money(lim)+' в день'+(limAuto(F)?' (считается из дохода; свой — переключи на «Вручную» ниже)':'')+'. Белый плюс — уложился, серый — чуть выше лимита, красный темнеет с суммой: самый тёмный — день на '+money(CAL_MAX)+' и больше. Нажми на день, чтобы открыть его траты.</p>':'<p class="note">Задай лимит на день ниже — и у каждого дня появится плюсик: уложился или нет.</p>')+
+      (M.s0>1&&M.s0<=M.n?'<p class="note">Счёт идёт с '+M.s0+'-го числа: это первый день, за который записаны траты.</p>':'')+'</section>';
     return h;
   }
   /* ---- лимит на день: сам из дохода или вручную ---- */
@@ -1977,7 +2049,11 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     var r=recOf(recM),R=finPlan(F,{now:NOW}),row=(recM===NOW&&R.months[0])||{pay:{},save:{}},db=list(F.debts),gl=list(F.goals);
     function dv(key,fb){return draft[key]!=null?draft[key]:fb}
     function dIn(key,fb,ph,lab){var v=num(dv(key,fb));return '<input class="inp num" id="d-'+key+'" data-d="'+key+'" inputmode="decimal" autocomplete="off" value="'+(v?money(v,1):'')+'" placeholder="'+ph+'" aria-label="'+esc(lab)+'">'}
-    var h=renderSum()+'<section class="sec"><h2>Записать месяц в историю</h2>'+
+    /* «Месяц»: что было (сводка) → куда идут деньги дальше (план) → история. Сверху короткие переходы к разделам */
+    var h='<nav class="jump" aria-label="Разделы"><button type="button" data-jump="sum-sec">Сводка</button><button type="button" data-jump="plan-sec">План</button><button type="button" data-jump="hist-sec">История</button></nav>'+
+      '<div id="sum-sec" class="part">'+renderSum()+'</div>'+
+      '<div id="plan-sec" class="part"><h2 class="part-h">План: куда идут деньги дальше</h2>'+renderPlan()+'</div>'+
+      '<div id="hist-sec" class="part"></div><section class="sec"><h2>Записать месяц в историю</h2>'+
       '<p class="note">Запиши, что было на самом деле. Остатки долгов уменьшатся на платежи, накопления по целям вырастут, а план пересчитается от новых чисел.'+(r?' Этот месяц уже записан: новая запись заменит старую.':'')+'</p>'+
       '<div class="mform"><label class="fld">Доход за месяц'+dIn('inc',r?r.inc:0,money(R.income,1),'Доход за месяц')+'</label><label class="fld">Расходы за месяц'+dIn('exp',r?r.exp:0,money(factExp(recM),1),'Расходы за месяц')+'</label></div>'+
       (db.length?'<h3>Заплатил по долгам</h3><div class="mform">'+db.map(function(d){return '<label class="fld">'+esc(d.n||'Долг')+dIn('p.'+d.id,r&&r.paid?r.paid[d.id]:0,row.pay[d.id]?money(row.pay[d.id],1):'0','Заплатил: '+(d.n||'долг'))+'</label>'}).join('')+'</div>':'')+
@@ -2047,20 +2123,28 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
   }
 
   /* ---------- сборка страницы ---------- */
-  var TABS=[['spend','Траты'],['plan','План'],['money','Деньги'],['sides','Доп. источники'],['months','Месяцы']];
+  /* три вкладки: «Траты» (день и календарь), «Месяц» (сводка, план, история), «Деньги» (доход, кредитки, цели, доп. источники).
+     Старые адреса #plan и #sides открывают нужный раздел внутри новых вкладок */
+  var TABS=[['spend','Траты'],['months','Месяц'],['money','Деньги']],TALIAS={plan:['months','plan-sec'],sides:['money','sides-sec']};
   function render(){
     var a=document.activeElement,id=a&&a.id,ss=null,se=null,kept={};try{ss=a.selectionStart;se=a.selectionEnd}catch(_){}
     /* недописанное в полях ввода траты переживает перерисовку (например, когда приходят записи с другого устройства) */
     [].forEach.call(view.querySelectorAll('.keep'),function(x){if(x.id&&x.value)kept[x.id]=x.value});
     $('tabs').innerHTML=TABS.map(function(t){return '<button type="button" role="tab" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0])+'">'+t[1]+'</button>'}).join('');
     CH.plan=null;
-    view.innerHTML=tab==='money'?renderMoney():tab==='sides'?renderSides():tab==='months'?renderMonths():tab==='plan'?renderPlan():renderSpend();
+    view.innerHTML=tab==='money'?renderMoney():tab==='months'?renderMonths():renderSpend();
     Object.keys(kept).forEach(function(k){var x=$(k);if(x)x.value=kept[k]});
-    if(tab==='plan')drawChart('ch-plan',CH.plan);if(tab==='months')drawChart('ch-fact',CH.fact);
+    if(tab==='months'){drawChart('ch-plan',CH.plan);drawChart('ch-fact',CH.fact)}
     if(id&&id.indexOf('-')>0){var n=$(id);if(n&&n!==document.activeElement){n.focus();try{if(ss!=null&&n.type!=='range'&&n.type!=='month')n.setSelectionRange(ss,se)}catch(_){}}}
   }
-  function setTab(t,push){tab=t;askDel='';render();window.scrollTo(0,0);if(push!==false)try{history.pushState({tab:t},'','#'+t)}catch(_){}}
-  window.addEventListener('popstate',function(e){var t=(e.state&&e.state.tab)||(location.hash||'').slice(1);setTab(TABS.some(function(x){return x[0]===t})?t:'spend',false)});
+  function setTab(t,push,to){
+    if(TALIAS[t]){to=to||TALIAS[t][1];t=TALIAS[t][0]}
+    if(!TABS.some(function(x){return x[0]===t}))t='spend';
+    tab=t;askDel='';render();window.scrollTo(0,0);if(to)jumpTo(to);
+    if(push!==false)try{history.pushState({tab:t},'','#'+t)}catch(_){}
+  }
+  function jumpTo(id){var el=$(id);if(el)try{el.scrollIntoView({block:'start',behavior:'smooth'})}catch(_){el.scrollIntoView()}}
+  window.addEventListener('popstate',function(e){var t=(e.state&&e.state.tab)||(location.hash||'').slice(1);setTab(t,false)});
   $('tabs').addEventListener('click',function(e){var b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab)});
   view.addEventListener('change',function(e){
     var t=e.target,p=t.dataset.p;
@@ -2089,7 +2173,8 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     if((b=t.closest('[data-spdel]'))){var dd=F.days[spD];if(dd){delete dd[b.dataset.spdel];if(!Object.keys(dd).length)delete F.days[spD]}save();render();return}
     if((b=t.closest('[data-day]'))){var dn=+b.dataset.day,nd=dn===0?TODAY:dShift(spD,dn);if(nd<=TODAY){spD=nd;render()}return}
     if((b=t.closest('[data-mon]'))){var nm=mAddK(spD.slice(0,7),+b.dataset.mon);if(nm<=TODAY.slice(0,7)){spD=nm===TODAY.slice(0,7)?TODAY:nm+'-'+p2(dimK(nm));render()}return}
-    if((b=t.closest('[data-pick]'))){spD=b.dataset.pick;render();window.scrollTo({top:0,behavior:'smooth'});return}
+    if((b=t.closest('[data-pick]'))){spD=b.dataset.pick;render();jumpTo('day-sec');return}
+    if((b=t.closest('[data-jump]'))){jumpTo(b.dataset.jump);return}
     if((b=t.closest('[data-add]'))){var c=b.dataset.add,id=nid(c.charAt(0)),o=ADD[c](),mx=0;list(F[c]).forEach(function(x){mx=Math.max(mx,x.o||0)});o.o=mx+1;if(b.dataset.k)o.k=b.dataset.k;F[c][id]=o;if(c==='debts')dcOpen[id]=true;save();render();var f=$('i-'+c+'.'+id+'.n');if(f)f.focus();return}
     if((b=t.closest('[data-del]'))){delP(b.dataset.del);save();render();return}
     if((b=t.closest('.seg [data-p]'))){setP(b.dataset.p,b.dataset.v);save();render();return}
@@ -2158,17 +2243,18 @@ html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-rad
     $('sy-in').hidden=!fsCanLogin();
   }
   function hm(t){var d=new Date(t);return(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes()}
-  var rsT;window.addEventListener('resize',function(){clearTimeout(rsT);rsT=setTimeout(function(){if(tab==='plan')drawChart('ch-plan',CH.plan);if(tab==='months')drawChart('ch-fact',CH.fact)},150)});
+  var rsT;window.addEventListener('resize',function(){clearTimeout(rsT);rsT=setTimeout(function(){if(tab==='months'){drawChart('ch-plan',CH.plan);drawChart('ch-fact',CH.fact)}},150)});
   window.addEventListener('storage',function(e){if(e.key==='lw-data3')theme();if(e.key===LSK&&e.newValue){try{F=norm(JSON.parse(e.newValue));render()}catch(_){}}if(e.key==='lw-data3-sy')fsBoot()});
   $('sy-in').onclick=function(){syDlgOpen(false)};
   $('st-pill').onclick=function(){if(fsCanLogin())syDlgOpen(false)};
   function dayTick(){var t=dKey(new Date());if(t===TODAY)return;if(spD===TODAY)spD=t;TODAY=t;NOW=mKey(new Date());render()}
   setInterval(dayTick,60000);document.addEventListener('visibilitychange',function(){if(!document.hidden)dayTick()});
   theme();
-  var h0=(location.hash||'').slice(1);if(TABS.some(function(x){return x[0]===h0}))tab=h0;
+  var h0=(location.hash||'').slice(1),j0='';if(TALIAS[h0]){j0=TALIAS[h0][1];h0=TALIAS[h0][0]}if(TABS.some(function(x){return x[0]===h0}))tab=h0;
+  if(j0)setTimeout(function(){jumpTo(j0)},50);
   try{history.replaceState({tab:tab},'','#'+tab)}catch(_){}
   render();pill();fsBoot();
-  var UPD_NAME='finansy',UPD_BUILD='0aef5cee4f';
+  var UPD_NAME='finansy',UPD_BUILD='cd6eff5289';
   function updBusy(){return fsBusy||(!!bkDlg&&!bkDlg.hidden)||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
