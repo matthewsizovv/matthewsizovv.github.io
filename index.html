@@ -2863,7 +2863,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   var menu=$('menu'),brand=$('brand'),brT=0;
   function hostOf(u){try{return new URL(u).host.replace(/^www\./,'')}catch(_){return u}}
   function renderMenu(){
-    var h='<div class="lab">Мои сайты</div>'+(inClaude?'':'<ul class="sites"><li><a href="finansy.html">Финансы<small>траты по дням, накопления, долги</small></a></li></ul>');
+    var h='<div class="lab">Мои сайты</div>'+(inClaude?'':'<ul class="sites"><li><a href="finansy.html">Финансы<small>траты по дням, накопления, долги</small></a></li><li><a href="prodazhi.html">Продажи<small>воронка: звонки, встречи, продажи</small></a></li></ul>');
     h+=sites.length?'<ul class="sites">'+sites.map(function(x,i){return '<li><a href="'+esc(x.u)+'" target="_blank" rel="noopener">'+esc(x.n||hostOf(x.u))+'<small>'+esc(hostOf(x.u))+' ↗</small></a><button type="button" data-sx="'+i+'" aria-label="Убрать сайт" title="Убрать">×</button></li>'}).join('')+'</ul>'
       :(inClaude?'<p class="note">Пока пусто. Добавь сюда сайт со сделками и другие свои страницы.</p>':'');
     h+=siteForm?'<div class="hform"><input class="inp" id="st-n" maxlength="40" placeholder="Название, например: сделки"><input class="inp" id="st-u" type="url" placeholder="https://адрес сайта"><div class="row"><button type="button" class="btn" id="st-ok">Добавить</button><button type="button" class="btn ghost" id="st-no">Отмена</button></div></div>'
@@ -4567,7 +4567,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   setInterval(dkCheck,5000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)dkCheck()});
 
-  var UPD_NAME='index',UPD_BUILD='92815014a2';
+  var UPD_NAME='index',UPD_BUILD='e9e12dd972';
   function updBusy(){return !loaded||!!cur||busy||hpopDay!=null||syBusy||syDlgShown()||!$('recap').hidden||[pop,hpop,gpop,$('dish-dlg'),$('m-dlg'),$('en-dlg')].some(function(x){return x&&!x.hidden})}
   function updFlush(){lsSave()}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------

@@ -1,0 +1,1319 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Продажи</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* Финансы: тот же внешний вид, что у «Колеса жизни» (те же цвета, шрифты, кнопки). Тема берётся из настроек главного сайта. */
+:root{
+  --bg:#FFFFFF; --surface:#FFFFFF; --soft:#F4F5F8; --soft-2:#ECEEF3; --ink:#14171F; --muted:#737B8A; --line:#E4E7ED;
+  --shadow:rgba(40,55,90,.18); --accent:#14171F; --on-accent:#FFFFFF; --danger:#C4352B; --faint:#A3AAB6; --ok-bg:#E3F6E8; --ok-fg:#1F6B3A; --warn-bg:#FFF3DC; --warn-fg:#7A4B00;
+  /* два цвета графика: долги и накопления; проверены на различимость в обеих темах */
+  --s-debt:#EB6834; --s-save:#2A78D6; --grid:#ECEEF3;
+  --fz:1; --display:"Unbounded","Onest",system-ui,sans-serif; --body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+:root[data-ui="dark"]{
+  --bg:#101216; --surface:#171A20; --soft:#1F232B; --soft-2:#2A2F39; --ink:#ECEEF3; --muted:#8D95A5; --line:#2A2F39;
+  --shadow:rgba(0,0,0,.6); --accent:#ECEEF3; --on-accent:#14171F; --danger:#FF7B70; --faint:#69707F; --ok-bg:#15301F; --ok-fg:#8FD9A8; --warn-bg:#33270F; --warn-fg:#F2C56B;
+  --s-debt:#D95926; --s-save:#3987E5; --grid:#232831;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:calc(14px*var(--fz));line-height:1.4}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+::placeholder{color:var(--muted);opacity:1}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.app{max-width:1180px;margin:0 auto;padding:16px clamp(16px,2.2vw,36px) 56px;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap}
+.brand-w{position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:calc(16px*var(--fz));letter-spacing:-.01em;white-space:nowrap;border:0;background:none;padding:6px 10px 6px 6px;margin:-6px -10px -6px -6px;border-radius:14px;color:var(--ink)}
+.brand:hover,.brand[aria-expanded="true"]{background:var(--soft)}
+.brand svg{width:24px;height:24px}
+.brand .car{font-family:var(--body);font-size:calc(11px*var(--fz));color:var(--muted)}
+.menu{position:absolute;top:calc(100% + 12px);left:-6px;z-index:30;width:min(300px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px -16px var(--shadow);padding:10px;display:grid;gap:2px}
+.menu a{display:grid;padding:9px 12px;border-radius:12px;text-decoration:none;font-weight:600}
+.menu a:hover{background:var(--soft)}
+.menu a small{font-weight:400;color:var(--muted);font-size:calc(12px*var(--fz))}
+.menu a[aria-current]{background:var(--soft)}
+.tabs,.seg{display:flex;gap:4px;background:var(--soft);border-radius:999px;padding:4px;max-width:100%;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tabs button,.seg button{flex:none}
+.tabs::-webkit-scrollbar,.seg::-webkit-scrollbar{display:none}
+.tabs button,.seg button{border:0;background:none;border-radius:999px;padding:8px 18px;font-weight:500;color:var(--muted);white-space:nowrap}
+.seg button{padding:6px 12px;font-size:calc(13px*var(--fz))}
+.tabs button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px -2px var(--shadow)}
+.top-r{display:flex;align-items:center;gap:8px}
+.fact{border:0;background:none;font-size:calc(11px*var(--fz));color:var(--faint);padding:4px 6px;border-radius:8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fact.bad{color:var(--danger)}
+.btn{border:0;border-radius:999px;background:var(--accent);color:var(--on-accent);padding:9px 16px;font-weight:500;font-size:calc(13px*var(--fz));white-space:nowrap;text-decoration:none;display:inline-block}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.ib{border:0;background:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:calc(16px*var(--fz));line-height:1;color:var(--muted);flex:none}
+.ib:hover{background:var(--soft);color:var(--ink)}
+.inp{border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--surface);color:var(--ink);min-width:0;width:100%}
+.inp.num{text-align:right;font-variant-numeric:tabular-nums}
+select.inp{padding-right:6px}
+.note{color:var(--muted);font-size:calc(13px*var(--fz));margin:0;max-width:70ch}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+h1,h2,h3{margin:0;font-weight:400}
+h2{font-family:var(--display);font-size:calc(20px*var(--fz));letter-spacing:-.02em}
+h3{font-weight:600;font-size:calc(14px*var(--fz))}
+#view{display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+.sec{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.sec>.note{margin-top:-6px}
+/* плитки с главными числами */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tile{border:1px solid var(--line);border-radius:22px;padding:16px 18px;display:grid;gap:4px;align-content:start;min-width:0}
+.tile .lab{color:var(--muted);font-size:calc(12px*var(--fz))}
+.tile .val{font-family:var(--display);font-size:calc(26px*var(--fz));letter-spacing:-.03em;line-height:1.15;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.tile .sub{color:var(--muted);font-size:calc(12px*var(--fz));font-variant-numeric:tabular-nums}
+.tile.neg .val{color:var(--danger)}
+.banner{border-radius:16px;padding:12px 16px;background:var(--warn-bg);color:var(--warn-fg);font-size:calc(13px*var(--fz))}
+.banner b{font-weight:600}
+.box{border:1px solid var(--line);border-radius:22px;padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.box-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-weight:600}
+.box-h small{font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:14px;align-items:start}
+/* строки списков: название и числа */
+.rows{display:grid;gap:6px}
+.r{display:grid;gap:6px;align-items:center}
+.r.c2{grid-template-columns:minmax(0,1fr) 124px 30px}
+.r.c4{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 76px minmax(0,1fr) 30px}
+.r.g4{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 128px 30px}
+.r.hd{color:var(--muted);font-size:calc(11px*var(--fz));padding:0 2px}
+.r.hd span:not(:first-child){text-align:right}
+.r.hd span.l{text-align:left}
+.bar{height:6px;border-radius:99px;background:var(--soft-2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--s-save)}
+.gline{display:grid;gap:4px;padding:0 2px 6px;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+/* настройки плана */
+.opts{display:grid;gap:0;border-top:1px solid var(--line)}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--line)}
+.opt>span:first-child{display:grid;gap:2px;flex:1 1 260px}
+.opt small{color:var(--muted);font-size:calc(12px*var(--fz));font-variant-numeric:tabular-nums}
+.opt .ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.opt .inp{width:130px}
+input[type=range]{accent-color:var(--ink);width:170px}
+/* таблицы */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;padding-left:2px;white-space:normal}
+th{font-weight:400;color:var(--muted);font-size:calc(12px*var(--fz))}
+td small{color:var(--muted);display:block;font-size:calc(11px*var(--fz));white-space:normal}
+tr.tot td{font-weight:600;border-bottom:0}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+.dot.d{background:var(--s-debt)}.dot.s{background:var(--s-save)}
+/* график */
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:260px;overflow:visible}
+.chart .ax{font-size:11px;fill:var(--muted);font-family:var(--body)}
+.chart .lb{font-size:12px;fill:var(--ink);font-family:var(--body);font-weight:500}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:calc(12px*var(--fz));color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:2px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);border-radius:10px;padding:7px 10px;font-size:12px;white-space:nowrap;z-index:5;display:grid;gap:2px;font-variant-numeric:tabular-nums}
+.tip b{font-weight:600}
+details>summary{cursor:pointer;color:var(--muted);font-size:calc(13px*var(--fz));padding:4px 0}
+/* события плана */
+.evs{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.evs li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.evs li>span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.tag{display:inline-block;border-radius:99px;padding:1px 8px;font-size:calc(11px*var(--fz));background:var(--soft);color:var(--muted);margin-left:6px}
+.tag.ok{background:var(--ok-bg);color:var(--ok-fg)}.tag.bad{background:var(--warn-bg);color:var(--warn-fg)}
+.r3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-variant-numeric:tabular-nums}
+.r3 div{display:grid;gap:2px}.r3 small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.r3 div:nth-child(2){text-align:center}.r3 div:nth-child(3){text-align:right}
+.rule{display:grid;grid-template-columns:minmax(0,1fr) 30px;gap:6px}
+.side{display:grid;gap:8px;border:1px solid var(--line);border-radius:18px;padding:12px}
+.side .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.side label,.fld{display:grid;gap:4px;font-size:calc(11px*var(--fz));color:var(--muted)}
+.side label .inp,.fld .inp{font-size:calc(14px*var(--fz));color:var(--ink)}
+.lf{display:grid;gap:3px;min-width:0}
+.lf>span{display:none;font-size:11px;color:var(--muted)}
+.side .ft{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.swt{flex:none;width:40px;height:24px;border-radius:99px;border:0;background:var(--soft-2);padding:3px;display:inline-flex}
+.swt i{width:18px;height:18px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px var(--shadow);transition:transform .15s}
+.swt[aria-checked="true"]{background:var(--accent)}
+.swt[aria-checked="true"] i{transform:translateX(16px);background:var(--on-accent)}
+.swl{display:inline-flex;align-items:center;gap:8px;font-size:calc(13px*var(--fz));color:var(--ink)}
+.mform{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.empty{border:1px dashed var(--line);border-radius:22px;padding:26px 22px;display:grid;gap:10px;justify-items:start}
+.empty ol{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;font-size:calc(13px*var(--fz));z-index:70;max-width:calc(100% - 32px)}
+#sy-dlg{position:fixed;inset:0;z-index:900;background:color-mix(in oklab,var(--ink) 38%,transparent);display:grid;place-items:center;padding:20px 16px;overflow:auto}
+.sy-db{width:min(400px,100%);background:var(--surface);border-radius:20px;padding:18px 18px 16px;display:grid;gap:10px;box-shadow:0 24px 60px -24px var(--shadow)}
+.sy-db p{margin:0;color:var(--muted);font-size:calc(13px*var(--fz));line-height:1.45}
+.sy-db .inp{font-size:16px}
+.sy-dmsg{min-height:1.4em;color:var(--danger)!important}
+.sy-dmsg.soft{color:var(--muted)!important}
+.sy-alt{color:var(--muted);font-size:calc(12px*var(--fz));text-underline-offset:2px}
+/* траты по дням */
+.row.between{justify-content:space-between}
+.ctl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ctl .inp{width:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:calc(13px*var(--fz));font-weight:500;color:var(--ink);white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.chip.add{border-style:dashed;color:var(--muted);font-weight:400}
+.chip i{font-style:normal;opacity:.6;margin-left:2px}
+.chips .inp{width:170px}
+.addrow{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:8px}
+.addrow .inp.num{font-size:calc(16px*var(--fz));font-weight:500}
+.sp-l{display:grid;border-top:1px solid var(--line)}
+.sp-e{display:grid;grid-template-columns:auto minmax(0,1fr) auto 30px;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.sp-e .nt{color:var(--muted);font-size:calc(13px*var(--fz));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-e.tot{border-bottom:0;font-weight:600}
+.tagc{border-radius:99px;padding:2px 9px;background:var(--soft);font-size:calc(12px*var(--fz));white-space:nowrap}
+.dayl{display:grid;border-top:1px solid var(--line)}
+.dayr{display:grid;grid-template-columns:64px minmax(40px,1fr) 104px 96px;gap:10px;align-items:center;padding:9px 2px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;color:var(--ink);font-variant-numeric:tabular-nums;width:100%}
+button.dayr:hover{background:var(--soft)}
+.dayr[aria-current="true"]{background:var(--soft)}
+.dayr.cat{grid-template-columns:minmax(90px,150px) minmax(40px,1fr) 104px 56px}
+.dayr .dn small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.dayr .db{position:relative;height:8px;border-radius:99px;background:var(--soft-2)}
+.dayr .db i{display:block;height:100%;border-radius:99px;background:var(--s-save)}
+.dayr .db u{position:absolute;top:-4px;width:2px;height:16px;border-radius:2px;background:var(--ink);transform:translateX(-1px)}
+.dayr .dsum{text-align:right}
+.dayr .tag{margin:0;justify-self:end}
+@media (max-width:640px){
+  .addrow{grid-template-columns:minmax(0,1fr) auto}
+  .addrow .inp.num{grid-column:1}
+  .addrow #sp-n{grid-column:1/-1;grid-row:2}
+  .dayr{grid-template-columns:44px minmax(30px,1fr) 78px 80px;gap:8px}
+  .dayr.cat{grid-template-columns:minmax(70px,104px) minmax(30px,1fr) 78px 44px}
+  .ctl .inp[type=date]{max-width:150px}
+  .tabs{order:3;width:100%}
+  .tabs button{padding:8px 13px}
+  .tile .val{font-size:calc(22px*var(--fz))}
+  .lf>span{display:block}
+  .r.c4{grid-template-columns:minmax(0,1.25fr) minmax(0,.8fr) minmax(0,1fr) 30px;grid-template-areas:"n n n x" "b a m m"}
+  .r.c4>:nth-child(1){grid-area:n}.r.c4>:nth-child(2){grid-area:b}.r.c4>:nth-child(3){grid-area:a}.r.c4>:nth-child(4){grid-area:m}.r.c4>:nth-child(5){grid-area:x}
+  .r.g4{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 30px;grid-template-areas:"n n x" "t s s" "d d d";align-items:end}
+  .r.c4{align-items:end}
+  .r.c4>:nth-child(5),.r.g4>:nth-child(5){align-self:start}
+  .side label .inp,.fld .inp{font-size:16px}
+  .r.g4>:nth-child(1){grid-area:n}.r.g4>:nth-child(2){grid-area:t}.r.g4>:nth-child(3){grid-area:s}.r.g4>:nth-child(4){grid-area:d}.r.g4>:nth-child(5){grid-area:x}
+  .r.hd{display:none}
+  .r.c4,.r.g4{padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .inp{font-size:16px}
+  th,td{padding:8px 6px}
+  table.fit th,table.fit td{white-space:normal}
+  table.fit td:first-child{min-width:104px}
+  .chart svg{height:220px}
+}
+@media (prefers-reduced-motion:reduce){.swt i{transition:none}}
+
+/* выписка банка */
+.bk-in{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
+.lnk{border:0;background:none;padding:0;color:var(--muted);text-decoration:underline;text-underline-offset:2px;font-size:calc(13px*var(--fz))}
+.lnk:hover{color:var(--ink)}
+.bk-how{border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:6px}
+.bk-how p{margin:0;font-size:calc(13px*var(--fz));line-height:1.45}
+#bk-dlg{position:fixed;inset:0;z-index:800;background:color-mix(in oklab,var(--ink) 38%,transparent);display:grid;place-items:center;padding:20px 16px}
+.bk-db{width:min(780px,100%);max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);background:var(--surface);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 24px 60px -24px var(--shadow);min-height:0}
+.bk-db .box-h{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:calc(16px*var(--fz))}
+.bk-list{flex:1 1 auto;min-height:120px;overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -18px;padding:0 18px;overscroll-behavior:contain}
+.bk-day{display:flex;justify-content:space-between;align-items:baseline;padding:12px 2px 6px;font-weight:600;position:sticky;top:0;background:var(--surface);z-index:1;font-variant-numeric:tabular-nums}
+.bk-day small{color:var(--muted);font-weight:500}
+.bk-r{display:grid;grid-template-columns:auto minmax(0,1fr) 160px 96px;gap:10px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.bk-r input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.bk-r.off .bk-d b,.bk-r.off .bk-a{color:var(--muted)}
+.bk-r.off .bk-a{text-decoration:line-through;text-decoration-color:var(--faint)}
+.bk-r select{padding:5px 6px;font-size:calc(13px*var(--fz))}
+.bk-d{display:grid;min-width:0}
+.bk-d b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-d small{color:var(--muted);font-size:calc(12px*var(--fz));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-a{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;text-align:right}
+.bk-tag{border-radius:99px;padding:1px 7px;background:var(--soft);margin-left:2px;white-space:nowrap}
+.bk-tag.warn{background:var(--warn-bg);color:var(--warn-fg)}
+.bk-tag.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.bk-more{border:0;background:none;padding:12px 2px;color:var(--muted);text-align:left;width:100%;font-size:calc(13px*var(--fz))}
+.bk-foot{gap:8px}
+.bk-db>.note,.bk-db>.banner{margin:0}
+.bk-err{color:var(--danger);margin:0}
+.bk-wait{margin:0;color:var(--muted)}
+html.bk-lock body{overflow:hidden}
+html.bk-drop #view{outline:2px dashed var(--muted);outline-offset:8px;border-radius:18px}
+@media (max-width:640px){
+  .bk-db{padding:14px}
+  .bk-list{margin:0 -14px;padding:0 14px}
+  .bk-r{grid-template-columns:auto minmax(0,1fr) auto}
+  .bk-r select{grid-column:2/-1;grid-row:2}
+}
+.bk-files{display:grid;gap:2px}
+.bk-files .bk-err{font-size:inherit}
+.bk-bank{font-style:normal;font-weight:600;color:var(--ink)}
+.bk-cov{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-size:calc(13px*var(--fz))}
+.bk-cb{white-space:normal}
+.bk-cb small{color:var(--muted)}
+.lnk.bad{color:var(--danger)}
+
+/* плашка «вышла новая версия» */
+.upd-bar{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);z-index:950;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--bg);border-radius:14px;padding:7px 7px 7px 16px;font-size:13px;box-shadow:0 12px 32px -12px rgba(0,0,0,.4);max-width:calc(100% - 32px)}
+.upd-bar button{border:0;border-radius:10px;padding:6px 12px;background:var(--bg);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+/* сводка месяца (27.10) */
+.sum-strip{display:flex;justify-content:space-between;align-items:center;gap:6px 14px;flex-wrap:wrap;border:1px solid var(--line);border-radius:16px;padding:10px 14px;font-size:calc(13px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.sum-strip .lnk{color:var(--ink)}
+.sum-eq{display:grid;gap:0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.sum-eq>div{display:flex;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.sum-eq>div>span{color:var(--muted)}
+.sum-eq .tot span{color:var(--ink);font-weight:600}
+.sum-eq .tot b{font-family:var(--display);font-size:calc(18px*var(--fz));font-weight:400}
+.sum-eq b.neg{color:var(--danger)}.sum-eq b.pos{color:var(--ok-fg)}
+.sum-l{list-style:none;margin:0;padding:0;display:grid}
+.sum-l li{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;padding:10px 2px;border-bottom:1px solid var(--line);font-size:calc(13px*var(--fz));line-height:1.45;font-variant-numeric:tabular-nums}
+.sum-l li>span:first-child{flex:1 1 300px;min-width:0}
+.sum-l li.ask{background:var(--warn-bg);border-radius:12px;padding:10px 12px;border:0;margin-bottom:4px;color:var(--warn-fg)}
+.sum-l.pays li>span:first-child{flex:1 1 200px;color:var(--muted)}
+.bk-who{display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.bk-who button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font-size:calc(12px*var(--fz));font-weight:500;white-space:nowrap}
+.bk-who button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.box .opt.cc-min{border-top:1px solid var(--line)}
+.cc-add{grid-template-columns:150px minmax(0,1fr) auto}
+.sp-e .nt .ho{display:inline-block;border-radius:99px;padding:0 7px;background:var(--warn-bg);color:var(--warn-fg);font-size:calc(11px*var(--fz))}
+.bk-files{display:grid;gap:4px}
+.bk-f{display:flex;justify-content:space-between;align-items:center;gap:4px 12px;flex-wrap:wrap;font-size:calc(13px*var(--fz));color:var(--muted)}
+.bk-f b{color:var(--ink);font-weight:600}
+.bk-cr{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--ink)}
+.bk-cr input{width:16px;height:16px;accent-color:var(--accent);margin:0}
+.bk-r.fl{cursor:default}
+.bk-ic{width:18px;text-align:center;color:var(--muted);font-weight:600}
+.bk-d .bk-who{margin-top:6px}
+.bk-due{display:block;width:100%;background:var(--warn-bg);color:var(--warn-fg);border-radius:12px;padding:8px 12px;font-size:calc(13px*var(--fz))}
+@media (max-width:640px){
+  .cc-add{grid-template-columns:minmax(0,1fr) auto}
+  .cc-add select{grid-column:1/-1;grid-row:2}
+  .sum-eq .tot b{font-size:calc(16px*var(--fz))}
+}
+.r.fix .fixl{display:grid;gap:1px;font-size:calc(14px*var(--fz));padding-left:2px}
+.r.fix .fixl small{color:var(--muted);font-size:calc(12px*var(--fz))}
+/* ---- деньги: компактные строки, кредитки карточками (27.10) ---- */
+.btn.sm{padding:6px 12px;font-size:calc(12px*var(--fz))}
+.inp.sm{padding:5px 8px;font-size:calc(13px*var(--fz))}
+.kv{display:grid}
+.kv-r{display:grid;grid-template-columns:minmax(0,1fr) 120px 30px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.kv-r:last-child{border-bottom:0}
+.kv-r>span:first-child{display:grid;gap:1px;font-size:calc(14px*var(--fz));min-width:0}
+.kv-r>span:first-child small{color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.kv-r .inp{padding:6px 9px}
+.kv-r.ro b{text-align:right;font-weight:500;font-variant-numeric:tabular-nums;padding-right:10px}
+.box-f{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}
+.box-f .lnk{color:var(--ink);text-decoration:none;font-weight:500}
+.box-f .lnk:hover{text-decoration:underline}
+.box-f .note{margin:0;font-size:calc(12px*var(--fz))}
+.rec{display:grid;gap:2px;background:var(--soft);border-radius:14px;padding:8px 10px}
+.rec-h{font-size:calc(12px*var(--fz));color:var(--muted);padding:2px 2px 4px}
+.rec-r{display:grid;grid-template-columns:minmax(0,1fr) auto auto 30px;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
+.rec-r>span{display:grid;min-width:0;font-size:calc(13px*var(--fz))}
+.rec-r>span small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.rec-r b{font-weight:500;font-size:calc(13px*var(--fz))}
+.dsec{gap:12px}
+.dtop{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px}
+.ds-i{display:grid;gap:3px;align-content:start;background:var(--soft);border-radius:14px;padding:10px 12px;min-width:0}
+.ds-i>span{font-size:calc(12px*var(--fz));color:var(--muted)}
+.ds-i>b{font-family:var(--display);font-weight:400;font-size:calc(18px*var(--fz));letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ds-i>b small{font-family:var(--body,inherit);font-size:calc(12px*var(--fz));color:var(--muted);letter-spacing:0}
+.ds-i>small{font-size:calc(11.5px*var(--fz));color:var(--muted);line-height:1.35}
+.ds-i>small b{color:var(--ink);font-weight:600}
+.ds-i .inp{background:var(--surface)}
+.ds-i .lnk{justify-self:start;font-size:calc(12px*var(--fz));color:var(--ink)}
+.ds-n{margin:0}
+.dcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:10px}
+.dc{border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:8px;align-content:start;min-width:0}
+.dc.soon{border-color:var(--warn-fg);box-shadow:0 0 0 1px var(--warn-bg) inset}
+.dc-t{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.dc-h{border:0;background:none;padding:0;text-align:left;display:grid;gap:2px;color:var(--ink);min-width:0;cursor:pointer}
+.dc-h b{font-weight:600;font-size:calc(15px*var(--fz))}
+.dc-h small{color:var(--muted);font-size:calc(12px*var(--fz))}
+.dc-b{font-family:var(--display);font-size:calc(20px*var(--fz));letter-spacing:-.02em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dc-p{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;font-size:calc(13px*var(--fz));font-variant-numeric:tabular-nums}
+.dc-p small,.dc-pd{color:var(--muted);font-size:calc(12px*var(--fz))}
+.dc-p .tag{margin:0 4px 0 0}
+.dc-i{margin:0;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.dc-l{display:grid;gap:4px;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.bar.lm i{background:var(--s-debt)}
+.dc-a{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dc-a .lnk{color:var(--ink)}
+.dc-pay{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;align-items:center}
+.dc-pay small{grid-column:1/-1;color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.dc-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;border-top:1px solid var(--line);padding-top:10px}
+.lf2{display:grid;gap:3px;min-width:0}
+.lf2>span{font-size:calc(11.5px*var(--fz));color:var(--muted)}
+.lf2 .seg{justify-self:start}
+.dc-x{display:flex;align-items:center;gap:2px;align-self:end;color:var(--muted);font-size:calc(12px*var(--fz))}
+.pay-rem{display:flex;justify-content:space-between;align-items:center;gap:8px 14px;flex-wrap:wrap;background:var(--warn-bg);color:var(--warn-fg);border-radius:16px;padding:10px 14px;font-size:calc(13px*var(--fz));line-height:1.45}
+.pay-rem small{opacity:.85}
+.lim-f{display:flex;flex-wrap:wrap;gap:4px 12px;padding:8px 2px 10px;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line)}
+.lim-f b{color:var(--ink);font-weight:600}
+.cl{display:grid;border-top:1px solid var(--line)}
+.cl-r{display:grid;grid-template-columns:minmax(90px,150px) minmax(40px,1fr) 150px 92px;gap:6px 12px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.cl-n{font-size:calc(14px*var(--fz));min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-b{position:relative;height:8px;border-radius:99px;background:var(--soft-2)}
+.cl-b i{display:block;height:100%;border-radius:99px;background:var(--s-save)}
+.cl-b u{position:absolute;top:-4px;width:2px;height:16px;border-radius:2px;background:var(--ink);transform:translateX(-1px)}
+.cl-r.warn .cl-b i{background:#E0A526}
+.cl-r.over .cl-b i{background:var(--danger)}
+.cl-a{display:grid;text-align:right;font-weight:500}
+.cl-a small{font-weight:400;color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.cl-r.over .cl-a small{color:var(--danger)}
+.cl-p{justify-self:end;text-align:right}
+.cl-p small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.cl-p .tag{margin:0}
+.cl-e{grid-column:1/-1;display:flex;justify-content:flex-end}
+.cl-e .inp{max-width:160px}
+.sp-e .nt .fx{display:inline-block;border-radius:99px;padding:0 7px;background:var(--soft-2);color:var(--muted);font-size:calc(11px*var(--fz))}
+.fx-n{color:var(--muted);font-weight:400;font-size:calc(11.5px*var(--fz))}
+.bk-fee{display:grid;gap:2px;background:var(--warn-bg);color:var(--warn-fg);border-radius:12px;padding:10px 12px;font-size:calc(12.5px*var(--fz));line-height:1.4;font-variant-numeric:tabular-nums}
+.bk-fee b{font-weight:600;font-size:calc(13px*var(--fz))}
+.bk-fee small{opacity:.85;margin-top:2px}
+.sum-l li.fee{color:var(--warn-fg)}
+.rec .btn.ghost{background:var(--surface);border:1px solid var(--line)}
+/* ---- календарь «факт / план» (29.10) ---- */
+:root{--cal-bg:#E4E7ED;--cal-o:rgba(20,23,31,.30)}
+:root[data-ui="dark"]{--cal-bg:#252A33;--cal-o:rgba(0,0,0,.45)}
+.cal-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px 16px;flex-wrap:wrap;font-size:calc(13px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.cal-top b{color:var(--ink);font-weight:600}
+.cal-top .ok{color:var(--ok-fg)}.cal-top .bad{color:var(--danger)}
+.cal-cnt{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}
+.cc{width:11px;height:11px;border-radius:3px;display:inline-block;margin-left:8px}
+.cc:first-child{margin-left:0}
+.cc.ok{background:#fff;box-shadow:inset 0 0 0 1.5px var(--faint)}
+.cc.near{background:#9AA0AA}
+.cc.bad{background:linear-gradient(90deg,rgba(239,110,110,.45),rgb(110,6,12))}
+.cal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-w{text-align:center;font-size:calc(11px*var(--fz));color:var(--muted)}
+.cal-d{position:relative;border:0;border-radius:14px;background:var(--cal-bg);height:78px;min-width:0;padding:0;color:var(--ink);display:grid;place-items:center;cursor:pointer;font-variant-numeric:tabular-nums}
+.cal-d:hover{filter:brightness(.97)}
+:root[data-ui="dark"] .cal-d:hover{filter:brightness(1.15)}
+.cal-d.sel{box-shadow:0 0 0 2px var(--ink)}
+.cal-d.fut{opacity:.35;cursor:default}
+.cal-d.off{opacity:.55}
+.cal-n{position:absolute;top:6px;left:8px;font-size:calc(11px*var(--fz));color:var(--muted)}
+.cal-d.tdy .cal-n{color:var(--ink);font-weight:700}
+.cal-s{position:absolute;bottom:5px;left:0;right:0;text-align:center;font-size:calc(10.5px*var(--fz));color:var(--muted);white-space:nowrap;overflow:hidden}
+.cal-d.st-bad .cal-s{color:var(--danger)}
+.pl{width:30px;height:30px;display:block}
+.pl path{fill:none;stroke-linecap:round}
+.pl .pl-o{stroke:var(--cal-o);stroke-width:5.6}
+.pl .pl-f{stroke-width:3.2}
+/* ---- вкладка «Месяц»: переходы к разделам ---- */
+.jump{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:-12px}
+.jump button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:calc(13px*var(--fz));font-weight:500;color:var(--ink)}
+.jump button:hover{background:var(--soft)}
+.part{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;scroll-margin-top:12px}
+.part-h{font-size:calc(24px*var(--fz));padding-top:8px;border-top:1px solid var(--line)}
+#hist-sec{display:block;height:0;margin-bottom:-28px}
+@media (max-width:640px){
+  .cal-g{gap:4px}
+  .cal-d{border-radius:10px;height:auto;aspect-ratio:1/1.08}
+  .cal-n{top:4px;left:5px;font-size:calc(10px*var(--fz))}
+  .cal-s{bottom:3px;font-size:calc(9.5px*var(--fz))}
+  .pl{width:46%;height:46%}
+  .part-h{font-size:calc(20px*var(--fz))}
+}
+.day-all{justify-self:start;margin-top:-4px}
+@media (max-width:640px){
+  .kv-r{grid-template-columns:minmax(0,1fr) 112px 30px}
+  .rec-r{grid-template-columns:minmax(0,1fr) auto 30px}
+  .rec-r .btn{grid-column:1/-1;grid-row:2;justify-self:start}
+  .dc-f{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .cl-r{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n a" "b b" "p p"}
+  .cl-n{grid-area:n}.cl-b{grid-area:b}.cl-a{grid-area:a}.cl-p{grid-area:p;justify-self:start}
+  .ds-i>b{font-size:calc(16px*var(--fz))}
+  .dtop{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+  .tiles{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .tiles .tile{padding:12px 14px;border-radius:18px}
+  .tiles .tile:first-child{grid-column:1/-1}
+  .tiles .tile:not(:first-child) .val{font-size:calc(19px*var(--fz))}
+  .ds-i{padding:8px 10px}
+  .ds-i>small{font-size:calc(11px*var(--fz))}
+}
+/* ---- траты одной страницей, настройки справа сверху (29.10, вечер) ---- */
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:calc(13px*var(--fz));font-weight:500;white-space:nowrap;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+button.pill:hover,button.pill[aria-pressed="true"]{background:var(--soft)}
+button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.top .tabs[hidden]{display:none}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:10px 28px;flex-wrap:wrap;padding:4px 2px 0}
+.hero-m{display:grid;gap:2px}
+.hero-m .lab{color:var(--muted);font-size:calc(13px*var(--fz))}
+.hero-m .val{font-family:var(--display);font-weight:400;font-size:calc(44px*var(--fz));letter-spacing:-.035em;line-height:1.05;font-variant-numeric:tabular-nums}
+.hero-s{display:grid;gap:3px;justify-items:end;text-align:right;font-size:calc(13px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.hero-s b{color:var(--ink);font-weight:600}
+.hero-s i{font-style:normal;font-weight:600}.hero-s i.up{color:var(--danger)}.hero-s i.dn{color:var(--ok-fg)}
+.asks{display:grid;gap:6px}
+.ask-r{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap;background:var(--warn-bg);color:var(--warn-fg);border-radius:14px;padding:8px 12px;font-size:calc(13px*var(--fz))}
+.cal-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.box.cal,.box.cats{padding:14px;gap:8px}
+.cal-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:calc(14px*var(--fz))}
+.cal-h b{font-weight:600}
+.cal-h .ib{width:26px;height:26px}
+.cal-h .lnk{color:var(--muted);font-size:calc(12px*var(--fz))}
+.box.cal .cal-g{grid-template-columns:repeat(7,34px);gap:4px}
+.box.cal .cal-w{font-size:calc(10px*var(--fz))}
+.box.cal .cal-d{height:34px;width:34px;border-radius:9px;overflow:visible;transition:transform .2s}
+.box.cal .cal-n{top:2px;left:4px;font-size:calc(9px*var(--fz))}
+.box.cal .pl{width:20px;height:20px;margin-top:3px}
+.box.cal .pl .pl-o{stroke-width:6;stroke:var(--cal-o)}
+.box.cal .pl .pl-f{stroke-width:3.4}
+.box.cal .cal-d.sel{box-shadow:0 0 0 2px var(--ink)}
+.box.cal .cal-d.off .pl,.box.cal .cal-d.fut .pl{display:none}
+/* наведение: ячейка раскрывается и показывает сумму за сутки */
+.cal-pop{position:absolute;left:50%;top:50%;width:96px;min-height:60px;padding:7px 8px;border-radius:12px;background:var(--surface);box-shadow:0 10px 30px -8px var(--shadow),0 0 0 1px var(--line);display:grid;gap:1px;justify-items:center;align-content:center;
+  transform:translate(-50%,-50%) scale(.35);opacity:0;pointer-events:none;transition:transform .18s cubic-bezier(.2,.8,.3,1.2),opacity .12s;z-index:5;font-variant-numeric:tabular-nums}
+.cal-pop small{font-size:calc(10.5px*var(--fz));color:var(--muted)}
+.cal-pop b{font-size:calc(15px*var(--fz));font-weight:600;color:var(--ink);white-space:nowrap}
+.cal-pop small.bad{color:var(--danger)}.cal-pop small.ok{color:var(--ok-fg)}
+.cal-d:not(.fut):hover,.cal-d:not(.fut):focus-visible{z-index:6}
+.cal-d:not(.fut):hover .cal-pop,.cal-d:not(.fut):focus-visible .cal-pop{transform:translate(-50%,-50%) scale(1);opacity:1}
+.cal-lg{display:flex;align-items:center;gap:6px;font-size:calc(10.5px*var(--fz));color:var(--muted);padding-top:2px}
+.cal-lg i{flex:1;height:6px;border-radius:9px;background:linear-gradient(90deg,#fff,rgb(24,24,27));box-shadow:inset 0 0 0 1px var(--line)}
+.box.cats .cl{border-top:0;gap:0}
+.box.cats .cl-r{grid-template-columns:minmax(0,1fr) auto 44px;grid-template-areas:"n a p" "b b b";gap:3px 10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.box.cats .cl-n{grid-area:n;font-size:calc(13px*var(--fz))}
+.box.cats .cl-a{grid-area:a;display:block;font-size:calc(13px*var(--fz));font-weight:600}
+.box.cats .cl-a small{color:var(--muted);font-weight:400}
+.box.cats .cl-p{grid-area:p;font-size:calc(11px*var(--fz))}
+.box.cats .cl-p i{font-style:normal;color:var(--muted)}.box.cats .cl-p i.up{color:var(--danger)}.box.cats .cl-p i.dn{color:var(--ok-fg)}
+.box.cats .cl-b{grid-area:b;height:4px}
+.box.cats .cl-b u{top:-3px;height:10px}
+.box.cats .cl-e{grid-column:1/-1}
+.cl-f{display:flex;justify-content:space-between;font-size:calc(13px*var(--fz));padding-top:2px}
+.cl-f span{color:var(--muted)}
+.box.day{gap:8px}
+.day-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px 16px;flex-wrap:wrap}
+.day-h h2{font-size:calc(18px*var(--fz))}
+.day-h small{color:var(--muted);font-size:calc(12.5px*var(--fz));font-variant-numeric:tabular-nums}
+.day-up{display:grid;justify-items:end;gap:3px;text-align:right}
+.day-up small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.day-up b.due{color:var(--warn-fg);background:var(--warn-bg);border-radius:6px;padding:0 5px;font-weight:600}
+.set-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stmt-d{display:grid;gap:6px}
+.stmt-d>div{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap;font-size:calc(13px*var(--fz));background:var(--soft);border-radius:12px;padding:8px 12px}
+.stmt-d small{color:var(--muted)}
+.plan-d{border-top:1px solid var(--line);padding-top:10px}
+.plan-d>summary{cursor:pointer;font-weight:600;font-size:calc(14px*var(--fz));padding:4px 0}
+.plan-d[open]>summary{margin-bottom:14px}
+.plan-d .tiles{margin-bottom:14px}
+@media (max-width:760px){
+  .cal-row{grid-template-columns:minmax(0,1fr)}
+  .box.cal .cal-g{grid-template-columns:repeat(7,minmax(0,1fr))}
+  .box.cal .cal-d{width:auto;height:auto;aspect-ratio:1/1}
+  .hero-s{justify-items:start;text-align:left}
+  .hero-m .val{font-size:calc(38px*var(--fz))}
+  .top-r .pill{padding:6px 10px}
+}
+.cal-h>span{display:flex;gap:2px}
+:root{--cal-o:rgba(20,23,31,.22)}
+.box.cal .cal-n{top:1px;left:3px}
+.box.cal .pl{margin-top:7px;width:18px;height:18px}
+@media (max-width:760px){.box.cal .cal-d{aspect-ratio:1/0.86}.box.cal .pl{margin-top:9px;width:20px;height:20px}}
+/* календарь и «На что ушло» поровну (29.10, 21:40) */
+.cal-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.box.cal .cal-g{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.box.cal .cal-d{width:auto;height:42px}
+.box.cal .cal-n{top:3px;left:6px;font-size:calc(10px*var(--fz))}
+.box.cal .pl{margin-top:4px;width:20px;height:20px}
+@media (max-width:760px){
+  .cal-row{grid-template-columns:minmax(0,1fr)}
+  .box.cal .cal-d{height:auto;aspect-ratio:1/0.86}
+}
+/* дни с суммами вместо плюсов, коротко о долгах (29.10, 21:55) */
+.box.cal .cal-d{box-shadow:inset 0 0 0 1px var(--line)}
+.box.cal .cal-d.off,.box.cal .cal-d.fut{background:var(--cal-bg);box-shadow:none}
+.box.cal .cal-d.sel{box-shadow:0 0 0 2px var(--accent)}
+.cal-v{font-size:calc(12px*var(--fz));font-weight:600;color:#14171F;margin-top:9px;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
+.cal-v.inv{color:#fff}
+.cal-v.z{color:#A3AAB6;font-weight:400}
+.box.cal .cal-d .cal-n{color:#737B8A}
+.box.cal .cal-d.dk .cal-n{color:rgba(255,255,255,.65)}
+.box.dmini{gap:10px}
+.dm-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.dm-top>div{display:grid;gap:3px;align-content:start;background:var(--soft);border-radius:14px;padding:10px 12px;min-width:0}
+.dm-top span{font-size:calc(12px*var(--fz));color:var(--muted)}
+.dm-top b{font-family:var(--display);font-weight:400;font-size:calc(19px*var(--fz));letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.dm-top small{font-size:calc(11.5px*var(--fz));color:var(--muted);line-height:1.35}
+.dm-top .bad b{color:var(--danger)}
+.dm-chg{margin:0;font-size:calc(13px*var(--fz));border-radius:12px;padding:8px 12px;font-variant-numeric:tabular-nums}
+.dm-chg.up{background:var(--warn-bg);color:var(--warn-fg)}.dm-chg.dn{background:var(--ok-bg);color:var(--ok-fg)}
+.dm-l{display:grid}
+.dm-r{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.dm-n{display:grid;min-width:0}.dm-n b{font-weight:600;font-size:calc(14px*var(--fz))}.dm-n small{color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.dm-p{display:grid;gap:3px}.dm-p small{color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.dm-p>i.bar{display:block}
+.dm-b{font-weight:600;font-size:calc(14px*var(--fz));white-space:nowrap}
+@media (max-width:640px){
+  .dm-top{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .dm-top>div:last-child{grid-column:1/-1}
+  .dm-r{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n b" "p p"}
+  .dm-n{grid-area:n}.dm-b{grid-area:b}.dm-p{grid-area:p}
+  .cal-v{font-size:calc(10.5px*var(--fz));margin-top:8px}
+}
+/* ---------- Продажи: поверх стилей «Финансов» ---------- */
+.g-x{border:0;background:none;color:var(--muted);font-size:calc(12px*var(--fz));padding:4px 6px;border-radius:6px;white-space:nowrap}
+.g-x:hover{background:var(--soft);color:var(--ink)}
+.g-x.red{color:var(--danger)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.set-h{display:flex;justify-content:space-between;align-items:center;gap:12px}
+/* главное: продажи месяца */
+.sl-hero{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px 28px;align-items:end}
+.sl-hm{display:grid;gap:10px;min-width:0}
+.sl-ml{display:flex;align-items:center;gap:6px;font-size:calc(14px*var(--fz))}
+.sl-ml b{font-weight:600;min-width:120px;text-align:center}
+.sl-ml .ib:disabled{opacity:.3;cursor:default}
+.sl-big{display:flex;align-items:baseline;gap:10px}
+.sl-big b{font-family:var(--display);font-weight:400;font-size:calc(56px*var(--fz));letter-spacing:-.04em;line-height:1}
+.sl-big span{color:var(--muted);font-size:calc(16px*var(--fz))}
+.sl-prog{position:relative;height:12px;border-radius:99px;background:var(--soft-2);margin:4px 0 20px}
+.sl-prog>i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:var(--accent)}
+.sl-prog em{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--ink);opacity:.55;font-style:normal}
+.sl-prog em small{position:absolute;top:22px;left:50%;transform:translateX(-50%);white-space:nowrap;color:var(--muted);font-size:calc(11px*var(--fz))}
+.sl-prog em.k small{transform:translateX(-100%)}
+.sl-st{margin:0;color:var(--muted);font-size:calc(13px*var(--fz))}
+.sl-hs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sl-hs>div{border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:4px;min-width:0}
+.sl-hs small{color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.sl-hs b{font-family:var(--display);font-weight:400;font-size:calc(18px*var(--fz));letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.sl-goal{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:calc(13px*var(--fz))}
+/* день: счётчики */
+.sl-dn{display:flex;align-items:center;gap:6px}
+.sl-dn .ib:disabled{opacity:.3;cursor:default}
+.sl-ctrs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sl-ctr{border-radius:18px;background:var(--soft);padding:12px;display:grid;gap:8px;align-content:start}
+.sl-ctr.ok{background:var(--ok-bg)}
+.sl-cl{font-weight:600}
+.sl-cl small{display:block;font-weight:400;color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.sl-cn{display:grid;grid-template-columns:40px minmax(0,1fr) 64px;gap:6px;align-items:center}
+.sl-cn .inp{text-align:center;font-family:var(--display);font-size:calc(22px*var(--fz));padding:6px 4px;height:48px}
+.sl-m,.sl-p{border:0;border-radius:14px;height:48px;font-weight:600;font-size:calc(18px*var(--fz))}
+.sl-m{background:var(--surface);color:var(--muted)}
+.sl-m:disabled{opacity:.4;cursor:default}
+.sl-p{background:var(--accent);color:var(--on-accent);font-size:calc(17px*var(--fz))}
+.sl-p:active{transform:scale(.97)}
+.sl-need{font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
+.sl-ctr.ok .sl-need{color:var(--ok-fg)}
+/* воронка и календарь рядом */
+.sl-two{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+.sl-fun .box-h small{text-align:right}
+.sl-fr{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:12px;align-items:center}
+.sl-fb{position:relative;justify-self:center;height:40px;border-radius:12px;background:var(--soft-2);overflow:hidden;min-width:120px}
+.sl-fb>i{position:absolute;inset:0 auto 0 0;background:var(--s-save);opacity:.9}
+.sl-fb>u{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ink);opacity:.7}
+.sl-fb>span{position:relative;display:flex;align-items:center;justify-content:center;height:100%;gap:4px;font-size:calc(12.5px*var(--fz));color:var(--ink);font-variant-numeric:tabular-nums;text-shadow:0 0 6px var(--surface)}
+.sl-fb>span b{font-weight:600;font-size:calc(14px*var(--fz))}
+.sl-fl{font-weight:500;font-size:calc(13px*var(--fz))}
+.sl-fl small{display:block;color:var(--muted);font-weight:400;font-size:calc(11.5px*var(--fz))}
+.sl-fr.bh .sl-fl small{color:var(--danger)}
+.sl-cv{display:flex;justify-content:center;gap:8px;align-items:baseline;font-size:calc(12px*var(--fz));color:var(--muted);padding-right:162px;font-variant-numeric:tabular-nums}
+.sl-cv small{font-size:calc(11px*var(--fz));opacity:.8}
+.sl-cv.bad span{color:var(--danger);font-weight:500}
+.sl-cv.good span{color:var(--ok-fg);font-weight:500}
+.sl-tip{margin:4px 0 0;padding:10px 12px;border-radius:12px;background:var(--soft);font-size:calc(13px*var(--fz))}
+.sl-tip b{font-weight:600}
+.sl-cg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.sl-cw{text-align:center;font-size:calc(11px*var(--fz));color:var(--muted)}
+.sl-cd{position:relative;border:0;border-radius:11px;aspect-ratio:1/1;min-width:0;padding:0;background:color-mix(in srgb,var(--s-save) var(--q,0%),var(--soft));color:var(--ink);display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.sl-cd b{font-weight:600;font-size:calc(13px*var(--fz))}
+.sl-cd.dk{color:#fff}
+.sl-cd.dk .sl-cn1{color:rgba(255,255,255,.8)}
+.sl-cd.we{background:color-mix(in srgb,var(--s-save) var(--q,0%),transparent);box-shadow:inset 0 0 0 1px var(--line)}
+.sl-cd:disabled{opacity:.35;cursor:default}
+.sl-cd.sel{box-shadow:0 0 0 2px var(--ink)}
+.sl-cd.tdy .sl-cn1{color:var(--ink);font-weight:700}
+.sl-cd.dk.tdy .sl-cn1{color:#fff}
+.sl-cn1{position:absolute;top:3px;left:6px;font-size:calc(10px*var(--fz));color:var(--muted)}
+.sl-cm{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:calc(10px*var(--fz));line-height:1;letter-spacing:1px}
+.sl-cm i{font-style:normal}
+/* продажи */
+.sl-form{display:grid;gap:10px;border-radius:16px;background:var(--soft);padding:12px}
+.sl-fg{display:grid;grid-template-columns:150px minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 90px;gap:8px}
+.sl-fg label{display:grid;gap:3px;min-width:0}
+.sl-fg small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.sl-auto{color:var(--muted);font-size:calc(12px*var(--fz))}
+.sl-sl{display:grid}
+.sl-sr{display:grid;grid-template-columns:110px minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 80px 150px;gap:8px;align-items:center;padding:9px 2px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.sl-sr>span:nth-child(n+3):nth-child(-n+5){text-align:right}
+.sl-sr .co{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sl-sr .act{display:flex;justify-content:flex-end;gap:2px}
+.sl-sr.hd{border-top:0;color:var(--muted);font-size:calc(11px*var(--fz));padding-top:0}
+.sl-sr.tot{font-weight:600}
+.sl-sr.ed{background:var(--soft);border-radius:10px}
+/* по месяцам */
+.sl-hr{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.4fr) repeat(3,minmax(0,.7fr)) minmax(0,1fr);gap:8px;align-items:center;padding:8px 2px;border:0;border-top:1px solid var(--line);background:none;width:100%;text-align:left;color:var(--ink);font-variant-numeric:tabular-nums}
+button.sl-hr:hover{background:var(--soft)}
+.sl-hr>span:nth-child(n+3){text-align:right}
+.sl-hr.hd{color:var(--muted);font-size:calc(11px*var(--fz));border-top:0;padding-top:0}
+.sl-hn{position:relative;display:flex;align-items:center;gap:8px}
+.sl-hn i{display:block;height:8px;border-radius:99px;background:var(--soft-2);min-width:4px}
+.sl-hn i.plan{background:var(--s-save)}
+.sl-hn i.key{background:var(--ok-fg)}
+.sl-hn b{font-weight:600}
+.sl-hn small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.sl-set-i{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--line)}
+.sl-set-i span{font-weight:500}
+.sl-set-i small{display:block;color:var(--muted);font-weight:400;font-size:calc(12px*var(--fz))}
+.sl-set-i .inp{max-width:110px}
+@media (max-width:980px){
+  .sl-two{grid-template-columns:minmax(0,1fr)}
+  .sl-hero{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:720px){
+  .sl-ctrs{grid-template-columns:minmax(0,1fr)}
+  .sl-ctr{grid-template-columns:minmax(0,1fr) 176px;align-items:center}
+  .sl-ctr .sl-need{grid-column:1/-1}
+  .sl-hs{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .sl-hs>div{padding:10px}
+  .sl-hs b{font-size:calc(14px*var(--fz))}
+  .sl-fr{grid-template-columns:minmax(0,1fr);gap:4px}
+  .sl-fl{order:-1;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .sl-fl small{display:inline}
+  .sl-fb{height:36px}
+  .sl-cv{padding:0;flex-wrap:wrap;text-align:center}
+  .sl-fg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .sl-fg .w2{grid-column:1/-1}
+  .sl-sr{grid-template-columns:minmax(0,1fr) auto;gap:2px 8px}
+  .sl-sr.hd{display:none}
+  .sl-sr>span{text-align:left!important}
+  .sl-sr>span:nth-child(1){grid-column:1;color:var(--muted);font-size:calc(12px*var(--fz))}
+  .sl-sr>span:nth-child(2){grid-column:1/-1;grid-row:2}
+  .sl-sr>span:nth-child(3){grid-column:1;grid-row:3}
+  .sl-sr>span:nth-child(4){grid-column:2;grid-row:3;text-align:right!important}
+  .sl-sr>span:nth-child(5){display:none}
+  .sl-sr>.act{grid-column:2;grid-row:1}
+  .sl-sr.tot>span:nth-child(n+5){display:none}
+  .sl-hr{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr)}
+  .sl-hr>span:nth-child(4),.sl-hr>span:nth-child(5){display:none}
+  .sl-big b{font-size:calc(46px*var(--fz))}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand-w" id="brand-w">
+      <button type="button" class="brand" id="brand" aria-haspopup="true" aria-expanded="false" title="Мои сайты">
+        <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h20l-7.5 9v7l-5 2.5V15z"/></svg>
+        Продажи <span class="car">▾</span>
+      </button>
+      <div class="menu" id="menu" hidden>
+        <a href="index.html">Колесо жизни<small>календарь, привычки, цели, дневник</small></a>
+        <a href="finansy.html">Финансы<small>траты по дням, накопления, долги</small></a>
+        <a href="prodazhi.html" aria-current="page">Продажи<small>воронка: звонки, встречи, продажи</small></a>
+      </div>
+    </div>
+    <div class="top-r"><button type="button" class="fact" id="st-pill"></button><button type="button" class="btn ghost" id="sy-in" hidden>Войти</button><button type="button" class="pill" id="set-btn" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Настройки</button></div>
+  </header>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+(function(){
+  'use strict';
+  var LSK='lw-sales1',SEED=null;
+  /* ---------- Продажи: воронка звонки → назначенные встречи → проведённые → продажи ----------
+     Записи: F.days['ГГГГ-ММ-ДД'] = {c: звонков от 40 с, s: назначено встреч, h: проведено встреч};
+             F.sales[id] = {d: дата продажи, co: компания, sum: общая сумма, mon: объём в месяц, n: платежей};
+             F.plan = {sales: продаж для плана (4), key: для ключевого менеджера (8), cps: звонков на 1 назначенную (20),
+                       sph: назначенных на 1 проведённую (2), hps: проведённых на 1 продажу (4), goal: 'plan' | 'key', wd: рабочие дни 1–7}.
+     Цель месяца: 4 продажи = 16 проведённых = 32 назначенных = 640 звонков (для ключевого вдвое больше). Нужное на сегодня —
+     сколько осталось до цели, делённое на оставшиеся рабочие дни месяца вместе с сегодняшним. */
+  var $=function(id){return document.getElementById(id)},view=$('view');
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function isO(x){return !!x&&typeof x==='object'&&!Array.isArray(x)}
+  function num(v){v=+v;return isFinite(v)?v:0}
+  function p2(n){return(n<10?'0':'')+n}
+  function dKey(d){d=d||new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+  function mKey(d){d=d||new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)}
+  function dOf(k){var a=k.split('-');return new Date(+a[0],+a[1]-1,+(a[2]||1))}
+  function mAdd(k,n){var d=dOf(k);d.setMonth(d.getMonth()+n);return mKey(d)}
+  function dim(k){var d=dOf(k);return new Date(d.getFullYear(),d.getMonth()+1,0).getDate()}
+  var MN=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+  var MP=['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
+  var MG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  var DW=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  function wdn(d){return(d.getDay()+6)%7+1}
+  function mName(k){var m=+k.slice(5)-1;return MN[m].charAt(0).toUpperCase()+MN[m].slice(1)+' '+k.slice(0,4)}
+  function mIn(k){return 'в '+MP[+k.slice(5)-1]}
+  function dTxt(k){var d=dOf(k);return d.getDate()+' '+MG[d.getMonth()]}
+  function plural(n,a,b,c){n=Math.abs(n)%100;var d=n%10;return n>10&&n<20?c:d>1&&d<5?b:d===1?a:c}
+  function sp(n){return String(Math.round(num(n))).replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
+  function money(n,bare){n=Math.round(num(n));return(n<0?'−':'')+sp(Math.abs(n))+(bare?'':' '+F.cur)}
+  function parseNum(v){v=String(v==null?'':v).replace(/[\s  ]/g,'').replace(',','.').replace(/[^\d.\-]/g,'');var n=parseFloat(v);return isFinite(n)?n:0}
+  function pct(v){return Math.round(v*100)+'%'}
+  function r1(v){return(Math.round(v*10)/10).toLocaleString('ru-RU')}
+  function nid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+  var toastT;function toast(m){var t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},4200)}
+  function hm(t){var d=new Date(t);return p2(d.getHours())+':'+p2(d.getMinutes())}
+
+  var PLAN0={sales:4,key:8,cps:20,sph:2,hps:4,goal:'plan',wd:[1,2,3,4,5]};
+  function blank(){return{v:1,cur:'₽',plan:JSON.parse(JSON.stringify(PLAN0)),sales:{},days:{}}}
+  function norm(f){
+    f=isO(f)?f:{};var b=blank();
+    if(!isO(f.sales))f.sales={};if(!isO(f.days))f.days={};
+    var p=isO(f.plan)?f.plan:{};
+    Object.keys(PLAN0).forEach(function(k){if(k==='wd'){if(!Array.isArray(p.wd)||!p.wd.length)p.wd=b.plan.wd.slice()}else if(k==='goal'){if(p.goal!=='key')p.goal='plan'}else if(!(num(p[k])>0))p[k]=PLAN0[k]});
+    f.plan=p;if(typeof f.cur!=='string'||!f.cur)f.cur='₽';f.v=1;return f;
+  }
+  var F=norm((function(){try{return JSON.parse(localStorage.getItem(LSK)||'null')}catch(_){return null}})());
+  var savedAt=0,saveErr=false,tab='main',NOW=mKey(),TODAY=dKey(),viewM=NOW,selD=TODAY,draft={d:TODAY},editId='',askDel='';
+  function save(){try{localStorage.setItem(LSK,JSON.stringify(F));savedAt=Date.now();saveErr=false}catch(_){saveErr=true}fsTouch();pill()}
+
+  /* ---------- расчёты ---------- */
+  function isWD(k){return F.plan.wd.indexOf(wdn(dOf(k)))>=0}
+  function daysOf(M){var r=[],n=dim(M);for(var i=1;i<=n;i++)r.push(M+'-'+p2(i));return r}
+  function dayV(k){var o=F.days[k]||{};return{c:num(o.c),s:num(o.s),h:num(o.h)}}
+  function salesOf(M){return Object.keys(F.sales).map(function(id){var x=F.sales[id];x.id=id;return x}).filter(function(x){return isO(x)&&String(x.d||'').slice(0,7)===M}).sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0})}
+  function mStat(M){
+    var r={c:0,s:0,h:0,n:0,sum:0,mon:0,wd:0,wdPast:0,wdLeft:0,list:salesOf(M)};
+    daysOf(M).forEach(function(k){var v=dayV(k);r.c+=v.c;r.s+=v.s;r.h+=v.h;if(isWD(k)){r.wd++;if(k<TODAY)r.wdPast++;else r.wdLeft++}});
+    r.list.forEach(function(x){r.n++;r.sum+=num(x.sum);r.mon+=num(x.mon)});
+    return r;
+  }
+  /* цель воронки на месяц: продажи → проведённые → назначенные → звонки */
+  function goalN(){return F.plan.goal==='key'?F.plan.key:F.plan.sales}
+  function chain(n){var h=n*F.plan.hps,s=h*F.plan.sph;return{n:n,h:h,s:s,c:s*F.plan.cps}}
+  /* сколько нужно сделать сегодня: остаток до цели (без сегодняшнего) на оставшиеся рабочие дни вместе с сегодняшним */
+  function todayNeed(M,st){
+    var g=chain(goalN()),t=dayV(TODAY),left=Math.max(1,st.wdLeft),out={};
+    [['c','c'],['s','s'],['h','h']].forEach(function(x){var done=st[x[0]]-t[x[0]];out[x[0]]=Math.max(0,Math.ceil((g[x[1]]-done)/left))});
+    out.n=Math.max(0,g.n-st.n);return out;
+  }
+  function stage(a,b){return b>0?a/b:0}
+
+  /* ---------- экран ---------- */
+  function render(){
+    var a=document.activeElement,id=a&&a.id,ss=null,se=null;try{ss=a.selectionStart;se=a.selectionEnd}catch(_){}
+    $('set-btn').setAttribute('aria-pressed',tab==='set');
+    view.innerHTML=tab==='set'?renderSet():renderMain();
+    if(id){var n=$(id);if(n&&n!==document.activeElement){n.focus();try{if(ss!=null)n.setSelectionRange(ss,se)}catch(_){}}}
+  }
+  function renderMain(){
+    var M=viewM,cur=M===NOW,st=mStat(M),P=F.plan,gp=chain(P.sales),gk=chain(P.key),g=chain(goalN());
+    /* главное: продажи месяца против плана и ключевого */
+    var mx=Math.max(P.key,st.n,1),fc=cur&&st.wdPast+(isWD(TODAY)?1:0)>=3?Math.round(st.n*st.wd/Math.max(1,st.wdPast+(isWD(TODAY)?1:0))):null;
+    var hero='<div class="sl-hero"><div class="sl-hm"><div class="sl-ml"><button type="button" class="ib" data-mnav="-1" aria-label="Прошлый месяц">‹</button><b>'+mName(M)+'</b><button type="button" class="ib" data-mnav="1" aria-label="Следующий месяц"'+(cur?' disabled':'')+'>›</button></div>'+
+      '<div class="sl-big"><b>'+st.n+'</b><span>'+plural(st.n,'продажа','продажи','продаж')+'</span></div>'+
+      '<div class="sl-prog" role="img" aria-label="Продаж '+st.n+': план '+P.sales+', ключевой '+P.key+'"><i style="width:'+Math.min(100,st.n/mx*100)+'%"></i><em style="left:'+(P.sales/mx*100)+'%"><small>план '+P.sales+'</small></em><em class="k" style="left:'+(P.key/mx*100)+'%"><small>ключевой '+P.key+'</small></em></div>'+
+      '<p class="sl-st">'+(st.n>=P.key?'Уровень ключевого менеджера взят 🔥':st.n>=P.sales?'План закрыт. До ключевого: '+(P.key-st.n)+' '+plural(P.key-st.n,'продажа','продажи','продаж'):'До плана: '+(P.sales-st.n)+' '+plural(P.sales-st.n,'продажа','продажи','продаж')+', до ключевого: '+(P.key-st.n))+
+        (fc!=null&&st.n?' · в этом темпе к концу месяца ≈ '+fc:'')+'</p></div>'+
+      '<div class="sl-hs"><div><small>Сумма продаж '+mIn(M)+'</small><b>'+money(st.sum)+'</b></div><div><small>Объём в месяц</small><b>'+money(st.mon)+'</b></div><div><small>Рабочих дней '+(cur?'осталось':'в месяце')+'</small><b>'+(cur?st.wdLeft:st.wd)+'</b></div></div></div>';
+    /* выбор цели */
+    var goal='<div class="sl-goal"><span>Считать воронку под</span><div class="seg" role="group" aria-label="Цель месяца"><button type="button" data-goal="plan" aria-pressed="'+(P.goal!=='key')+'">план: '+P.sales+' '+plural(P.sales,'продажа','продажи','продаж')+'</button><button type="button" data-goal="key" aria-pressed="'+(P.goal==='key')+'">ключевого: '+P.key+'</button></div></div>';
+    return hero+goal+(cur||selD.slice(0,7)===M?dayBox(st):'')+'<div class="sl-two">'+funnelBox(M,st,g)+calBox(M,g,st)+'</div>'+salesBox(M,st)+histBox();
+  }
+  /* день: три счётчика и продажа */
+  function dayBox(st){
+    var k=selD,v=dayV(k),isT=k===TODAY,need=isT?todayNeed(viewM,st):null,d=dOf(k);
+    function ctr(f,lab,sub){
+      var nd=need?need[f]:0,ok=need&&nd>0&&v[f]>=nd;
+      return '<div class="sl-ctr'+(ok?' ok':'')+'"><div class="sl-cl">'+lab+'<small>'+sub+'</small></div>'+
+        '<div class="sl-cn"><button type="button" class="sl-m" data-dc="'+f+'" data-v="-1" aria-label="'+lab+': минус один"'+(v[f]?'':' disabled')+'>−</button>'+
+        '<input class="inp num" id="dc-'+f+'" inputmode="numeric" data-dset="'+f+'" value="'+v[f]+'" aria-label="'+lab+'">'+
+        '<button type="button" class="sl-p" data-dc="'+f+'" data-v="1" aria-label="'+lab+': плюс один">+1</button></div>'+
+        (need?'<div class="sl-need">'+(nd?(ok?'норма дня есть: '+v[f]+' из '+nd:'нужно сегодня: '+nd+(v[f]?', осталось '+(nd-v[f]):'')):'на цель уже хватает')+'</div>':'')+'</div>';
+    }
+    return '<div class="box sl-day"><div class="box-h"><span class="sl-dn"><button type="button" class="ib" data-dnav="-1" aria-label="Предыдущий день">‹</button>'+(isT?'Сегодня, ':'')+d.getDate()+' '+MG[d.getMonth()]+'<button type="button" class="ib" data-dnav="1" aria-label="Следующий день"'+(isT?' disabled':'')+'>›</button></span>'+
+      '<button type="button" class="btn" data-sale-new>+ Продажа</button></div>'+
+      '<div class="sl-ctrs">'+ctr('c','Звонки','от 40 секунд')+ctr('s','Назначено встреч','на любую дату')+ctr('h','Проведено встреч','состоялись')+'</div>'+
+      (isT&&!isWD(TODAY)?'<p class="note">Сегодня выходной по настройкам: норма дня считается по рабочим дням.</p>':'')+'</div>';
+  }
+  /* воронка месяца: факт против цели, конверсии против норм, узкое место */
+  function funnelBox(M,st,g){
+    var P=F.plan,cur=M===NOW,el=cur?(st.wdPast+(isWD(TODAY)?1:0))/Math.max(1,st.wd):1;
+    var rows=[['c','Звонки от 40 с',st.c,g.c],['s','Назначено встреч',st.s,g.s],['h','Проведено встреч',st.h,g.h],['n','Продажи',st.n,g.n]];
+    var W=[100,80,60,42];
+    var conv=[
+      {a:st.s?st.c/st.s:0,ok:st.s?st.c/st.s<=P.cps:null,t:st.s?'1 встреча на '+r1(st.c/st.s)+' звонков':'встреч пока нет',nt:'норма '+P.cps,eff:st.s?P.cps/(st.c/st.s):null,need:st.c>=P.cps*2,lab:'звонки → назначенные'},
+      {a:stage(st.h,st.s),ok:st.s?st.h/st.s>=1/P.sph:null,t:st.s?'проведено '+pct(Math.min(9.99,st.h/st.s))+' назначенных':'—',nt:'норма '+pct(1/P.sph),eff:st.s?(st.h/st.s)*P.sph:null,need:st.s>=3,lab:'назначенные → проведённые'},
+      {a:stage(st.n,st.h),ok:st.h?st.n/st.h>=1/P.hps:null,t:st.h?'продажа с '+pct(st.n/st.h)+' встреч':'—',nt:'норма '+pct(1/P.hps),eff:st.h?(st.n/st.h)*P.hps:null,need:st.h>=4,lab:'проведённые → продажи'}];
+    var h='';
+    rows.forEach(function(r,i){
+      var q=r[3]?r[2]/r[3]:0,behind=cur&&r[3]&&q<el-.08;
+      h+='<div class="sl-fr'+(behind?' bh':'')+'"><div class="sl-fb" style="width:'+W[i]+'%"><i style="width:'+Math.min(100,q*100)+'%"></i>'+(cur&&el<1?'<u style="left:'+(el*100)+'%" title="где нужно быть к сегодняшнему дню"></u>':'')+
+        '<span><b>'+sp(r[2])+'</b> из '+sp(r[3])+'</span></div><div class="sl-fl">'+r[1]+'<small>'+pct(q)+(behind?' · отстаёшь от темпа':'')+'</small></div></div>';
+      if(i<3){var c=conv[i];h+='<div class="sl-cv'+(c.need&&c.eff!=null?(c.eff<.9?' bad':c.eff>=1?' good':''):'')+'"><span>↓ '+c.t+'</span><small>'+c.nt+'</small></div>'}
+    });
+    /* узкое место: самая слабая конверсия против нормы, когда данных уже достаточно; иначе — отставание по активности */
+    var weak=conv.filter(function(c){return c.need&&c.eff!=null&&c.eff<.85}).sort(function(a,b){return a.eff-b.eff})[0],tip='';
+    if(weak)tip='Узкое место: <b>'+weak.lab+'</b> — '+weak.t+' при '+weak.nt.replace('норма ','норме ')+'.';
+    else if(cur&&g.c&&st.c/g.c<el-.08)tip='Конверсии в норме, не хватает объёма: звонков '+sp(st.c)+' из '+sp(g.c)+', к сегодняшнему дню нужно было ≈ '+sp(Math.round(g.c*el))+'.';
+    else if(st.c||st.s||st.h)tip='Идёшь в темпе: конверсии не хуже норм.';
+    return '<div class="box sl-fun"><div class="box-h"><span>Воронка '+mIn(M)+'</span><small>'+goalN()+' '+plural(goalN(),'продажа','продажи','продаж')+' = '+g.h+' проведённых = '+g.s+' назначенных = '+sp(g.c)+' звонков</small></div>'+h+
+      (tip?'<p class="sl-tip">'+tip+'</p>':'')+'</div>';
+  }
+  /* календарь месяца: число звонков, оттенок — доля дневной нормы звонков; точки — встречи, звезда — продажа */
+  function calBox(M,g,st){
+    var ds=daysOf(M),first=wdn(dOf(ds[0])),norm1=g.c/Math.max(1,st.wd),sold={},h='';
+    st.list.forEach(function(x){sold[x.d]=(sold[x.d]||0)+1});
+    for(var i=1;i<first;i++)h+='<span></span>';
+    ds.forEach(function(k){
+      var v=dayV(k),fut=k>TODAY,wd=isWD(k),q=norm1?Math.min(1,v.c/norm1):0,d=+k.slice(8);
+      h+='<button type="button" class="sl-cd'+(k===selD?' sel':'')+(k===TODAY?' tdy':'')+(wd?'':' we')+(q>.55?' dk':'')+'" data-day="'+k+'"'+(fut?' disabled':'')+' style="--q:'+Math.round(q*100)+'%" title="'+dTxt(k)+(v.c||v.s||v.h?': звонков '+v.c+', назначено '+v.s+', проведено '+v.h:'')+(sold[k]?', продаж '+sold[k]:'')+'">'+
+        '<span class="sl-cn1">'+d+'</span>'+(v.c?'<b>'+v.c+'</b>':'')+'<span class="sl-cm">'+(sold[k]?'★':'')+(v.h?'<i>'+Array(Math.min(v.h,3)+1).join('•')+'</i>':'')+'</span></button>';
+    });
+    return '<div class="box sl-cal"><div class="box-h"><span>По дням</span><small>норма ≈ '+Math.ceil(norm1)+' звонков в рабочий день</small></div><div class="sl-cg">'+DW.map(function(x){return '<span class="sl-cw">'+x+'</span>'}).join('')+h+'</div>'+
+      '<p class="note">Число — звонки от 40 с, чем темнее, тем ближе к норме дня. Точки — проведённые встречи, ★ — продажа. Нажми на день, чтобы поправить его счётчики.</p></div>';
+  }
+  /* продажи месяца: форма и список */
+  function salesBox(M,st){
+    var e=editId&&F.sales[editId],d=draft,auto=saleAuto(d);
+    var form='<div class="sl-form" id="sale-form"><div class="sl-fg">'+
+      '<label><small>Дата продажи</small><input class="inp" type="date" id="sf-d" max="'+TODAY+'" value="'+esc(d.d||TODAY)+'"></label>'+
+      '<label class="w2"><small>Компания</small><input class="inp" id="sf-co" maxlength="80" placeholder="ООО «Ромашка»" value="'+esc(d.co||'')+'" autocomplete="off"></label>'+
+      '<label><small>Общая сумма</small><input class="inp num" id="sf-sum" inputmode="decimal" placeholder="'+(auto.f==='sum'?sp(auto.v):'0')+'" value="'+(d.sum?sp(d.sum):'')+'"></label>'+
+      '<label><small>Объём в месяц</small><input class="inp num" id="sf-mon" inputmode="decimal" placeholder="'+(auto.f==='mon'?sp(auto.v):'0')+'" value="'+(d.mon?sp(d.mon):'')+'"></label>'+
+      '<label><small>Платежей</small><input class="inp num" id="sf-n" inputmode="numeric" placeholder="'+(auto.f==='n'?auto.v:'0')+'" value="'+(d.n||'')+'"></label>'+
+      '</div><div class="row"><button type="button" class="btn" data-sale-save>'+(e?'Сохранить':'Добавить продажу')+'</button>'+(e?'<button type="button" class="btn ghost" data-sale-cancel>Отмена</button>':'')+
+      '<small class="sl-auto" id="sf-auto">'+(auto.f?autoTxt(auto):'Впиши любые два из трёх чисел — третье посчитается само.')+'</small></div></div>';
+    var list=st.list.length?'<div class="sl-sl"><div class="sl-sr hd"><span>Дата</span><span>Компания</span><span>Сумма</span><span>В месяц</span><span>Платежей</span><span></span></div>'+
+      st.list.map(function(x){var del=askDel===x.id;return '<div class="sl-sr'+(x.id===editId?' ed':'')+'"><span>'+dTxt(x.d)+'</span><span class="co">'+esc(x.co||'—')+'</span><span>'+money(x.sum)+'</span><span>'+money(x.mon)+'</span><span>'+(num(x.n)||'—')+'</span>'+
+        '<span class="act"><button type="button" class="g-x" data-sale-ed="'+x.id+'">изменить</button><button type="button" class="g-x'+(del?' red':'')+'" data-sale-del="'+x.id+'">'+(del?'точно удалить?':'×')+'</button></span></div>'}).join('')+
+      '<div class="sl-sr tot"><span>Итого</span><span>'+st.n+' '+plural(st.n,'продажа','продажи','продаж')+'</span><span>'+money(st.sum)+'</span><span>'+money(st.mon)+'</span><span></span><span></span></div></div>':'<p class="note">'+(M===NOW?'Продаж в этом месяце пока нет. Первая — через форму выше или кнопку «+ Продажа».':'Продаж '+mIn(M)+' нет.')+'</p>';
+    return '<div class="box sl-sales"><div class="box-h"><span>Продажи '+mIn(M)+'</span><small>'+st.n+' из '+F.plan.sales+' по плану</small></div>'+form+list+'</div>';
+  }
+  /* два числа из трёх: общая сумма = объём в месяц × число платежей */
+  function saleAuto(d){
+    var s=num(d.sum),m=num(d.mon),n=num(d.n);
+    if(s&&m&&!n)return{f:'n',v:Math.max(1,Math.round(s/m))};
+    if(s&&n&&!m)return{f:'mon',v:Math.round(s/n)};
+    if(m&&n&&!s)return{f:'sum',v:Math.round(m*n)};
+    return{f:''};
+  }
+  function autoTxt(a){return a.f==='sum'?'Общая сумма посчитается: '+money(a.v):a.f==='mon'?'Объём в месяц посчитается: '+money(a.v):'Платежей посчитается: '+a.v}
+  /* по месяцам: видно, как часто закрывается план и уровень ключевого */
+  function histBox(){
+    var ms=[],m=NOW;for(var i=0;i<6;i++){ms.push(m);m=mAdd(m,-1)}
+    /* месяцы до первых записей не показываются */
+    var has=function(k){var s=mStat(k);return s.n||s.c||s.s||s.h};while(ms.length&&!has(ms[ms.length-1]))ms.pop();if(!ms.length||(ms.length===1&&!has(ms[0])))return '';
+    var P=F.plan,mx=Math.max(P.key,1);
+    return '<div class="box sl-hist"><div class="box-h"><span>По месяцам</span><small>план '+P.sales+' · ключевой '+P.key+'</small></div><div class="sl-hr hd"><span>Месяц</span><span>Продажи</span><span>Звонки</span><span>Назначено</span><span>Проведено</span><span>Сумма</span></div>'+
+      ms.map(function(k){var s=mStat(k),lv=s.n>=P.key?'key':s.n>=P.sales?'plan':'';
+        return '<button type="button" class="sl-hr" data-mgo="'+k+'"><span>'+mName(k)+'</span><span class="sl-hn"><i class="'+lv+'" style="width:'+Math.min(100,s.n/mx*100)+'%"></i><b>'+s.n+'</b>'+(lv==='key'?'<small>ключевой</small>':lv==='plan'?'<small>план</small>':'')+'</span><span>'+sp(s.c)+'</span><span>'+s.s+'</span><span>'+s.h+'</span><span>'+money(s.sum)+'</span></button>'}).join('')+'</div>';
+  }
+  /* настройки */
+  function renderSet(){
+    var P=F.plan,gp=chain(P.sales),gk=chain(P.key);
+    function f(k,lab,sub){return '<label class="sl-set-i"><span>'+lab+(sub?'<small>'+sub+'</small>':'')+'</span><input class="inp num" inputmode="numeric" data-pn="'+k+'" value="'+P[k]+'"></label>'}
+    return '<div class="sec"><div class="set-h"><h2>Настройки</h2><button type="button" class="btn ghost" data-set-close>Готово</button></div>'+
+      '<div class="box"><div class="box-h"><span>План месяца</span></div>'+f('sales','Продаж для плана','закрыть план месяца')+f('key','Продаж для ключевого менеджера','уровень, к которому растёшь')+'</div>'+
+      '<div class="box"><div class="box-h"><span>Нормы воронки</span></div>'+f('cps','Звонков от 40 с на 1 назначенную встречу','')+f('sph','Назначенных на 1 проведённую','половина назначенных доходит до встречи — это 2')+f('hps','Проведённых на 1 продажу','')+
+        '<p class="note">План: '+gp.n+' '+plural(gp.n,'продажа','продажи','продаж')+' = '+gp.h+' проведённых = '+gp.s+' назначенных = '+sp(gp.c)+' звонков. Ключевой: '+gk.n+' = '+gk.h+' = '+gk.s+' = '+sp(gk.c)+'.</p></div>'+
+      '<div class="box"><div class="box-h"><span>Рабочие дни</span></div><div class="chips">'+DW.map(function(x,i){return '<button type="button" class="chip" data-wd="'+(i+1)+'" aria-pressed="'+(P.wd.indexOf(i+1)>=0)+'">'+x+'</button>'}).join('')+'</div><p class="note">По ним считается норма на день и темп месяца.</p></div>'+
+      '<div class="box"><div class="box-h"><span>Данные</span></div><label class="sl-set-i"><span>Валюта</span><input class="inp" data-cur value="'+esc(F.cur)+'" maxlength="4" style="max-width:80px"></label>'+
+        '<p class="note">'+(fsOn()?'Записи синхронизируются через то же хранилище, что «Колесо жизни» и «Финансы», отдельным зашифрованным файлом.':'Записи хранятся в этом браузере. Войди на главном сайте или кнопкой «Войти», и они будут синхронизироваться между устройствами.')+'</p>'+
+        '<div class="row"><button type="button" class="btn ghost" data-exp>Сохранить копию в файл</button><button type="button" class="btn ghost" data-imp>Загрузить из файла</button><input type="file" id="imp-file" accept=".json,application/json" hidden></div></div></div>';
+  }
+  function setTab(t){tab=t==='set'?'set':'main';askDel='';render();window.scrollTo(0,0);try{history.replaceState({},'',t==='set'?'#set':'#')}catch(_){}}
+
+  /* ---------- действия ---------- */
+  function dayPut(k,f,v){var o=isO(F.days[k])?F.days[k]:{};v=Math.max(0,Math.min(9999,Math.round(num(v))));if(v)o[f]=v;else delete o[f];if(Object.keys(o).length)F.days[k]=o;else delete F.days[k];save()}
+  function readForm(){
+    var g=function(id){var x=$(id);return x?x.value:''};
+    draft={d:g('sf-d')||TODAY,co:g('sf-co').trim(),sum:parseNum(g('sf-sum')),mon:parseNum(g('sf-mon')),n:Math.round(parseNum(g('sf-n')))};
+  }
+  function saleSave(){
+    readForm();var d=draft;
+    if(!/^\d{4}-\d\d-\d\d$/.test(d.d)||d.d>TODAY){toast('Проверь дату продажи: не позже сегодняшнего дня.');return}
+    if(!d.co){toast('Впиши компанию.');var c=$('sf-co');if(c)c.focus();return}
+    var a=saleAuto(d);if(a.f)d[a.f]=a.v;
+    var o={d:d.d,co:d.co.slice(0,80),sum:Math.round(num(d.sum)),mon:Math.round(num(d.mon)),n:Math.round(num(d.n))},id=editId||nid('s'),was=!!editId;
+    F.sales[id]=o;editId='';draft={d:TODAY};viewM=o.d.slice(0,7);save();render();
+    var st=mStat(viewM);toast((was?'Продажа исправлена':'Продажа записана: '+o.co)+'. '+mName(viewM)+': '+st.n+' из '+F.plan.sales+(st.n>=F.plan.key?' — уровень ключевого!':st.n===F.plan.sales?' — план закрыт!':''));
+  }
+  view.addEventListener('click',function(e){
+    var t=e.target,b;
+    if((b=t.closest('[data-mnav]'))){viewM=mAdd(viewM,+b.dataset.mnav);if(viewM>NOW)viewM=NOW;askDel='';if(viewM===NOW)selD=TODAY;render();return}
+    if((b=t.closest('[data-mgo]'))){viewM=b.dataset.mgo;if(viewM===NOW)selD=TODAY;render();window.scrollTo(0,0);return}
+    if((b=t.closest('[data-dnav]'))){var nd=dOf(selD);nd.setDate(nd.getDate()+(+b.dataset.dnav));var k=dKey(nd);if(k<=TODAY){selD=k;viewM=k.slice(0,7);render()}return}
+    if((b=t.closest('[data-day]'))){selD=b.dataset.day;viewM=selD.slice(0,7);render();var db=document.querySelector('.sl-day');if(db&&window.innerWidth<900)try{db.scrollIntoView({block:'start',behavior:'smooth'})}catch(_){}return}
+    if((b=t.closest('[data-dc]'))){var f=b.dataset.dc,v=dayV(selD)[f]+(+b.dataset.v);dayPut(selD,f,v);render();return}
+    if((b=t.closest('[data-goal]'))){F.plan.goal=b.dataset.goal==='key'?'key':'plan';save();render();return}
+    if(t.closest('[data-sale-new]')){editId='';draft={d:selD};render();var c=$('sf-co');if(c){try{c.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}c.focus()}return}
+    if(t.closest('[data-sale-save]')){saleSave();return}
+    if(t.closest('[data-sale-cancel]')){editId='';draft={d:TODAY};render();return}
+    if((b=t.closest('[data-sale-ed]'))){var x=F.sales[b.dataset.saleEd];if(x){editId=b.dataset.saleEd;draft={d:x.d,co:x.co,sum:x.sum,mon:x.mon,n:x.n};askDel='';render();var co=$('sf-co');if(co){try{co.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}co.focus()}}return}
+    if((b=t.closest('[data-sale-del]'))){var id=b.dataset.saleDel;if(askDel!==id){askDel=id;render();return}askDel='';delete F.sales[id];if(editId===id){editId='';draft={d:TODAY}}save();render();toast('Продажа удалена.');return}
+    if((b=t.closest('[data-wd]'))){var w=+b.dataset.wd,l=F.plan.wd.filter(function(x){return x!==w});if(l.length===F.plan.wd.length)l.push(w);if(!l.length){toast('Оставь хотя бы один рабочий день.');return}F.plan.wd=l.sort();save();render();return}
+    if(t.closest('[data-set-close]')){setTab('main');return}
+    if(t.closest('[data-exp]')){try{var u=URL.createObjectURL(new Blob([JSON.stringify(F)],{type:'application/json'})),l2=document.createElement('a');l2.href=u;l2.download='prodazhi-'+NOW+'.json';document.body.appendChild(l2);l2.click();l2.remove()}catch(_){toast('Не получилось сохранить файл.')}return}
+    if(t.closest('[data-imp]')){$('imp-file').click();return}
+  });
+  view.addEventListener('input',function(e){
+    var t=e.target;
+    if(/^sf-(sum|mon|n)$/.test(t.id)){readForm();var a=saleAuto(draft),o=$('sf-auto');if(o)o.textContent=a.f?autoTxt(a):'Впиши любые два из трёх чисел — третье посчитается само.';['sum','mon','n'].forEach(function(k){var x=$('sf-'+k);if(x)x.placeholder=a.f===k?(k==='n'?a.v:sp(a.v)):'0'})}
+  });
+  view.addEventListener('change',function(e){
+    var t=e.target,d=t.dataset;
+    if(d.dset){dayPut(selD,d.dset,parseNum(t.value));render();return}
+    if(d.pn){var v=Math.round(parseNum(t.value));if(v>0&&v<=100000){F.plan[d.pn]=v;save()}render();return}
+    if(d.cur!=null){var c=t.value.trim().slice(0,4);if(c){F.cur=c;save()}render();return}
+    if(/^sf-(sum|mon)$/.test(t.id)){var n=parseNum(t.value);t.value=n?sp(n):''}
+    if(t.id==='sf-d'||t.id==='sf-co'){readForm()}
+    if(t.id==='imp-file'&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var o=JSON.parse(String(fr.result));if(!isO(o)||o.v!==1||!isO(o.sales))throw 0;F=norm(o);save();render();toast('Записи загружены из файла.')}catch(_){toast('Это не файл продаж.')}};fr.readAsText(t.files[0])}
+  });
+  view.addEventListener('keydown',function(e){
+    if(e.key!=='Enter')return;var t=e.target;
+    if(/^sf-/.test(t.id)){e.preventDefault();saleSave()}
+    else if(t.dataset&&t.dataset.dset){e.preventDefault();t.blur()}
+  });
+  $('set-btn').addEventListener('click',function(){setTab(tab==='set'?'main':'set')});
+  /* меню слева сверху: переход между своими сайтами */
+  var menu=$('menu'),brand=$('brand');
+  brand.addEventListener('click',function(){menu.hidden=!menu.hidden;brand.setAttribute('aria-expanded',!menu.hidden)});
+  document.addEventListener('click',function(e){if(!menu.hidden&&!e.target.closest('#brand-w')){menu.hidden=true;brand.setAttribute('aria-expanded','false')}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!menu.hidden){menu.hidden=true;brand.setAttribute('aria-expanded','false')}});
+  /* тема и размер текста — из настроек главного сайта */
+  function theme(){
+    var ui={};try{ui=((JSON.parse(localStorage.getItem('lw-data3')||'null')||{}).set||{}).ui||{}}catch(_){}
+    var dark=ui.theme==='dark'||(ui.theme==='auto'&&!!window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.setAttribute('data-ui',dark?'dark':'light');
+    if(typeof ui.fz==='number'&&ui.fz>=.8&&ui.fz<=1.4)document.documentElement.style.setProperty('--fz',ui.fz);
+  }
+  function pill(){
+    var p=$('st-pill'),s=fsLine();
+    p.textContent=saveErr?'Не сохранено':s||(savedAt?'Сохранено '+hm(savedAt):'Автосохранение включено');p.classList.toggle('bad',saveErr||fsBad());
+    $('sy-in').hidden=!fsCanLogin();
+  }
+  window.addEventListener('storage',function(e){if(e.key==='lw-data3')theme();if(e.key===LSK&&e.newValue){try{F=norm(JSON.parse(e.newValue));render()}catch(_){}}if(e.key==='lw-data3-sy')fsBoot()});
+  $('sy-in').onclick=function(){syDlgOpen(false)};
+  $('st-pill').onclick=function(){if(fsCanLogin())syDlgOpen(false)};
+  function dayTick(){var t=dKey();if(t===TODAY)return;var wasT=selD===TODAY,wasM=viewM===NOW;TODAY=t;NOW=mKey();if(wasT)selD=t;if(wasM)viewM=NOW;if(!editId)draft.d=TODAY;render()}
+  setInterval(dayTick,60000);document.addEventListener('visibilitychange',function(){if(!document.hidden)dayTick()});
+  theme();if((location.hash||'')==='#set')tab='set';
+  /* ---- общее с главным сайтом ---- */
+  function syStr(v){
+    if(v===undefined)return 'undefined';
+    if(v===null||typeof v!=='object')return JSON.stringify(v)||'null';
+    if(Array.isArray(v))return '['+v.map(function(x){return x===undefined?'null':syStr(x)}).join(',')+']';
+    var ks=Object.keys(v).sort(),o=[];
+    for(var i=0;i<ks.length;i++){var x=v[ks[i]];if(x!==undefined)o.push(JSON.stringify(ks[i])+':'+syStr(x))}
+    return '{'+o.join(',')+'}';
+  }
+  function syHash(s){var a=2166136261,b=5381;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);a=Math.imul(a^c,16777619);b=(Math.imul(b,33)+c)|0}return(a>>>0).toString(36)+'.'+(b>>>0).toString(36)+'.'+s.length.toString(36)}
+  function syObj(x){return !!x&&typeof x==='object'&&!Array.isArray(x)}
+  function merge3(b,l,r,d){
+    var ls=syStr(l),rs=syStr(r);if(ls===rs)return l;
+    var bs=syStr(b);if(ls===bs)return r;if(rs===bs)return l;
+    if(syObj(l)&&syObj(r)&&(d||0)<8){var o={},bb=syObj(b)?b:{};Object.keys(l).concat(Object.keys(r)).forEach(function(k){if(k in o)return;var v=merge3(bb[k],l[k],r[k],(d||0)+1);if(v!==undefined)o[k]=v});return o}
+    return l;
+  }
+  function syU8(s){return new TextEncoder().encode(s)}
+  function syB64(u){var s='';for(var i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)}
+  function syUB64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+  function syKey(){
+    if(!syKeyP)syKeyP=crypto.subtle.importKey('raw',syU8(sy.tok),'PBKDF2',false,['deriveKey']).then(function(k){
+      return crypto.subtle.deriveKey({name:'PBKDF2',salt:syU8('koleso-zhizni-sync-v1'),iterations:100000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])});
+    return syKeyP;
+  }
+  function syEnc(str,pa){
+    var iv=crypto.getRandomValues(new Uint8Array(12));
+    return syKey().then(function(k){return crypto.subtle.encrypt({name:'AES-GCM',iv:iv},k,syU8(str))}).then(function(buf){return JSON.stringify({v:1,h:syHash(str),pa:pa||[],iv:syB64(iv),ct:syB64(new Uint8Array(buf))})});
+  }
+  function syDec(env){return syKey().then(function(k){return crypto.subtle.decrypt({name:'AES-GCM',iv:syUB64(env.iv)},k,syUB64(env.ct))}).then(function(buf){return new TextDecoder().decode(buf)})}
+  function syApi(method,path,body,etag){
+    var h={Accept:'application/vnd.github+json',Authorization:'Bearer '+sy.tok};
+    if(body)h['Content-Type']='application/json';
+    if(etag)h['If-None-Match']=etag;
+    return fetch('https://api.github.com'+path,{method:method,headers:h,body:body?JSON.stringify(body):undefined,cache:'no-store'}).then(function(r){
+      if(r.status===304)return{status:304};
+      return r.text().then(function(t){
+        var d=null;try{d=JSON.parse(t)}catch(_){}
+        if(r.ok)return{status:r.status,data:d,etag:r.headers.get('ETag')||'',scopes:r.headers.get('X-OAuth-Scopes')};
+        throw{code:r.status===401?'tok':r.status===404?'gone':r.status===429||(r.status===403&&/rate limit|secondary|abuse/i.test(t))?'limit':r.status===403?'deny':'err',retry:+r.headers.get('Retry-After')||0};
+      });
+    },function(){throw{code:'net'}});
+  }
+  function syText(f){
+    if(!f)return Promise.resolve('');
+    if(!f.truncated||!f.raw_url)return Promise.resolve(f.content||'');
+    return fetch(f.raw_url,{cache:'no-store'}).then(function(r){if(!r.ok)throw{code:'err'};return r.text()},function(){throw{code:'net'}});
+  }
+  function syEnv(t){try{var e=JSON.parse(t);return e&&e.v===1&&e.iv&&e.ct?e:null}catch(_){return null}}
+  function syUser(){var m=/^([a-z0-9][a-z0-9-]*)\.github\.io$/i.exec(location.hostname||'');return m?m[1]:String((SEED&&SEED.ghu)||'')}
+  function syPw(pw){pw=String(pw||'').trim();try{pw=pw.normalize('NFC')}catch(_){}return pw}
+  function syPwKey(pw,salt,it){
+    return crypto.subtle.importKey('raw',syU8(pw),'PBKDF2',false,['deriveKey']).then(function(k){
+      return crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:it,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])});
+  }
+  function syVhOpen(b,pw){
+    return syPwKey(pw,syUB64(b.salt),Math.min(5000000,Math.max(1000,+b.it||SYVIT))).then(function(k){return crypto.subtle.decrypt({name:'AES-GCM',iv:syUB64(b.iv)},k,syUB64(b.ct))}).then(function(buf){return new TextDecoder().decode(buf)},function(){throw{code:'pw'}});
+  }
+  function syVhOk(b){return !!b&&b.app==='koleso-zhizni-vhod'&&!!b.salt&&!!b.iv&&!!b.ct}
+  function syPub(path){
+    return fetch('https://api.github.com'+path,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'}).then(function(r){
+      return r.text().then(function(t){
+        var d=null;try{d=JSON.parse(t)}catch(_){}
+        if(r.ok)return d;
+        throw{code:r.status===404?'nouser':r.status===403||r.status===429?'limit':'err'};
+      });
+    },function(){throw{code:'net'}});
+  }
+  function syVhFind(user){
+    /* повторная попытка после неверного пароля не ходит за шифром заново */
+    if(syVhMem&&syVhMem.u===user)return Promise.resolve(syVhMem.b);
+    return syVhGet(user).then(function(b){syVhMem={u:user,b:b};return b});
+  }
+  function syVhGet(user){
+    return fetch('koleso-vhod.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null}).then(function(b){
+      if(syVhOk(b))return b;
+      if(!user)throw{code:'nouser'};
+      return syPub('/users/'+encodeURIComponent(user)+'/gists?per_page=100').then(function(l){
+        var g=null;(l||[]).forEach(function(x){if(x&&x.files&&x.files[SYV]&&(!g||x.updated_at>g.updated_at))g=x});
+        if(!g)throw{code:'none'};
+        return syPub('/gists/'+g.id);
+      }).then(function(g){
+        var f=g&&g.files&&g.files[SYV],b2=null;try{b2=JSON.parse(f.content)}catch(_){}
+        if(!syVhOk(b2))throw{code:'none'};
+        return b2;
+      });
+    });
+  }
+  /* ---------- синхронизация и вход ----------
+     Финансы лежат на том же адресе, что и «Колесо жизни», поэтому ключ GitHub у них общий: вошёл на одном сайте, второй уже подключён.
+     Записи финансов хранятся отдельным зашифрованным файлом fin.json в том же секретном хранилище. */
+  var MAINK='lw-data3-sy',FSK=LSK+'-sy',FFILE='sales.json',SYF='koleso-zhizni.json',SYV='koleso-zhizni-vhod.json',SYVIT=600000,syVhMem=null;
+  var sy=null,syKeyP=null,fs=null,fsBusy=false,fsT=0,fsState='',fsAt=0,fsLast=0,fsFail=0,syDlg=null,syVhBusy=false;
+  var SYVERR={pw:'Пароль не подошёл.',none:'Вход по паролю ещё не включён. Включи его на главном сайте: Колесо жизни → Настройки → Данные.',nouser:'Не нашёл аккаунт GitHub с таким именем.',
+    limit:'GitHub временно не отвечает из этой сети: слишком много запросов. Попробуй через несколько минут или с другого интернета.',net:'Нет связи с GitHub. Проверь интернет.',err:'GitHub ответил ошибкой. Попробуй ещё раз.'};
+  function fsCan(){return !!(window.crypto&&crypto.subtle&&window.fetch&&window.TextEncoder)}
+  function fsMain(){try{var o=JSON.parse(localStorage.getItem(MAINK)||'null');return o&&o.tok?o:null}catch(_){return null}}
+  function fsOn(){return !!sy&&fsCan()}
+  function fsSave(){try{localStorage.setItem(FSK,JSON.stringify(fs))}catch(_){}}
+  function fsBlank(){return syStr(F)===syStr(norm({}))}
+  function fsSet(st){var ch=st!==fsState;fsState=st;if(st==='ok')fsAt=Date.now();if(ch||st==='ok')pill()}
+  function fsSoon(ms){clearTimeout(fsT);if(fsOn())fsT=setTimeout(fsCycle,ms)}
+  function fsTouch(){if(fsOn()&&fsState!=='tok'&&fsState!=='key'&&fsState!=='deny'){if(fsState==='ok')fsState='wait';fsSoon(700)}}
+  /* части записей: всё, кроме трат, лежит в fin.json; траты разложены по месяцам (fd-ГГГГ-ММ.json), чтобы каждая новая трата
+     отправляла маленький файл, а не все записи за годы */
+  var FS_M0='';
+  function fsFile(k){return k==='m'?FFILE:'sd-'+k.slice(2)+'.json'}
+  function fsDoc(f){var m;return f===FFILE?'m':(m=/^sd-(\d{4}-\d\d)\.json$/.exec(f))?'d:'+m[1]:''}
+  function fsGet(k){
+    var o={};
+    if(k==='m'){Object.keys(F).forEach(function(x){if(x!=='days')o[x]=F[x]});return o}
+    var mk=k.slice(2);Object.keys(F.days||{}).forEach(function(dk){if(dk.slice(0,7)===mk)o[dk]=F.days[dk]});return o;
+  }
+  function fsPut(k,o){
+    o=isO(o)?o:{};
+    if(k==='m'){var days=F.days||{};F=norm(o);F.days=days;return}
+    var mk=k.slice(2);Object.keys(F.days).forEach(function(dk){if(dk.slice(0,7)===mk)delete F.days[dk]});
+    Object.keys(o).forEach(function(dk){if(dk.slice(0,7)===mk&&isO(o[dk])&&Object.keys(o[dk]).length)F.days[dk]=o[dk]});
+  }
+  function fsDocs(){
+    var l=['m'],seen={m:1};
+    Object.keys(F.days||{}).forEach(function(dk){var k='d:'+dk.slice(0,7);if(/^\d{4}-\d\d-\d\d$/.test(dk)&&!seen[k]){seen[k]=1;l.push(k)}});
+    Object.keys(fs.d||{}).forEach(function(k){if(!seen[k]&&fsDoc(fsFile(k))===k){seen[k]=1;l.push(k)}});
+    return l;
+  }
+  function fsEmpty(k,str){if(!FS_M0){var keep=F;F=norm({});FS_M0=syStr(fsGet('m'));F=keep}return k==='m'?str===FS_M0:str==='{}'}
+  function fsMeta(k){return fs.d[k]||(fs.d[k]={rh:null,lh:null,base:'',pa:[],prev:null,prevH:''})}
+  function fsBoot(){
+    clearTimeout(fsT);var m=fsMain();
+    if(!m||!fsCan()){sy=null;fsState='';pill();fsAuto();return}
+    if(!sy||sy.tok!==m.tok){sy={tok:m.tok};syKeyP=null;fsState=''}
+    try{fs=JSON.parse(localStorage.getItem(FSK)||'null')}catch(_){fs=null}
+    var th=syHash(m.tok);if(!fs||fs.th!==th||!isO(fs.d))fs={th:th,id:'',etag:'',d:{}};
+    if(!fs.id&&m.id)fs.id=m.id;
+    pill();fsCycle();
+  }
+  function fsStore(){try{localStorage.setItem(LSK,JSON.stringify(F));savedAt=Date.now()}catch(_){}}
+  function fsFind(){
+    return syApi('GET','/gists?per_page=100').then(function(r){
+      var best=null;(r.data||[]).forEach(function(g){if(g&&g.files&&g.files[SYF]&&(!best||g.updated_at>best.updated_at))best=g});
+      if(best){fs.id=best.id;fs.etag='';return fsPull(true)}
+      /* хранилища ещё нет: заводится с той же меткой, которую понимает главный сайт */
+      var docs=fsDocs(),strs={},files={};
+      docs.forEach(function(k){var s=syStr(fsGet(k));if(!fsEmpty(k,s)||k==='m')strs[k]=s});
+      return Promise.all([syEnc('koleso')].concat(Object.keys(strs).map(function(k){return syEnc(strs[k]).then(function(c){files[fsFile(k)]={content:c}})}))).then(function(a){
+        files[SYF]={content:JSON.stringify({app:'koleso-zhizni',v:1,chk:JSON.parse(a[0])})};
+        return syApi('POST','/gists',{description:'Колесо жизни: записи сайта (зашифрованы). Не удалять: это хранилище синхронизации.',public:false,files:files});
+      }).then(function(r2){fs.id=r2.data.id;fs.etag='';fs.d={};Object.keys(strs).forEach(function(k){var m=fsMeta(k);m.rh=m.lh=syHash(strs[k]);m.base=strs[k]});fsLast=Date.now();fsSave()});
+    });
+  }
+  function fsPull(first){
+    var cond=!first&&!fs.nc&&fs.etag?fs.etag:'';
+    return syApi('GET','/gists/'+fs.id,null,cond).catch(function(e){
+      if(!cond||!e||e.code!=='net')throw e;
+      return syApi('GET','/gists/'+fs.id).then(function(r){fs.nc=1;return r});
+    }).then(function(r){
+      if(r.status===304)return;
+      var files=(r.data&&r.data.files)||{},man=files[SYF],todo=[];
+      if(!man)throw{code:'gone'};
+      return syText(man).then(function(t){
+        var m=null;try{m=JSON.parse(t)}catch(_){}
+        if(!m||!m.chk)throw{code:'key'};
+        return syDec(m.chk).then(function(s){if(s!=='koleso')throw 0},function(){throw 0}).catch(function(){throw{code:'key'}});
+      }).then(function(){
+        Object.keys(files).forEach(function(name){var k=fsDoc(name);if(k)todo.push({k:k,f:files[name]})});
+        return Promise.all(todo.map(function(x){
+          return syText(x.f).then(function(t){
+            var e=syEnv(t);if(!e||e.h===fsMeta(x.k).rh){x.skip=1;return}
+            x.h=e.h;x.pa=Array.isArray(e.pa)?e.pa:[];
+            return syDec(e).then(function(s){x.str=s;x.obj=JSON.parse(s)},function(){throw{code:'key'}});
+          });
+        }));
+      }).then(function(){
+        /* всё ниже идёт одним куском без ожиданий: пока версии сводятся, записи на экране не меняются */
+        var ch=0;
+        todo.forEach(function(x){
+          if(x.skip)return;
+          var k=x.k,m=fsMeta(k),ls=syStr(fsGet(k)),known=m.lh!=null,dirty=known?syHash(ls)!==m.lh:!fsEmpty(k,ls);
+          /* чужая отправка легла поверх моей почти одновременной: версии сводятся от общей прежней, а не затирают друг друга */
+          var lost=known&&!dirty&&!!m.prevH&&x.pa.indexOf(m.prevH)>=0&&x.pa.indexOf(m.rh)<0&&!!m.prev;
+          if(!dirty&&!lost){fsPut(k,x.obj);var s2=syStr(fsGet(k));m.lh=syHash(s2);m.base=s2}
+          else{var bs=lost?m.prev:known?m.base:'';fsPut(k,merge3(bs?JSON.parse(bs):{},fsGet(k),x.obj,0));m.base=x.str;m.lh=syStr(fsGet(k))===x.str?syHash(x.str):'*'}
+          m.rh=x.h;m.pa=x.pa;ch++;
+        });
+        fs.etag=r.etag||'';fsSave();
+        if(ch){fsStore();render()}
+      });
+    });
+  }
+  function fsDirty(){
+    var out=[];
+    fsDocs().forEach(function(k){var s=syStr(fsGet(k)),m=fsMeta(k);if(syHash(s)===m.lh)return;if(m.lh==null&&m.rh==null&&fsEmpty(k,s))return;out.push({k:k,s:s})});
+    return out;
+  }
+  function fsPush(){
+    var d=fsDirty();if(!d.length)return;
+    if(Date.now()-fsLast<2500)return 'later';
+    var files={},pas={};
+    d.forEach(function(x){var m=fsMeta(x.k);pas[x.k]=[m.rh].concat(m.pa||[]).filter(Boolean).slice(0,8)});
+    return Promise.all(d.map(function(x){return syEnc(x.s,pas[x.k]).then(function(c){files[fsFile(x.k)]={content:c}})})).then(function(){
+      return syApi('PATCH','/gists/'+fs.id,{files:files});
+    }).then(function(){
+      d.forEach(function(x){var m=fsMeta(x.k);m.prevH=m.rh||'';m.prev=m.base||'';m.pa=pas[x.k];m.rh=m.lh=syHash(x.s);m.base=x.s});
+      fsLast=Date.now();fsSave();
+    });
+  }
+  function fsCycle(){
+    if(!fsOn()||fsBusy||fsState==='tok'||fsState==='key'||fsState==='deny')return;
+    /* на главном сайте вышли или сменили ключ: здесь то же самое */
+    var m=fsMain();if(!m||m.tok!==sy.tok){fsBoot();return}
+    fsBusy=true;if(fsState!=='ok'&&fsState!=='wait')fsSet('busy');
+    Promise.resolve().then(function(){return fs.id?fsPull(false):fsFind()}).then(function(){return fsPush()}).then(function(r){
+      fsBusy=false;fsFail=0;var dirty=fsDirty().length>0;
+      fsSet(dirty?'wait':'ok');
+      if(r==='later'||dirty)fsSoon(Math.max(500,2600-(Date.now()-fsLast)));else if(!document.hidden)fsSoon(fs.etag&&!fs.nc?4000:9000);
+    },function(e){
+      var c=(e&&e.code)||'err';fsBusy=false;fsFail++;
+      if(c==='gone'){fs.id='';fs.etag='';fs.d={};fsSave();fsSet('busy');fsSoon(800);return}
+      fsSet(c==='tok'||c==='key'||c==='deny'?c:c==='net'?'net':'err');
+      if(c==='tok'||c==='key'||c==='deny')return;
+      fsSoon(c==='limit'?Math.max(60,e.retry||0)*1000:Math.min(60000,4000*Math.pow(2,Math.min(fsFail,4))));
+    });
+  }
+  function fsLine(){
+    if(!fsOn())return '';
+    return fsState==='ok'?'Синхронизировано '+hm(fsAt):fsState==='net'?'Нет связи: отправлю позже':fsState==='tok'?'Ключ GitHub не принят: войди заново на главном сайте':fsState==='key'||fsState==='deny'?'Синхронизация остановлена: проверь её на главном сайте':fsState==='err'?'Синхронизация ждёт':'Синхронизирую…';
+  }
+  function fsBad(){return fsOn()&&(fsState==='net'||fsState==='err'||fsState==='tok'||fsState==='key'||fsState==='deny')}
+  function fsCanLogin(){return fsCan()&&!sy&&/^https?:$/.test(location.protocol)}
+  document.addEventListener('visibilitychange',function(){if(fsOn())fsSoon(0)});
+  window.addEventListener('online',function(){if(fsOn())fsSoon(0)});
+  window.addEventListener('focus',function(){if(!fsBusy){if(fsOn())fsSoon(0);else if(fsMain())fsBoot()}});
+  /* вход по паролю: то же окно, что на главном сайте. Задать пароль в первый раз можно там же, на главном сайте */
+  function syDlgMsg(m,soft){var el=$('sy-dmsg');if(el){el.textContent=m||'';el.classList.toggle('soft',!!soft)}var b=$('sy-dgo');if(b)b.disabled=!!soft}
+  function syLogin(pw,user){
+    pw=syPw(pw);user=String(user||syUser()).trim().replace(/^@/,'');
+    if(!pw){syDlgMsg('Введи пароль.');return}
+    if(!user){syDlgMsg('Введи имя своего аккаунта GitHub.');return}
+    if(syVhBusy)return;syVhBusy=true;syDlgMsg('Проверяю…',1);
+    var was=!!(syVhMem&&syVhMem.u===user);
+    syVhFind(user).then(function(b){return syVhOpen(b,pw)}).catch(function(e){
+      if(!was||!e||e.code!=='pw')throw e;
+      syVhMem=null;return syVhFind(user).then(function(b){return syVhOpen(b,pw)});
+    }).then(function(tok){
+      syVhBusy=false;syDlg.hidden=true;
+      try{localStorage.setItem(MAINK,JSON.stringify({tok:tok,id:'',etag:'',rh:{},lh:{},base:{},pa:{},prev:{},prevH:{}}))}catch(_){}
+      fsBoot();toast('Вход выполнен: записи загружаются.');
+    },function(e){syVhBusy=false;syDlgMsg(SYVERR[(e&&e.code)]||SYVERR.err)});
+  }
+  function syDlgOpen(auto){
+    if(!fsCanLogin())return;
+    if(!syDlg){
+      syDlg=document.createElement('div');syDlg.id='sy-dlg';syDlg.setAttribute('role','dialog');syDlg.setAttribute('aria-label','Вход по паролю');document.body.appendChild(syDlg);
+      syDlg.addEventListener('click',function(e){
+        var t=e.target;
+        if(t===syDlg||t.closest('[data-syx]')){try{localStorage.setItem('lw-data3-vx','1')}catch(_){}syDlg.hidden=true;return}
+        if(t.closest('#sy-dgo'))syLogin($('sy-dpw').value,$('sy-duser')?$('sy-duser').value:'');
+      });
+      syDlg.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();syLogin($('sy-dpw').value,$('sy-duser')?$('sy-duser').value:'')}else if(e.key==='Escape')syDlg.hidden=true});
+    }
+    syDlg.innerHTML='<div class="sy-db"><div class="box-h"><span>Вход</span><button type="button" class="ib" data-syx aria-label="Закрыть">×</button></div>'+
+      '<p>Введи свой пароль, и записи загрузятся на это устройство. Пароль тот же, что у «Колеса жизни».</p>'+
+      (syUser()?'':'<input class="inp" id="sy-duser" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Имя аккаунта GitHub" aria-label="Имя аккаунта GitHub">')+
+      '<input class="inp" id="sy-dpw" type="password" autocomplete="current-password" placeholder="Пароль" aria-label="Пароль">'+
+      '<p class="sy-dmsg" id="sy-dmsg" role="status"></p>'+
+      '<div class="row"><button type="button" class="btn" id="sy-dgo">Войти</button><button type="button" class="btn ghost" data-syx>Закрыть</button></div>'+
+      '<a class="sy-alt" href="index.html">Пароль ещё не задан: задать на главном сайте</a></div>';
+    syDlg.hidden=false;
+    if(!auto)setTimeout(function(){var i=$('sy-duser')||$('sy-dpw');if(i)i.focus()},30);
+  }
+  var fsAutoDone=false;
+  function fsAuto(){
+    if(fsAutoDone)return;fsAutoDone=true;
+    var seenX=false;try{seenX=!!localStorage.getItem('lw-data3-vx')}catch(_){}
+    /* на пустом устройстве окно входа открывается само, если пароль уже задан */
+    var u=syUser();if(fsCanLogin()&&!seenX&&fsBlank()&&!!u&&location.protocol==='https:')syVhFind(u).then(function(){if(fsCanLogin()&&(!syDlg||syDlg.hidden))syDlgOpen(true)},function(){});
+  }
+  var UPD_NAME='prodazhi',UPD_BUILD='3f56118dcb';
+  function updBusy(){return fsBusy||(!!syDlg&&!syDlg.hidden)}
+  function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
+  /* ---------- сайт сам обновляется до новой версии (21.10) ----------
+     При выкладке рядом с сайтом кладётся version.json с номерами сборок обоих сайтов. Страница сверяется с ним через 8 секунд после
+     открытия, при возвращении на вкладку, при появлении сети и раз в 10 минут. Если вышла новая сборка, страница перезагружается сама,
+     но только когда ничего не печатается, нет недописанных полей, не открыто окно и не идёт отправка записей. Иначе внизу плашка
+     «Обновить», а перезагрузка случится сама, как только станет можно (проверка раз в 15 секунд; в скрытой вкладке — сразу).
+     Перезагрузка идёт на адрес с «?v=сборка», чтобы браузер и GitHub не отдали старую копию из кэша; если всё равно пришла старая,
+     второй раз страница не перезагружается, остаётся плашка. Записи перед перезагрузкой сохраняются в память браузера. */
+  var UPD_ON=/^https:$/.test(location.protocol)&&!/(^|\.)claude\.(ai|site)$|(^|\.)claudeusercontent\.com$/.test(location.hostname),updNew='',updT=0,updBar=null;
+  function updIdle(){
+    var a=document.activeElement;
+    if(a&&a!==document.body&&(a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable||(a.tagName==='INPUT'&&!/^(checkbox|radio|button|range|submit|file|color|reset)$/.test(a.type))))return false;
+    var dirty=[].some.call(document.querySelectorAll('input,textarea'),function(x){return !!x.offsetParent&&!/^(checkbox|radio|button|range|submit|file|hidden|color|reset)$/.test(x.type)&&x.value!==x.defaultValue});
+    if(dirty)return false;
+    try{if(updBusy())return false}catch(_){return false}
+    return true;
+  }
+  function updCheck(){
+    if(!UPD_ON||!window.fetch)return;
+    fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(v){
+      var nv=v&&v[UPD_NAME];if(!nv||nv===UPD_BUILD)return;
+      updNew=String(nv);updTry();
+    }).catch(function(){});
+  }
+  function updTry(){
+    clearTimeout(updT);if(!updNew)return;
+    var tried='';try{tried=sessionStorage.getItem('upd-'+UPD_NAME)||''}catch(_){}
+    if(tried===updNew){updShow();return}
+    if(!updIdle()){updShow();updT=setTimeout(updTry,15000);return}
+    updGo();
+  }
+  function updGo(){
+    try{updFlush()}catch(_){}
+    try{sessionStorage.setItem('upd-'+UPD_NAME,updNew)}catch(_){}
+    location.replace(location.pathname+'?v='+encodeURIComponent(updNew)+location.hash);
+  }
+  function updShow(){
+    if(updBar)return;
+    updBar=document.createElement('div');updBar.className='upd-bar';updBar.setAttribute('role','status');
+    updBar.innerHTML='<span>Вышла новая версия сайта</span><button type="button">Обновить</button>';
+    updBar.querySelector('button').onclick=updGo;document.body.appendChild(updBar);
+  }
+  /* после обновления в адресе остался «?v=…»: убираем, чтобы ссылка была чистой */
+  if(/(^|[?&])v=/.test(location.search.slice(1))){try{history.replaceState(history.state,'',location.pathname+location.hash)}catch(_){}}
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)updCheck();else if(updNew&&updIdle())updGo()});
+  window.addEventListener('focus',updCheck);window.addEventListener('online',updCheck);
+  setInterval(updCheck,6e5);setTimeout(updCheck,8000);
+
+  render();pill();fsBoot();
+})();
+</script>
+</body>
+</html>
