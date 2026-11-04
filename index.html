@@ -692,6 +692,68 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 .f-qt{color:var(--muted);font-size:calc(11px*var(--fz))}
 
 .m-est{color:var(--muted);border-bottom:1px dotted currentColor;cursor:help}
+/* ---------- энергия и время засыпания ---------- */
+.hc.sc{background:color-mix(in srgb,var(--fill) var(--q,0%),var(--soft))}
+.hc.sc.dk{color:var(--of,var(--on-fill))}
+.hd-sc{flex-wrap:wrap}
+.sc10{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;flex:1 0 100%}
+.sc10 button{border:0;border-radius:9px;height:32px;padding:0;font-weight:600;font-size:calc(12px*var(--fz));font-variant-numeric:tabular-nums;color:var(--deep);background:color-mix(in srgb,var(--fill) calc(var(--q) * .35),var(--soft))}
+.sc10 button[aria-pressed="true"]{background:var(--fill);color:var(--of,var(--on-fill));box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--fill)}
+.sc10 button:disabled{opacity:.35;cursor:default}
+.t-in{display:flex;align-items:center;gap:6px}
+.t-in .inp{width:auto;min-width:96px;padding:5px 8px;font-variant-numeric:tabular-nums}
+.t-st{font-style:normal;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:600;background:var(--fill);color:var(--of,var(--on-fill))}
+.t-st.late{background:var(--tint);color:var(--danger);box-shadow:inset 0 0 0 1.5px var(--danger)}
+.hb-lim{display:flex;align-items:center;gap:6px}
+.hb-lim small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.hb-lim .inp{width:100%;min-width:0}
+.en-num{margin-top:4px}
+.en-num .inp{width:84px;padding:5px 8px}
+.en-us-l{margin:10px 0 6px;color:var(--muted);font-size:calc(13px*var(--fz))}
+.en-us{display:flex;flex-wrap:wrap;gap:6px 14px}
+/* окно «Как прошёл вчерашний день?» */
+.en-box{width:min(520px,100%)}
+.en-q{display:grid;gap:8px}
+.en-q>.lab{font-weight:600}
+.en-sc button{height:40px;font-size:calc(14px*var(--fz))}
+.en-ends{display:flex;justify-content:space-between;color:var(--muted);font-size:calc(11px*var(--fz))}
+.en-sl{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px}
+.en-sl label{display:grid;gap:3px}
+.en-sl small,.en-hint{color:var(--muted);font-size:calc(11px*var(--fz))}
+.en-sl .inp{width:120px;padding:7px 10px;font-variant-numeric:tabular-nums}
+.en-dur{padding-bottom:8px;font-variant-numeric:tabular-nums}
+.en-dur i{color:var(--danger);font-style:normal}
+.en-ops{display:flex;flex-wrap:wrap;gap:8px}
+.en-op{border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:7px 12px;text-align:left;font-weight:500;font-size:calc(13px*var(--fz));display:grid;gap:1px;color:var(--ink)}
+.en-op small{color:var(--muted);font-weight:400;font-size:calc(11px*var(--fz))}
+.en-op[aria-pressed="true"],.en-op.ro.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.en-op[aria-pressed="true"] small,.en-op.ro.on small{color:inherit;opacity:.75}
+.en-op.ro{cursor:default}
+.en-op.ro.off{border-style:dashed}
+.en-act{justify-content:flex-start}
+/* блок «Энергия: что на неё влияет» */
+.en-sec{display:grid;gap:10px}
+.en-sum{margin:0;font-size:calc(14px*var(--fz));max-width:70ch}
+.en-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px 36px}
+.en-col{display:grid;gap:6px;align-content:start}
+.en-col h3{margin:8px 0 2px;font-size:calc(12px*var(--fz));letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.en-f{display:grid;grid-template-columns:minmax(0,1fr) auto 56px;gap:10px;align-items:center;border-top:1px solid var(--line);padding:8px 0}
+.en-f.weak{opacity:.6}
+.en-fn{font-weight:500;min-width:0}
+.en-fn small{display:block;color:var(--muted);font-weight:400;font-size:calc(11px*var(--fz))}
+.en-tag{font-style:normal;font-size:calc(10px*var(--fz));color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 6px;margin-left:6px;vertical-align:1px}
+.en-fv{display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums}
+.en-fv small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.en-fd{justify-self:end;font-weight:600;font-variant-numeric:tabular-nums;border-radius:999px;padding:2px 8px;font-size:calc(12px*var(--fz))}
+.en-fd.up{background:var(--ok-bg);color:var(--ok-fg)}
+.en-fd.dn{background:var(--tint);color:var(--danger)}
+.en-b{display:grid;grid-template-columns:52px minmax(0,1fr) 30px 46px;gap:8px;align-items:center;font-size:calc(12px*var(--fz))}
+.en-b>i{height:8px;border-radius:999px;background:var(--soft);overflow:hidden;display:block}
+.en-b>i b{display:block;height:100%;border-radius:999px;background:var(--fill)}
+.en-b em{font-style:normal;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.en-b small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.en-nb{max-width:80ch}
+@media (max-width:760px){.en-grid{grid-template-columns:minmax(0,1fr)}.en-f{grid-template-columns:minmax(0,1fr) auto 50px}}
 
 @media (max-width:1100px){
   .lower{grid-template-columns:1fr}
@@ -1002,14 +1064,16 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   var now=new Date(),nowM=mk(now);
   var months={},series={},goals={},diary={},plans={},sites=[],seen={},snap={},budget=120,hideDemo=true,loaded=false,db=null,dishes={};
   var SLEEP_H={id:'hs',n:'Сон, часы',s:'sleep',type:'hours'};
-  var habits=[SLEEP_H,{id:'h1',n:'Лёг до 23:00',s:'sleep',type:'check'},{id:'h2',n:'Заполнил КБЖУ',s:'other',type:'check'},{id:'h3',n:'Откладывал дела',s:'other',type:'count'}];
+  var habits=[{id:'en',n:'Энергия',s:'other',type:'score'},SLEEP_H,{id:'h1',n:'Лёг до 00:00',s:'sleep',type:'time',lim:1440},{id:'hback',n:'Экстензия / растяжка',s:'fitness',type:'check',en:'b'},{id:'huse',n:'Полезные дела',s:'other',type:'check',en:'u'},{id:'h2',n:'Заполнил КБЖУ',s:'other',type:'check'},{id:'h3',n:'Откладывал дела',s:'other',type:'count'}];
   /* настройки по умолчанию; всё, что меняется в «Настройках», лежит в этих объектах и сохраняется вместе с записями */
   var UI0={theme:'light',accent:'ink',sat:1,font:'onest',dfont:'unbounded',fz:1};
   var CAL0={hh:46,start:7.5,snap:15,view:'week',dur:30,side:1,chips:1,we:1,info:1,tick:1,ding:1,dvol:2};
   var REP0={mode:'month',months:6,wheel:1,empty:1,autoW:0,autoM:1,s1:1,s2:1,s3:1,s4:1,s5:1};
   var SEC0={habits:1,goals:1,diary:1,report:1},FEAT0={gh:'off',links:1},GS0={url:'',key:'',on:0,show:1,cals:{},hid:{},src:'',cid:''};
   var FOOD0={on:1,inHabits:1,c:'#B9C45E',rk:1,rp:1,rf:1,rc:1,rm:1,nk:0,np:0,nf:0,nc:0,mfix:0,meals:['Завтрак','Обед','Перекус','Ужин']};
-  var ui=clone(UI0),calS=clone(CAL0),repS=clone(REP0),sec=clone(SEC0),feat=clone(FEAT0),food=clone(FOOD0),gs=clone(GS0),gcalOn=true,saveSt={s:'ok',t:0},saveErr=false;
+  /* энергия: утренний вопрос и пороги опор (еда, сон, часы полезных дел и их сферы) */
+  var EN0={ask:1,kcal:2200,sleep:8,use:2,us:['crypto','growth','creative','work']};
+  var ui=clone(UI0),calS=clone(CAL0),repS=clone(REP0),sec=clone(SEC0),feat=clone(FEAT0),food=clone(FOOD0),gs=clone(GS0),enS=clone(EN0),gcalOn=true,saveSt={s:'ok',t:0},saveErr=false;
   setSpheres(SP_DEF);
   var syncAt=Date.now(),nextSync=0;
   var EV=[],EVM={},AGG={},DS={},BYDAY={},GH={},GP={},isDemo=false,firstM=nowM;
@@ -1024,7 +1088,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function dump(){return{at:Date.now(),demo:EXAMPLE?1:0,gcid:gCid(),months:months,series:series,goals:goals,diary:diary,dishes:dishes,set:setBody()}}
   function lsSave(){try{localStorage.setItem(LSK,JSON.stringify(dump()));return true}catch(_){return false}}
   function applyAll(raw){months=raw.months||{};series=raw.series||{};goals=raw.goals||{};diary=raw.diary||{};dishes=raw.dishes||{};normDishes();applySettings(raw.set)}
-  function setBody(){return{v:7,budget:budget,plans:plans,hideDemo:hideDemo,habits:habits,sites:sites,seen:seen,snap:snap,spheres:sphBody(),ui:ui,cal:calS,gcal:gcalOn,rep:repS,sec:sec,feat:feat,food:food,gs:gs}}
+  function setBody(){return{v:8,budget:budget,plans:plans,hideDemo:hideDemo,habits:habits,sites:sites,seen:seen,snap:snap,spheres:sphBody(),ui:ui,cal:calS,gcal:gcalOn,rep:repS,sec:sec,feat:feat,food:food,gs:gs,en:enS}}
   function bodyOf(k){if(k==='@set')return setBody();if(k==='@ser')return{items:series};if(k==='@goals')return{items:goals};if(k==='@diary')return{items:diary};if(k.indexOf('dish:')===0)return dishes[k.slice(5)]||null;var m=months[k]||{};return{events:m.events||{},habits:m.habits||{},food:m.food||{}}}
   function pathOf(k){return k==='@set'?'settings/main':k==='@ser'?'settings/series':k==='@goals'?'settings/goals':k==='@diary'?'settings/diary':k.indexOf('dish:')===0?'dishes/'+k.slice(5):'months/'+k}
   /* автосохранение: каждое изменение сразу уходит в хранилище страницы или в память браузера, а оттуда в файл */
@@ -1057,7 +1121,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function applySettings(d){
     if(!d)return;
     if(Array.isArray(d.spheres)&&d.spheres.length){var keep=SP[sel]&&SP[sel].id;setSpheres(d.spheres);sel=SPI[keep]!=null?SPI[keep]:0}
-    ui=mergeS(UI0,d.ui);calS=mergeS(CAL0,d.cal);repS=mergeS(REP0,d.rep);sec=mergeS(SEC0,d.sec);feat=mergeS(FEAT0,d.feat);food=mergeS(FOOD0,d.food);gs=mergeS(GS0,d.gs);
+    ui=mergeS(UI0,d.ui);calS=mergeS(CAL0,d.cal);repS=mergeS(REP0,d.rep);sec=mergeS(SEC0,d.sec);feat=mergeS(FEAT0,d.feat);food=mergeS(FOOD0,d.food);gs=mergeS(GS0,d.gs);enS=mergeS(EN0,d.en);
     if(!okHex(food.c))food.c=FOOD0.c;
     /* прежний порядок приёмов пищи по умолчанию меняется на «завтрак, обед, перекус, ужин»; старые записи корзины переставляются при чтении */
     if(!(d.v>=6)&&food.meals.join('|')==='Завтрак|Обед|Ужин|Перекус'){food.meals=clone(FOOD0.meals);food.mfix=1}
@@ -1069,6 +1133,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       habits=d.habits.filter(function(h){if(h&&OLD[h.s])h.s=OLD[h.s];if(h&&SPI[h.s]==null)h.s='other';return h&&h.id});
       if(!(d.v>=2)&&!habits.some(function(h){return h.type==='hours'}))habits.unshift(SLEEP_H);
     }
+    if(!(d.v>=8))enMigrate();
     if(Array.isArray(d.sites))sites=d.sites.filter(function(x){return x&&x.u});
     else if(d.links)sites=Object.keys(d.links).filter(function(k){return SPI[k]!=null}).map(function(k){return{n:SP[SPI[k]].n,u:d.links[k]}});
     seen=d.seen||{};snap=d.snap||{};
@@ -1193,6 +1258,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(ts>Date.now())return 0;
     var x=(dKey(ts)*31+h.id.length*17+h.id.charCodeAt(h.id.length-1)*7)%11;
     if(h.type==='hours')return ts<mStart(mAdd(nowM,-5)).getTime()?null:6.5+(x%5)*.5;
+    if(h.type==='time')return 1350+x*13;if(h.type==='score')return 3+(x*7+dKey(ts))%8;
     return h.type==='count'?(x<5?0:x<8?1:x<10?2:3):(x<7?1:0);
   }
 
@@ -1295,7 +1361,16 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   }
 
   /* ---------- привычки: четыре вида отметки (часы, плюсик, счётчик, число). Набор привычек правится в настройках ---------- */
-  var HT=[['check','Плюсик: сделал или нет'],['count','Счётчик: сколько раз'],['num','Число: любое значение'],['hours','Часы: идут в зачёт сферы']];
+  var HT=[['check','Плюсик: сделал или нет'],['count','Счётчик: сколько раз'],['num','Число: любое значение'],['hours','Часы: идут в зачёт сферы'],['time','Время: во сколько заснул'],['score','Оценка от 1 до 10']];
+  /* время (вид «Время») хранится в минутах от начала дня; после полуночи счёт идёт дальше 24:00 (00:30 = 1470), поэтому
+     среднее не ломается на полуночи. Значение 1 осталось от прежнего плюсика «Лёг до 23:00»: плюс без записанного времени */
+  function tEnc(s){var m=/^(\d{1,2}):(\d{2})/.exec(String(s||''));if(!m)return null;var v=(+m[1])*60+(+m[2]);if(v>=1440||+m[2]>59)return null;return v<720?v+1440:v}
+  function tTxt(v){if(!(v>=720))return '';v=Math.round(v)%1440;return ('0'+Math.floor(v/60)).slice(-2)+':'+('0'+v%60).slice(-2)}
+  function tLim(h){return h.lim>=720?h.lim:1440}
+  function tOk(h,v){return v>=720?v<tLim(h):v>0}
+  /* у оценки в сфере «Другое» свой тёплый цвет, чтобы энергия не была серой */
+  var EN_C=null;function hCol(h){if(h&&h.type==='score'&&h.s==='other'){if(!EN_C)EN_C='0;'+cv(oklchHex(.8,.145,85));return EN_C}return hOf(h.s)}
+  function sc1(v){return(Math.round(v*10)/10).toLocaleString('ru-RU')}
   function habitById(id){for(var i=0;i<habits.length;i++)if(habits[i].id===id)return habits[i];return null}
   function hGet(h,ts){
     if(isDemo)return demoHv(h,ts);
@@ -1315,8 +1390,8 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     persist(k);refresh();renderHF(true);
   }
   function hRange(h,a,b){
-    var r={n:0,done:0,sum:0,rec:0,zero:0},end=Math.min(b,day0(now).getTime()+1);
-    for(var d=day0(a);d.getTime()<end;d=addDays(d,1)){r.n++;var v=hRaw(h,d.getTime());if(v!=null){r.rec++;if(v===0)r.zero++}if(v){r.done++;r.sum+=v}}
+    var r={n:0,done:0,sum:0,rec:0,zero:0,ok:0,tn:0,ts:0},end=Math.min(b,day0(now).getTime()+1),tm=h.type==='time';
+    for(var d=day0(a);d.getTime()<end;d=addDays(d,1)){r.n++;var v=hRaw(h,d.getTime());if(v!=null){r.rec++;if(v===0)r.zero++}if(v){r.done++;r.sum+=v}if(tm&&v){if(tOk(h,v))r.ok++;if(v>=720){r.tn++;r.ts+=v}}}
     return r;
   }
   function hStreak(h){
@@ -1329,14 +1404,18 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function num(v){return(Math.round(v*100)/100).toLocaleString('ru-RU')}
   function short(v){var a=Math.abs(v);return a>=10000?Math.round(v/1000)+'к':a>=1000?(Math.round(v/100)/10).toLocaleString('ru-RU')+'к':a>=100?String(Math.round(v)):(Math.round(v*10)/10).toLocaleString('ru-RU')}
   function hUnit(h){return h.type==='num'&&h.u?' '+esc(h.u):''}
-  function hStatText(h,r){return h.type==='hours'?(r.rec?hrs(r.sum/r.rec):'0')+' ч в среднем':h.type==='check'?r.done+' из '+r.n+' дн.':h.type==='num'?(r.rec?'в среднем '+num(r.sum/r.rec)+hUnit(h):'нет записей'):r.sum+' раз'}
-  function hHint(h){return h.type==='count'?(h.dir==='more'?' · чем больше, тем лучше':' · чем меньше, тем лучше'):h.type==='hours'?(h.s==='sleep'?' · сколько поспал к этому утру':' · часы идут в зачёт сферы'):h.type==='num'&&h.u?' · '+esc(h.u):''}
+  function hStatText(h,r){if(h.type==='time')return(r.tn?'засыпаю в '+tTxt(r.ts/r.tn):'время не записано')+' · до '+tTxt(tLim(h))+': '+r.ok+' из '+r.rec;if(h.type==='score')return r.rec?'в среднем '+sc1(r.sum/r.rec)+' из 10':'нет оценок';return h.type==='hours'?(r.rec?hrs(r.sum/r.rec):'0')+' ч в среднем':h.type==='check'?r.done+' из '+r.n+' дн.':h.type==='num'?(r.rec?'в среднем '+num(r.sum/r.rec)+hUnit(h):'нет записей'):r.sum+' раз'}
+  function hHint(h){if(h.type==='time')return ' · во сколько заснул, граница '+tTxt(tLim(h));return h.type==='count'?(h.dir==='more'?' · чем больше, тем лучше':' · чем меньше, тем лучше'):h.type==='hours'?(h.s==='sleep'?' · сколько поспал к этому утру':' · часы идут в зачёт сферы'):h.type==='num'&&h.u?' · '+esc(h.u):''}
   function habitDayHTML(ts){
     var fut=ts>Date.now();
     if(!habits.length)return '<p class="note">Привычек пока нет. Добавь их в настройках, раздел «Привычки».</p>';
     return '<div class="hd">'+habits.map(function(h){
       var v=hRaw(h,ts),at=' data-h="'+h.id+'" data-d="'+ts+'"'+(fut?' disabled':'');
-      return '<div class="hd-r sph" style="--h:'+hOf(h.s)+'"><span>'+esc(h.n)+'<small>'+SP[SPI[h.s]].n+hHint(h)+'</small></span>'+
+      if(h.type==='score'){var ix=enIdx(ts);return '<div class="hd-r hd-sc sph" style="--h:'+hCol(h)+'"><span>'+esc(h.n)+'<small>как прошёл день, от 1 до 10'+(ix.n?' · опор '+ix.ok+' из '+ix.n:'')+'</small></span>'+
+        '<div class="sc10" role="group" aria-label="'+esc(h.n)+' от 1 до 10">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){return '<button type="button" data-hsc="'+i+'"'+at+' aria-pressed="'+(v===i)+'" style="--q:'+(i*10)+'%">'+i+'</button>'}).join('')+'</div></div>'}
+      if(h.type==='time'){var tt=tTxt(v);return '<div class="hd-r sph" style="--h:'+hCol(h)+'"><span>'+esc(h.n)+'<small>'+SP[SPI[h.s]].n+hHint(h)+'</small></span>'+
+        '<span class="num t-in">'+(v?'<i class="t-st'+(tOk(h,v)?'':' late')+'" title="'+(tOk(h,v)?'до '+tTxt(tLim(h)):'позже '+tTxt(tLim(h)))+'">'+(tOk(h,v)?'+':'−')+'</i>':'')+'<input class="inp" type="time" data-ht="'+h.id+'" data-d="'+ts+'" value="'+tt+'" aria-label="'+esc(h.n)+': во сколько заснул"'+(fut?' disabled':'')+'></span></div>'}
+      return '<div class="hd-r sph" style="--h:'+hCol(h)+'"><span>'+esc(h.n)+'<small>'+SP[SPI[h.s]].n+hHint(h)+'</small></span>'+
         (h.type==='num'?'<span class="num"><input class="inp" type="number" step="any" data-hn="'+h.id+'" data-d="'+ts+'" value="'+(v==null?'':v)+'" placeholder="—" aria-label="'+esc(h.n)+'"'+(fut?' disabled':'')+'>'+hUnit(h)+'</span>'
         :h.type!=='check'?'<span class="stp"><button type="button" data-ha="m"'+at+' aria-label="Меньше">−</button><b>'+(v==null?'—':h.type==='hours'?hrs(v)+' ч':v)+'</b><button type="button" data-ha="p"'+at+' aria-label="Больше">+</button></span>'
           :'<button type="button" class="tog" data-ha="t"'+at+' aria-pressed="'+(v>0)+'" aria-label="Отметить">+</button>')+'</div>';
@@ -1349,6 +1428,17 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var v=hRaw(h,ts),a=b.dataset.ha;
     if(h.type==='hours'){var sl=h.s==='sleep';hSet(h,ts,a==='p'?(v==null?(sl?8:.5):Math.min(16,v+.5)):(v==null?(sl?7:null):v<=.5?null:v-.5))}
     else hSet(h,ts,a==='t'?(v?null:1):a==='p'?(v==null?(h.type==='count'&&h.dir==='more'?1:0):v+1):(v?v-1:null));
+  });
+  /* оценка 1–10: нажатие на ту же цифру снимает оценку; время засыпания вписывается полем времени */
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-hsc]');if(!b||b.disabled)return;
+    var h=habitById(b.dataset.h),ts=+b.dataset.d;if(!h||ts>Date.now())return;
+    exitDemo();hDay=ts;var v=+b.dataset.hsc;hSet(h,ts,hRaw(h,ts)===v?null:v);
+  });
+  document.addEventListener('change',function(e){
+    var t=e.target;if(!t.dataset||!t.dataset.ht)return;
+    var h=habitById(t.dataset.ht),ts=+t.dataset.d;if(!h||ts>Date.now())return;
+    exitDemo();hDay=ts;hSet(h,ts,t.value?tEnc(t.value):null);
   });
   document.addEventListener('change',function(e){
     var t=e.target;if(!t.dataset||!t.dataset.hn)return;
@@ -1581,16 +1671,24 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var stats='';
     if(withH)habits.forEach(function(h){
       var r=hRange(h,a.getTime(),a.getTime()+dim*DAY),pa=mStart(mAdd(curM,-1)),pr=hRange(h,pa.getTime(),a.getTime()),more=h.type==='count'&&h.dir==='more';
-      g+='<div class="hn sph" style="--h:'+hOf(h.s)+'"><i></i>'+esc(h.n)+'</div>';
+      g+='<div class="hn sph" style="--h:'+hCol(h)+'"><i></i>'+esc(h.n)+'</div>';
       for(i=1;i<=dim;i++){
         d=new Date(a.getFullYear(),a.getMonth(),i).getTime();var v=hRaw(h,d),fut=d>t0,tt=esc(h.n)+', '+i+' '+MG[a.getMonth()];
-        if(h.type==='hours')g+='<button type="button" class="hc sph'+(v?(v<6?' c1':v<7.5?' c2':' c3'):'')+'" style="--h:'+hOf(h.s)+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v?': '+hrs(v)+' ч':'')+'">'+(v?Math.round(v):'')+'</button>';
-        else if(h.type==='num')g+='<button type="button" class="hc sm sph'+(v!=null?' c2':'')+'" style="--h:'+hOf(h.s)+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v!=null?': '+num(v)+hUnit(h):'')+'">'+(v!=null?short(v):'')+'</button>';
-        else g+='<button type="button" class="hc sph'+(h.type==='check'?(v?' on':''):more?(v?' c'+Math.min(3,v):''):(v===0?' z':v?' c'+Math.min(3,v):''))+'" style="--h:'+hOf(h.s)+'" data-ha="'+(h.type==='check'?'t':'p')+'" data-h="'+h.id+'" data-d="'+d+'"'+(fut?' disabled':'')+' title="'+tt+'">'+(h.type==='count'&&v!=null?v:h.type==='check'&&v?'+':'')+'</button>';
+        if(h.type==='hours')g+='<button type="button" class="hc sph'+(v?(v<6?' c1':v<7.5?' c2':' c3'):'')+'" style="--h:'+hCol(h)+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v?': '+hrs(v)+' ч':'')+'">'+(v?Math.round(v):'')+'</button>';
+        else if(h.type==='score'){var ix=v!=null?enIdx(d):null;g+='<button type="button" class="hc sc sph'+(v>5?' dk':'')+'" style="--h:'+hCol(h)+(v!=null?';--q:'+(v*9+6)+'%':'')+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v!=null?': '+v+' из 10'+(ix.n?' · опор '+ix.ok+' из '+ix.n:''):'')+'">'+(v!=null?v:'')+'</button>'}
+        else if(h.type==='time'){var tk=v?tOk(h,v):false;g+='<button type="button" class="hc sph'+(v?(tk?' on':' ov'):'')+'" style="--h:'+hCol(h)+'" data-hsel="'+d+'" data-tfocus="'+h.id+'"'+(fut?' disabled':'')+' title="'+tt+(v?': '+(v>=720?'заснул в '+tTxt(v):'до '+tTxt(tLim(h))+', время не записано'):'')+'">'+(v?(tk?'+':'−'):'')+'</button>'}
+        else if(h.type==='num')g+='<button type="button" class="hc sm sph'+(v!=null?' c2':'')+'" style="--h:'+hCol(h)+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v!=null?': '+num(v)+hUnit(h):'')+'">'+(v!=null?short(v):'')+'</button>';
+        else g+='<button type="button" class="hc sph'+(h.type==='check'?(v?' on':''):more?(v?' c'+Math.min(3,v):''):(v===0?' z':v?' c'+Math.min(3,v):''))+'" style="--h:'+hCol(h)+'" data-ha="'+(h.type==='check'?'t':'p')+'" data-h="'+h.id+'" data-d="'+d+'"'+(fut?' disabled':'')+' title="'+tt+'">'+(h.type==='count'&&v!=null?v:h.type==='check'&&v?'+':'')+'</button>';
       }
-      g+='<div class="hs">'+(h.type==='check'?r.done+' из '+r.n:h.type==='hours'?hrs(r.sum)+' ч':h.type==='num'?(r.rec?'ср. '+short(r.sum/r.rec):''):'всего '+r.sum)+'</div>';
+      g+='<div class="hs">'+(h.type==='time'?(r.tn?'ср. '+tTxt(r.ts/r.tn):r.ok+' из '+r.n):h.type==='score'?(r.rec?'ср. '+sc1(r.sum/r.rec):''):h.type==='check'?r.done+' из '+r.n:h.type==='hours'?hrs(r.sum)+' ч':h.type==='num'?(r.rec?'ср. '+short(r.sum/r.rec):''):'всего '+r.sum)+'</div>';
       var hr=h.type==='hours',ck=h.type==='check',nm=h.type==='num';
-      stats+='<div class="hstat sph" style="--h:'+hOf(h.s)+'"><div class="lab">'+esc(h.n)+'</div>'+
+      if(h.type==='time'||h.type==='score'){var tm=h.type==='time';
+        stats+='<div class="hstat sph" style="--h:'+hCol(h)+'"><div class="lab">'+esc(h.n)+'</div>'+
+          '<div class="val">'+(tm?(r.tn?tTxt(r.ts/r.tn):'—')+'<small>засыпаю в среднем</small>':(r.rec?sc1(r.sum/r.rec):'—')+'<small>из 10 в среднем</small>')+'</div>'+
+          '<div class="sub">'+(tm?'до '+tTxt(tLim(h))+': '+r.ok+' из '+r.rec+' дн. · прошлый месяц: '+(pr.tn?tTxt(pr.ts/pr.tn):'—'):'оценено '+r.rec+' дн. · прошлый месяц: '+(pr.rec?sc1(pr.sum/pr.rec):'—'))+'</div></div>';
+        return;
+      }
+      stats+='<div class="hstat sph" style="--h:'+hCol(h)+'"><div class="lab">'+esc(h.n)+'</div>'+
         '<div class="val">'+(hr?(r.rec?hrs(r.sum/r.rec):'0')+'<small>ч в среднем</small>':ck?r.done+'<small>из '+r.n+' дн.</small>':nm?(r.rec?num(Math.round(r.sum/r.rec*10)/10):'—')+'<small>в среднем'+hUnit(h)+'</small>':r.sum+'<small>раз за месяц</small>')+'</div>'+
         '<div class="sub">прошлый месяц: '+(hr?(pr.rec?hrs(pr.sum/pr.rec):'0')+' ч':ck?pr.done+' из '+pr.n:nm?(pr.rec?num(Math.round(pr.sum/pr.rec*10)/10):'—'):pr.sum)+'</div></div>';
     });
@@ -1598,17 +1696,17 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       if(withH&&habits.length)g+='<div class="hsep">Питание</div>';
       g+=foodRows(a,dim,t0);
     }
-    var hint=withH?'нажми на день, чтобы отметить; у счётчика первое нажатие ставит 0, следующие добавляют 1; часы, числа и еда вносятся в карточке дня слева':'нажми на день, чтобы открыть его корзину слева';
+    var hint=withH?'нажми на день, чтобы отметить; у счётчика первое нажатие ставит 0, следующие добавляют 1; часы, время, оценка, числа и еда вносятся в карточке дня слева':'нажми на день, чтобы открыть его корзину слева';
     /* перерисовка не должна сбрасывать прокрутку: запоминаем её и возвращаем */
     var SC=['.h-side','.h-main'],keep=[el.scrollTop].concat(SC.map(function(q){var x=el.querySelector(q);return x?x.scrollTop:0}));
-    el.innerHTML='<div class="h-side">'+side+'</div><div class="h-main"><div><div class="sec-h"><h2>'+mName(curM)+'</h2><span>'+hint+'</span></div><div class="hm-wrap"><div class="hm" style="grid-template-columns:'+cols+'">'+g+'</div></div></div>'+(stats?'<div class="hstats">'+stats+'</div>':'')+(withF?dishesBlock():'')+'</div>';
+    el.innerHTML='<div class="h-side">'+side+'</div><div class="h-main"><div><div class="sec-h"><h2>'+mName(curM)+'</h2><span>'+hint+'</span></div><div class="hm-wrap"><div class="hm" style="grid-template-columns:'+cols+'">'+g+'</div></div></div>'+(stats?'<div class="hstats">'+stats+'</div>':'')+(withH?enBlock():'')+(withF?dishesBlock():'')+'</div>';
     el.scrollTop=keep[0];SC.forEach(function(q,i){var x=el.querySelector(q);if(x)x.scrollTop=keep[i+1]});
   }
   function hfClick(e){
     var t0=day0(now).getTime(),b=e.target.closest('[data-hday]');
     if(b){hDay=clamp(addDays(new Date(hDay),+b.dataset.hday).getTime(),0,t0);renderHF(true);return}
     b=e.target.closest('[data-hsel]');
-    if(b){hDay=+b.dataset.hsel;renderHF(true);return}
+    if(b){hDay=+b.dataset.hsel;var tf=b.dataset.tfocus;renderHF(true);if(tf){var ti=(hv.querySelector('[data-ht="'+tf+'"]'));if(ti&&matchMedia('(pointer:fine)').matches)ti.focus()}return}
     b=e.target.closest('[data-toset]');
     if(b){setSec=b.dataset.toset;setTab('settings');return}
     b=e.target.closest('[data-fx]');
@@ -1643,6 +1741,185 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function hfSubmit(e){var f=e.target.closest('[data-fqf]');if(!f)return;e.preventDefault();fqAdd(f)}
   [hv,fv].forEach(function(el){el.addEventListener('click',hfClick);el.addEventListener('input',hfInput);el.addEventListener('change',hfChange);el.addEventListener('submit',hfSubmit)});
 
+  /* ---------- энергия: оценка дня от 1 до 10, пять опор, утренний вопрос о вчерашнем дне и закономерности ----------
+     Оценка — привычка вида «Оценка от 1 до 10» (по умолчанию «Энергия»). Опоры дня D:
+       еда — сумма ккал корзины дня D от порога (2200), если в этот день есть записи питания;
+       спина — плюсик с пометкой en:'b' («Спина: экстензия или растяжка») или событие календаря с экстензией/растяжкой;
+       полезные дела — плюсик en:'u' или столько часов (2) в календаре в выбранных сферах (крипта, саморазвитие, творчество, работа);
+       сон — «Сон, часы» в день D от порога (8): часы сна пишутся на утро, к которому поспал;
+       засыпание — время засыпания накануне (вечер D−1) раньше границы (00:00).
+     Утром при первом входе окно спрашивает про вчера: энергию, во сколько заснул и проснулся этой ночью (время засыпания
+     пишется во «Время» вчерашним вечером, часы сна — в «Сон, часы» сегодняшним утром) и опоры вчерашнего дня.
+     «Позже» откладывает вопрос до завтра на этом устройстве. Пороги и сферы меняются в настройках привычек. */
+  function enHab(){for(var i=0;i<habits.length;i++)if(habits[i].type==='score')return habits[i];return null}
+  function enBed(){for(var i=0;i<habits.length;i++)if(habits[i].type==='time')return habits[i];return null}
+  function enSlp(){for(var i=0;i<habits.length;i++)if(habits[i].type==='hours'&&habits[i].s==='sleep')return habits[i];return null}
+  function enRole(x){for(var i=0;i<habits.length;i++)if(habits[i].en===x&&habits[i].type==='check')return habits[i];return null}
+  /* переход на энергию: «Лёг до 23:00» становится временем засыпания с границей 00:00 (прежние плюсики остаются плюсами),
+     добавляются «Энергия», «Спина: экстензия или растяжка» и «Полезные дела». Постоянные id: на двух устройствах выйдет одно и то же */
+  function enMigrate(){
+    if(!enBed()){
+      var old=null;habits.forEach(function(h){if(!old&&h.type==='check'&&/^л[её]г\s+до/i.test(h.n||''))old=h});
+      if(old){old.type='time';old.lim=1440;old.n='Лёг до 00:00'}
+      else{var si=-1;habits.forEach(function(h,i){if(h.type==='hours'&&h.s==='sleep')si=i});habits.splice(si+1,0,{id:'hbed',n:'Лёг до 00:00',s:SPI.sleep!=null?'sleep':'other',type:'time',lim:1440})}
+    }
+    if(!enHab())habits.unshift({id:'en',n:'Энергия',s:'other',type:'score'});
+    if(!enRole('b')){var b=null;habits.forEach(function(h){if(!b&&h.type==='check'&&/спин|экстенз|растяж/i.test(h.n||''))b=h});if(b)b.en='b';else habits.splice(habits.indexOf(enBed())+1,0,{id:'hback',n:'Экстензия / растяжка',s:SPI.fitness!=null?'fitness':'other',type:'check',en:'b'})}
+    if(!enRole('u')){var u=null;habits.forEach(function(h){if(!u&&h.type==='check'&&/полезн/i.test(h.n||''))u=h});if(u)u.en='u';else habits.splice(habits.indexOf(enRole('b')||enBed())+1,0,{id:'huse',n:'Полезные дела',s:'other',type:'check',en:'u'})}
+    SP.forEach(function(x){if(/работ/i.test(x.n||'')&&enS.us.indexOf(x.id)<0)enS.us.push(x.id)});
+  }
+  var EN_BACK=/экстенз|гиперэкст|растяж|спин[аеуы]\b/i;
+  function enBackCal(ts){return (BYDAY[dKey(ts)]||[]).some(function(e){return EN_BACK.test(e.t||'')})}
+  /* часы полезных дел за день: засчитанные события календаря в выбранных сферах */
+  function enUseH(ts){var a=AGG[mk(new Date(ts))]||{},dk=dKey(ts),n=0;enS.us.forEach(function(sid){var s=a[sid];if(s&&s.days&&s.days[dk])n+=s.days[dk]});return n}
+  function enPrev(ts){return addDays(new Date(ts),-1).getTime()}
+  function enKcal(ts){var l=foodOn()?fDay(ts):[];return l.length?fSum(ts).k:null}
+  /* опоры дня: ok — выполнена (true), нет (false) или неизвестно (null) */
+  function enOps(ts){
+    var r=[],kc=enKcal(ts),b=enRole('b'),u=enRole('u'),sl=enSlp(),bd=enBed(),uh=enUseH(ts);
+    r.push({k:'k',n:'Еда от '+enS.kcal+' ккал',ok:kc==null?null:kc>=enS.kcal,t:kc==null?'нет записей питания':Math.round(kc).toLocaleString('ru-RU')+' ккал'});
+    if(b)r.push({k:'b',n:b.n,ok:hRaw(b,ts)>0||enBackCal(ts)});
+    r.push({k:'u',n:u?u.n:'Полезные дела',ok:(!!u&&hRaw(u,ts)>0)||uh>=enS.use,t:uh?hrs(uh)+' ч в календаре':''});
+    if(sl){var sv=hRaw(sl,ts);r.push({k:'s',n:'Сон от '+hrs(enS.sleep)+' ч',ok:sv!=null?sv>=enS.sleep:null,t:sv!=null?hrs(sv)+' ч':''})}
+    if(bd){var pv=hRaw(bd,enPrev(ts));r.push({k:'l',n:'Заснул до '+tTxt(tLim(bd))+' накануне',ok:pv?tOk(bd,pv):null,t:pv>=720?tTxt(pv):''})}
+    return r;
+  }
+  function enIdx(ts){var n=0,ok=0;enOps(ts).forEach(function(o){if(o.ok!=null){n++;if(o.ok)ok++}});return{n:n,ok:ok}}
+
+  /* ---------- утреннее окно «Как прошёл вчерашний день?» ---------- */
+  var enDlg=null,enBox=null,enT=0,enD=null;
+  function enSkipped(){try{return localStorage.getItem('kz-en-skip')===String(dKey(Date.now()))}catch(_){return false}}
+  function enSkip(){try{localStorage.setItem('kz-en-skip',String(dKey(Date.now())))}catch(_){}}
+  function enAsk(ms){clearTimeout(enT);enT=setTimeout(enAsk2,ms==null?1500:ms)}
+  function enAsk2(){
+    var h=enHab();if(!loaded||isDemo||EXAMPLE||!h||!enS.ask)return;
+    if(enDlg&&!enDlg.hidden)return;
+    var y=addDays(day0(new Date()),-1).getTime();
+    if(hRaw(h,y)!=null||enSkipped())return;
+    /* поверх другого окна или посреди ввода не открываемся: попробуем чуть позже */
+    var busy=syBusy||!$('recap').hidden||(gateEl&&!gateEl.hidden)||[$('dish-dlg'),$('m-dlg'),pop,hpop].some(function(x){return x&&!x.hidden})||typingIn(document.body);
+    if(busy){if($('recap').hidden)enAsk(syBusy?4000:30000);return}
+    enOpen(y);
+  }
+  function enOpen(y){
+    var td=addDays(new Date(y),1).getTime(),bd=enBed(),sl=enSlp(),b=enRole('b'),u=enRole('u');
+    var bv=bd?hRaw(bd,y):null,sv=sl?hRaw(sl,td):null;
+    enD={y:y,v:null,bed:bv>=720?tTxt(bv):'',up:bv>=720&&sv?tTxt(bv+sv*60):'',b:!!b&&(hRaw(b,y)>0||enBackCal(y)),u:(!!u&&hRaw(u,y)>0)||enUseH(y)>=enS.use};
+    if(!enDlg){
+      enDlg=document.createElement('div');enDlg.className='rc-scrim';enDlg.id='en-dlg';enDlg.hidden=true;
+      enDlg.innerHTML='<div class="dz en-box" role="dialog" aria-modal="true" aria-labelledby="en-t"></div>';
+      document.body.appendChild(enDlg);enBox=enDlg.firstChild;
+      enDlg.addEventListener('click',function(e){
+        var t=e.target,b;
+        if(t.closest('[data-enx]')){enSkip();enClose();return}
+        b=t.closest('[data-env]');if(b){enD.v=+b.dataset.env;enRender();return}
+        b=t.closest('[data-enop]');if(b){var k=b.dataset.enop;enD[k]=!enD[k];enRender();return}
+        if(t.closest('[data-ensave]')){enSave();return}
+      });
+      enDlg.addEventListener('input',function(e){var t=e.target;if(t.id==='en-bed'||t.id==='en-up'){enD[t.id==='en-bed'?'bed':'up']=t.value;var o=$('en-dur');if(o)o.innerHTML=enDurTxt()}});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&enDlg&&!enDlg.hidden){enSkip();enClose()}});
+    }
+    enDlg.hidden=false;enRender();
+  }
+  function enClose(){if(enDlg)enDlg.hidden=true;enD=null}
+  /* записи пришли с другого устройства, и вчера уже оценено: окно больше не нужно */
+  function enRecheck(){if(enD&&enDlg&&!enDlg.hidden){var h=enHab();if(!h||hRaw(h,enD.y)!=null)enClose()}}
+  /* длительность сна по времени засыпания и подъёма: подъём всегда на следующее утро после засыпания */
+  function enDurH(){
+    if(!enD)return null;var a=tEnc(enD.bed),m=/^(\d{1,2}):(\d{2})/.exec(enD.up||'');if(!a||!m)return null;
+    var b=(+m[1])*60+(+m[2])+1440;while(b<=a)b+=1440;var h=(b-a)/60;
+    return h>0&&h<=16?Math.round(h*10)/10:null;
+  }
+  function enDurTxt(){var h=enDurH();if(h==null)return enD&&enD.bed&&enD.up?'<i>проверь время</i>':'';var mm=Math.round(h*60);return '= <b>'+Math.floor(mm/60)+' ч'+(mm%60?' '+mm%60+' мин':'')+'</b>'}
+  function enRender(){
+    if(!enD||!enBox)return;
+    var y=new Date(enD.y),td=addDays(new Date(enD.y),1),bd=enBed(),sl=enSlp(),b=enRole('b'),u=enRole('u'),ops=enOps(enD.y),fk=ops[0],uh=enUseH(enD.y);
+    var wn=WDN[y.getDay()];wn=wn.charAt(0).toUpperCase()+wn.slice(1);
+    enBox.innerHTML='<div class="box-h"><span id="en-t">Как прошёл вчерашний день?</span><button type="button" class="ib" data-enx aria-label="Спросить завтра">×</button></div>'+
+      '<p class="note">'+wn+', '+y.getDate()+' '+MG[y.getMonth()]+'. Пара нажатий, и сайт начнёт видеть, от чего зависит твоя энергия.</p>'+
+      '<div class="en-q"><div class="lab">Энергия</div><div class="sc10 en-sc sph" style="--h:'+hCol(enHab())+'" role="group" aria-label="Энергия от 1 до 10">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){return '<button type="button" data-env="'+i+'" aria-pressed="'+(enD.v===i)+'" style="--q:'+(i*10)+'%">'+i+'</button>'}).join('')+'</div>'+
+        '<div class="en-ends"><small>1 — без сил</small><small>10 — на максимуме</small></div></div>'+
+      (bd||sl?'<div class="en-q"><div class="lab">Сон этой ночью</div><div class="en-sl">'+(bd?'<label><small>заснул в</small><input class="inp" type="time" id="en-bed" value="'+esc(enD.bed)+'"></label>':'')+
+        (sl?'<label><small>проснулся в</small><input class="inp" type="time" id="en-up" value="'+esc(enD.up)+'"></label>':'')+'<span class="en-dur" id="en-dur">'+enDurTxt()+'</span></div>'+
+        '<small class="en-hint">'+[bd?'время запишется в «'+esc(bd.n)+'» за '+fmtDay(enD.y):'',sl?'часы — в «'+esc(sl.n)+'» за '+fmtDay(td.getTime()):''].filter(Boolean).join(', ')+'</small></div>':'')+
+      '<div class="en-q"><div class="lab">Опоры вчера</div><div class="en-ops">'+
+        '<span class="en-op ro'+(fk.ok?' on':fk.ok===false?' off':'')+'" title="Считается само по «Питанию»">Еда от '+enS.kcal+' ккал<small>'+fk.t+'</small></span>'+
+        (b?'<button type="button" class="en-op" data-enop="b" aria-pressed="'+enD.b+'">'+esc(b.n)+'<small>'+(enBackCal(enD.y)?'есть в календаре':'отметь, если было')+'</small></button>':'')+
+        '<button type="button" class="en-op" data-enop="u" aria-pressed="'+enD.u+'">'+esc(u?u.n:'Полезные дела')+'<small>'+(uh?hrs(uh)+' ч в календаре':'отметь, если были')+'</small></button>'+
+      '</div></div>'+
+      '<div class="row en-act"><button type="button" class="btn" data-ensave'+(enD.v?'':' disabled')+'>Сохранить</button><button type="button" class="btn ghost" data-enx>Спросить завтра</button></div>';
+  }
+  function enSave(){
+    var h=enHab();if(!h||!enD||!enD.v)return;
+    var y=enD.y,td=addDays(new Date(y),1).getTime(),ks={},bd=enBed(),sl=enSlp(),b=enRole('b'),u=enRole('u'),bv=tEnc(enD.bed),dur=enDurH(),v=enD.v;
+    function put(hb,ts,val){var d=new Date(ts),k=mk(d),m=months[k]||(months[k]={events:{},habits:{},food:{}}),hs=m.habits||(m.habits={}),o=hs[hb.id]||(hs[hb.id]={});if(val==null)delete o[d.getDate()];else o[d.getDate()]=val;ks[k]=1}
+    exitDemo();
+    put(h,y,v);
+    if(bd&&bv)put(bd,y,bv);
+    if(sl&&dur&&td<=Date.now())put(sl,td,dur);
+    if(b)put(b,y,enD.b?1:null);
+    if(u)put(u,y,enD.u?1:null);
+    enClose();Object.keys(ks).forEach(function(k){persist(k)});refresh();renderHF(true);
+    toast('Записал за '+fmtDay(y)+': энергия '+v+' из 10'+(bv?', заснул в '+tTxt(bv):'')+(dur?', сон '+hrs(dur)+' ч':'')+'.');
+  }
+
+  /* ---------- закономерности: средняя энергия в дни с опорой и без неё ---------- */
+  function enDays(){
+    var h=enHab(),r=[];if(!h)return r;
+    var t0=day0(now).getTime(),from=addDays(day0(now),-180).getTime();
+    if(isDemo){for(var d=addDays(day0(now),-60);d.getTime()<=t0;d=addDays(d,1)){var dv=hRaw(h,d.getTime());if(dv)r.push({ts:d.getTime(),v:dv})}return r}
+    Object.keys(months).sort().forEach(function(k){
+      var o=months[k]&&months[k].habits&&months[k].habits[h.id];if(!o||!/^\d{4}-\d\d$/.test(k))return;var f=mStart(k);
+      Object.keys(o).forEach(function(dn){var ts=new Date(f.getFullYear(),f.getMonth(),+dn).getTime(),v=+o[dn];if(ts>=from&&ts<=t0&&v>=1&&v<=10)r.push({ts:ts,v:v})});
+    });
+    return r.sort(function(a,b){return a.ts-b.ts});
+  }
+  function enFactors(){
+    var L=[],en=enHab(),bd=enBed(),sl=enSlp(),b=enRole('b'),u=enRole('u');
+    L.push({n:'Еда от '+enS.kcal+' ккал',op:1,f:function(ts){var k=enKcal(ts);return k==null?null:k>=enS.kcal}});
+    if(b)L.push({n:b.n,op:1,f:function(ts){return hRaw(b,ts)>0||enBackCal(ts)}});
+    L.push({n:u?u.n:'Полезные дела',op:1,f:function(ts){return (!!u&&hRaw(u,ts)>0)||enUseH(ts)>=enS.use}});
+    if(sl)L.push({n:'Сон от '+hrs(enS.sleep)+' ч',op:1,f:function(ts){var v=hRaw(sl,ts);return v!=null?v>=enS.sleep:null}});
+    if(bd)L.push({n:'Заснул до '+tTxt(tLim(bd))+' накануне',op:1,f:function(ts){var v=hRaw(bd,enPrev(ts));return v?tOk(bd,v):null}});
+    habits.forEach(function(h){
+      if(h===en||h===bd||h===sl||h===b||h===u)return;
+      if(h.type==='check')L.push({n:h.n,f:function(ts){return hRaw(h,ts)>0}});
+      else if(h.type==='count')L.push({n:h.n+(h.dir==='more'?': хотя бы раз':': ни разу'),f:function(ts){var v=hRaw(h,ts);return v==null?null:h.dir==='more'?v>0:v===0}});
+      else if(h.type==='hours')L.push({n:h.n+' от 1 ч',f:function(ts){return (hRaw(h,ts)||0)>=1}});
+      else if(h.type==='time')L.push({n:h.n+' накануне',f:function(ts){var v=hRaw(h,enPrev(ts));return v?tOk(h,v):null}});
+    });
+    SP.forEach(function(s){if(s.off||s.unit==='d'||s.id==='sleep')return;L.push({n:s.n+' от 1 ч',f:function(ts){var a=AGG[mk(new Date(ts))],x=a&&a[s.id];return ((x&&x.days&&x.days[dKey(ts)])||0)>=1}})});
+    return L;
+  }
+  function enAvg(a){var s=0;a.forEach(function(x){s+=x});return a.length?s/a.length:0}
+  function enDiff(d){return(d>0?'+':'−')+sc1(Math.abs(d))}
+  function enBar(lab,v,n,sub){return '<div class="en-b"><span>'+lab+'</span><i><b style="width:'+Math.round(v*10)+'%"></b></i><em>'+sc1(v)+'</em><small>'+n+' дн.'+(sub||'')+'</small></div>'}
+  function enBlock(){
+    var h=enHab();if(!h)return '';
+    var days=enDays(),N=days.length,all=enAvg(days.map(function(d){return d.v})),t0=day0(now).getTime(),m30=addDays(day0(now),-30).getTime();
+    var r30=days.filter(function(d){return d.ts>m30}),head='<div class="sec-h"><h2>'+esc(h.n)+': что на неё влияет</h2><span>'+(N?'оценено '+N+' дн. · в среднем '+sc1(all)+' из 10'+(r30.length&&r30.length<N?' · за 30 дней '+sc1(enAvg(r30.map(function(d){return d.v}))):''):'оценок пока нет')+'</span></div>';
+    if(N<7)return '<div class="en-sec sph" style="--h:'+hCol(h)+'">'+head+'<p class="note">'+(N?'Оценено дней: '+N+'. ':'')+'Первые закономерности появятся после 7 оценок, надёжные — после 20–30. Оценка ставится утром в окне «Как прошёл вчерашний день?» или в карточке дня слева.</p></div>';
+    var res=[];
+    enFactors().forEach(function(F){var a=[],b=[];days.forEach(function(d){var x=F.f(d.ts);if(x===true)a.push(d.v);else if(x===false)b.push(d.v)});
+      if(a.length>=3&&b.length>=3){var ma=enAvg(a),mb=enAvg(b);res.push({n:F.n,op:F.op,a:ma,b:mb,d:ma-mb,na:a.length,nb:b.length})}});
+    res.sort(function(x,y){return Math.abs(y.d)-Math.abs(x.d)});
+    var top=res.slice(0,8),best=res.filter(function(x){return x.d>=.5})[0],worst=res.filter(function(x){return x.d<=-.5})[0];
+    var sum=best||worst?'<p class="en-sum">'+(best?'Сильнее всего энергию поднимает: <b>'+esc(best.n)+'</b> ('+enDiff(best.d)+' в среднем)':'')+(best&&worst?'. ':'')+(worst?(best?'А ниже она':'Ниже энергия')+' в дни, когда <b>'+esc(worst.n.charAt(0).toLowerCase()+worst.n.slice(1))+'</b> ('+enDiff(worst.d)+')':'')+'.</p>':'';
+    var rows=top.length?top.map(function(x){var weak=Math.min(x.na,x.nb)<5;
+      return '<div class="en-f'+(weak?' weak':'')+'"><div class="en-fn">'+esc(x.n)+(x.op?'<i class="en-tag">опора</i>':'')+'<small>с этим '+x.na+' дн. · без '+x.nb+' дн.'+(weak?' · мало дней':'')+'</small></div>'+
+        '<div class="en-fv"><b>'+sc1(x.a)+'</b><small>против</small><b>'+sc1(x.b)+'</b></div><span class="en-fd '+(x.d>=0?'up':'dn')+'">'+enDiff(x.d)+'</span></div>'}).join(''):'<p class="note">Пока не с чем сравнивать: у каждой опоры нужно хотя бы по 3 дня «с ней» и «без неё».</p>';
+    /* энергия по числу выполненных опор и по дням недели */
+    var bi={},bw={};days.forEach(function(d){var k=enIdx(d.ts).ok;(bi[k]||(bi[k]=[])).push(d.v);var w=wd(d.ts);(bw[w]||(bw[w]=[])).push(d.v)});
+    var idx=Object.keys(bi).sort(function(a,b){return b-a}).map(function(k){return enBar(k+' из 5',enAvg(bi[k]),bi[k].length)}).join('');
+    var wks=DW.map(function(n,i){return bw[i]?enBar(n,enAvg(bw[i]),bw[i].length):''}).join('');
+    var bd=enBed(),bedTxt='';
+    if(bd){var hi=[],lo=[];days.forEach(function(d){var v=hRaw(bd,enPrev(d.ts));if(!(v>=720))return;if(d.v>=8)hi.push(v);else if(d.v<=4)lo.push(v)});
+      if(hi.length>=2&&lo.length>=2)bedTxt='<p class="note">Перед днями с энергией 8–10 засыпал в среднем в <b>'+tTxt(enAvg(hi))+'</b>, перед днями 1–4 — в <b>'+tTxt(enAvg(lo))+'</b>.</p>'}
+    return '<div class="en-sec sph" style="--h:'+hCol(h)+'">'+head+sum+
+      '<div class="en-grid"><div class="en-col"><h3>С чем энергия выше и ниже</h3>'+rows+'</div>'+
+      '<div class="en-col"><h3>Энергия по числу опор</h3>'+idx+'<h3>По дням недели</h3>'+wks+bedTxt+'</div></div>'+
+      '<p class="note en-nb">Сравниваются дни с опорой и без неё за последние полгода. Это связь, а не доказательство причины: хороший день мог быть хорошим и по другим причинам. Чем больше оценок, тем точнее.</p></div>';
+  }
   /* ---------- меню магазинов: ВкусВилл, Милти и Лента с весом порции и КБЖУ на 100 г ----------
      Названия, вес и КБЖУ зашиты в саму страницу (работают без интернета и не зависят от магазинов).
      ВкусВилл (vv): 439 популярных блюд готовой еды, сняты с карточек товаров на сайте ВкусВилла 26.10.2026; у блюд нескольких
@@ -2558,7 +2835,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     $('rc-back').disabled=rc.i===0;$('rc-fwd').textContent=rc.i===rc.n-1?'Закрыть':'Дальше';
   }
   function openRecap(type,key){rc.type=type;rc.key=key;rc.i=0;$('recap').hidden=false;renderRecap()}
-  function closeRecap(){$('recap').hidden=true;if(rcQueue.length){var q=rcQueue.shift();openRecap(q[0],q[1])}}
+  function closeRecap(){$('recap').hidden=true;if(rcQueue.length){var q=rcQueue.shift();openRecap(q[0],q[1])}else enAsk(600)}
   $('rc-close').onclick=closeRecap;
   $('recap').addEventListener('click',function(e){if(e.target===$('recap'))closeRecap()});
   $('rc-back').onclick=function(){rcSlide(rc.i-1)};
@@ -2579,6 +2856,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     }
     if(seen.m!==nowM||seen.w!==wk){seen={m:nowM,w:wk};persist('@set')}
     if(q.length&&$('recap').hidden){rcQueue=q.slice(1);openRecap(q[0][0],q[0][1])}
+    enAsk();
   }
 
   /* ---------- логотип: клик открывает список своих сайтов, двойной клик ведёт на главную ---------- */
@@ -3857,7 +4135,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   /* ---------- Настройки: оформление, часы, календарь, привычки, питание, отчёт, больше возможностей, интеграции, данные ---------- */
   var sv=$('view-settings'),SECS=[['more','Больше возможностей'],['look','Оформление'],['hours','Часы'],['cal','Календарь'],['habits','Привычки'],['food','Питание'],['report','Отчёт'],['int','Интеграции'],['data','Данные']];
   var askImp=false,askOld=false,impSph='other',expRange='month',hbDel=null;
-  var OBJ={ui:function(){return ui},cal:function(){return calS},rep:function(){return repS},sec:function(){return sec},feat:function(){return feat},food:function(){return food},gs:function(){return gs}};
+  var OBJ={ui:function(){return ui},cal:function(){return calS},rep:function(){return repS},sec:function(){return sec},feat:function(){return feat},food:function(){return food},gs:function(){return gs},en:function(){return enS}};
   function seg(name,list,val){return '<div class="seg" data-seg="'+name+'">'+list.map(function(x){return '<button type="button" data-v="'+x[0]+'" aria-pressed="'+(String(x[0])===String(val))+'">'+x[1]+'</button>'}).join('')+'</div>'}
   function swt(name,on,label){return '<button type="button" class="swt" role="switch" aria-checked="'+!!on+'" data-sw="'+name+'" aria-label="'+label+'"><i></i></button>'}
   function srow(t,sub,ctl){return '<div class="s-r"><span>'+t+(sub?'<small>'+sub+'</small>':'')+'</span><span class="s-c">'+ctl+'</span></div>'}
@@ -3916,16 +4194,27 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   }
   function renderHabSet(){
     $('set-habits').innerHTML='<div class="s-g"><h2>Привычки</h2>'+srow('Раздел «Привычки»','вкладка с отметками по дням',swt('sec.habits',sec.habits,'Раздел «Привычки»'))+'</div>'+
-      '<div class="s-g wide"><h2>Мои привычки</h2><p>Порядок меняется перетаскиванием за точки слева. Плюсик отвечает «сделал или нет». Счётчик считает, сколько раз. Число хранит любое значение: вес, шаги, страницы. Часы идут в зачёт сферы, так ведётся сон. Вид отметки можно менять в любой момент, прежние записи останутся.</p>'+
+      '<div class="s-g wide"><h2>Мои привычки</h2><p>Порядок меняется перетаскиванием за точки слева. Плюсик отвечает «сделал или нет». Счётчик считает, сколько раз. Число хранит любое значение: вес, шаги, страницы. Часы идут в зачёт сферы, так ведётся сон. Время — во сколько заснул: в сетке плюс, если раньше границы, при наведении точное время, справа среднее. Оценка от 1 до 10 — так ведётся энергия. Вид отметки можно менять в любой момент, прежние записи останутся.</p>'+
       (habits.length?'<div class="hb-list">'+habits.map(function(h,i){
         var s=SP[SPI[h.s]];
         return '<div class="hb-row" data-hb="'+h.id+'">'+GRIP+'<input class="inp" data-hbf="n" maxlength="60" value="'+esc(h.n)+'" aria-label="Название привычки">'+
           '<select class="inp" data-hbf="type" aria-label="Вид отметки">'+HT.map(function(x){return '<option value="'+x[0]+'"'+(h.type===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select>'+
           '<select class="inp fsel sph on" style="--h:'+s.h+'" data-hbf="s" aria-label="Сфера">'+SP.filter(function(x){return !x.off||x.id===h.s}).map(function(x){return '<option value="'+x.id+'"'+oSt(x.c)+(x.id===h.s?' selected':'')+'>'+x.n+'</option>'}).join('')+'</select>'+
           (h.type==='num'?'<input class="inp" data-hbf="u" maxlength="12" placeholder="единица: кг, шаги" value="'+esc(h.u||'')+'" aria-label="Единица измерения">'
+            :h.type==='time'?'<label class="hb-lim"><small>граница</small><input class="inp" type="time" data-hbf="lim" value="'+tTxt(tLim(h))+'" aria-label="Граница: до скольки плюс"></label>'
             :h.type==='count'?'<select class="inp" data-hbf="dir" aria-label="Что лучше"><option value="less"'+(h.dir!=='more'?' selected':'')+'>чем меньше, тем лучше</option><option value="more"'+(h.dir==='more'?' selected':'')+'>чем больше, тем лучше</option></select>':'<span></span>')+
           '<span class="sp-act"><button type="button" class="g-x" data-hbdel>'+(hbDel===h.id?'точно?':'удалить')+'</button></span></div>'}).join('')+'</div>':'<p class="note">Привычек пока нет.</p>')+
-      '<div class="s-add"><button type="button" class="btn ghost" id="hb-add">+ Привычка</button></div></div>';
+      '<div class="s-add"><button type="button" class="btn ghost" id="hb-add">+ Привычка</button></div></div>'+enSetHTML();
+  }
+  /* энергия: утренний вопрос о вчерашнем дне и пороги опор */
+  function enSetHTML(){
+    var eh=enHab();
+    if(!eh)return '<div class="s-g"><h2>Энергия</h2><p>Добавь привычку с видом «Оценка от 1 до 10», и сайт будет утром спрашивать, как прошёл вчерашний день, и искать закономерности.</p><div class="s-add"><button type="button" class="btn ghost" id="en-add">+ Энергия</button></div></div>';
+    var us=SP.filter(function(x){return !x.off&&x.unit!=='d'&&x.id!=='sleep'});
+    return '<div class="s-g"><h2>Энергия</h2><p>Оценка дня от 1 до 10 и пять опор: еда, спина, полезные дела, сон и время засыпания. По ним блок «Энергия» в привычках ищет, что сильнее всего влияет на самочувствие.</p>'+
+      srow('Спрашивать утром','при первом входе за день окно: энергия вчера, во сколько заснул и проснулся, опоры',swt('en.ask',enS.ask,'Спрашивать утром'))+
+      '<div class="pl-grid en-num">'+[['kcal','Еда от','ккал',0,9999,50],['sleep','Сон от','ч',0,14,.5],['use','Полезные дела от','ч',0,16,.5]].map(function(x){return '<label class="pl-i"><span>'+x[1]+'</span><input class="inp" type="number" inputmode="decimal" min="'+x[3]+'" max="'+x[4]+'" step="'+x[5]+'" data-enn="'+x[0]+'" value="'+enS[x[0]]+'"><small>'+x[2]+'</small></label>'}).join('')+'</div>'+
+      '<p class="en-us-l">Полезные дела засчитываются сами, если в календаре столько часов в этих сферах:</p><div class="en-us">'+us.map(function(x){return '<label class="chk sph" style="--h:'+hOf(x.id)+'"><input type="checkbox" data-enus="'+x.id+'"'+(enS.us.indexOf(x.id)>=0?' checked':'')+'><span>'+esc(x.n)+'</span></label>'}).join('')+'</div></div>';
   }
   function renderFoodSet(){
     var nd=Object.keys(dishes).length;
@@ -4005,6 +4294,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     b=t.closest('[data-mealx]');
     if(b){food.meals.splice(+b.dataset.mealx,1);persist('@set');renderFoodSet();return}
     if(t.id==='sp-add')addSphere();
+    else if(t.id==='en-add'){enMigrate(true);saveHab();renderHabSet()}
     else if(t.id==='hb-add'){var id=newId('h');habits.push({id:id,n:'Новая привычка',s:okSph(lastSphere),type:'check',c:Date.now()});saveHab();var inp=sv.querySelector('[data-hb="'+id+'"] [data-hbf="n"]');if(inp){inp.focus();inp.select()}}
     else if(t.id==='meal-add'){food.meals.push('Приём пищи');persist('@set');renderFoodSet();var ms=sv.querySelectorAll('[data-meal]');if(ms.length){ms[ms.length-1].focus();ms[ms.length-1].select()}}
     else if(t.id==='food-open'){if(!food.on){food.on=1;persist('@set')}setTab(foodInHabits()?'habits':'food')}
@@ -4050,12 +4340,15 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else if(d.hbf){
       var row=t.closest('[data-hb]'),h=row&&habitById(row.dataset.hb);if(!h)return;
       if(d.hbf==='n'){var n=t.value.trim();if(n)h.n=n}
-      else if(d.hbf==='type'){h.type=t.value;if(h.type!=='num')delete h.u;if(h.type!=='count')delete h.dir}
+      else if(d.hbf==='type'){h.type=t.value;if(h.type!=='num')delete h.u;if(h.type!=='count')delete h.dir;if(h.type==='time'){if(!(h.lim>=720))h.lim=1440}else delete h.lim}
+      else if(d.hbf==='lim'){var lv=tEnc(t.value);if(lv)h.lim=lv}
       else if(d.hbf==='s'){if(SPI[t.value]!=null)h.s=t.value}
       else if(d.hbf==='u'){var u=t.value.trim();if(u)h.u=u;else delete h.u}
       else if(d.hbf==='dir'){if(t.value==='more')h.dir='more';else delete h.dir}
       persist('@set');refresh();renderHabSet();
     }
+    else if(d.enn){var ev=parseFloat(String(t.value).replace(',','.'));if(!isNaN(ev)){enS[d.enn]=clamp(ev,0,d.enn==='kcal'?9999:24);persist('@set');refresh()}}
+    else if(d.enus){var ul=enS.us.filter(function(x){return x!==d.enus});if(t.checked)ul.push(d.enus);if(ul.length){enS.us=ul.slice(0,8);persist('@set');refresh()}else{t.checked=true;toast('Оставь хотя бы одну сферу.')}}
     else if(d.norm){food['n'+d.norm]=clamp(Math.round(+t.value||0),0,99999);persist('@set')}
     else if(d.meal!=null){var m=t.value.replace(/[<>&"]/g,'').trim();if(m){food.meals[+d.meal]=m;persist('@set')}else renderFoodSet()}
     else if(t.id==='hs-budget'){budget=clamp(Math.round(+t.value||0),0,744);persist('@set');renderHours()}
@@ -4152,7 +4445,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(!sphDlg.hidden)renderPanel();
     if(!$('recap').hidden)renderRecap();
   }
-  function refresh(){rebuild();renderAll()}
+  function refresh(){rebuild();renderAll();enRecheck()}
   function setTab(t){
     if(!tabOn(t))t='calendar';
     tab=t;mselClose();colClose();icoClose();
@@ -4274,8 +4567,8 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   setInterval(dkCheck,5000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)dkCheck()});
 
-  var UPD_NAME='index',UPD_BUILD='6fa4560d90';
-  function updBusy(){return !loaded||!!cur||busy||hpopDay!=null||syBusy||syDlgShown()||!$('recap').hidden||[pop,hpop,gpop,$('dish-dlg'),$('m-dlg')].some(function(x){return x&&!x.hidden})}
+  var UPD_NAME='index',UPD_BUILD='92815014a2';
+  function updBusy(){return !loaded||!!cur||busy||hpopDay!=null||syBusy||syDlgShown()||!$('recap').hidden||[pop,hpop,gpop,$('dish-dlg'),$('m-dlg'),$('en-dlg')].some(function(x){return x&&!x.hidden})}
   function updFlush(){lsSave()}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
      При выкладке рядом с сайтом кладётся version.json с номерами сборок обоих сайтов. Страница сверяется с ним через 8 секунд после
