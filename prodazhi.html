@@ -775,6 +775,26 @@ button.sl-hr:hover{background:var(--soft)}
 .sl-fsep{margin:10px 0 2px;padding-top:10px;border-top:1px dashed var(--line);font-size:calc(12px*var(--fz));color:var(--muted)}
 .sl-fsep b{color:var(--ink);font-weight:600}
 @media (max-width:720px){.sl-ctrs.sl-ctrs2{grid-template-columns:minmax(0,1fr)}.sl-rh small{display:block;margin:2px 0 0}}
+
+/* компактные счётчики дня */
+.sl-dg{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:4px 28px;align-items:start}
+.sl-rows{display:grid;gap:2px}
+.sl-rows2{border-left:1px solid var(--line);padding-left:24px}
+.sl-rows2 .sl-rh{font-size:calc(12px*var(--fz));font-weight:600;color:var(--ink);padding:2px 0 4px}
+.sl-rows2 .sl-rh small{display:inline;margin:0;font-weight:400;color:var(--muted);font-size:inherit}
+.sl-row{display:grid;grid-template-columns:minmax(0,1fr) auto 108px;gap:10px;align-items:center;padding:4px 0}
+.sl-rl{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sl-stp{display:inline-flex;align-items:center;gap:4px}
+.sl-stp .sl-m,.sl-stp .sl-p{height:32px;border-radius:10px;font-size:calc(14px*var(--fz))}
+.sl-stp .sl-m{width:32px;background:var(--soft)}
+.sl-stp .sl-p{width:44px}
+.sl-stp .inp{width:56px;height:32px;padding:2px 4px;text-align:center;font-weight:600;font-size:calc(15px*var(--fz));font-family:var(--body)}
+.sl-rg{text-align:right;font-size:calc(12px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sl-rg b{color:var(--ink);font-weight:600}
+.sl-rg small{font-size:inherit}
+.sl-row.ok .sl-rg,.sl-row.ok .sl-rg b{color:var(--ok-fg)}
+@media (max-width:860px){.sl-dg{grid-template-columns:minmax(0,1fr)}.sl-rows2{border-left:0;padding-left:0;border-top:1px dashed var(--line);padding-top:6px;margin-top:4px}}
+@media (max-width:420px){.sl-row{grid-template-columns:minmax(0,1fr) auto;gap:2px 8px}.sl-rg{grid-column:1/-1;text-align:left;margin-top:-2px}.sl-rl{white-space:normal}}
 </style>
 </head>
 <body>
@@ -952,26 +972,23 @@ button.sl-hr:hover{background:var(--soft)}
     return a+(rkOn?' · РКО: '+st.rk+' из '+P.rko+', заявок '+st.ra+' из '+P.rko*P.rpa:'');
   }
   /* день: три счётчика и продажа */
+  /* день: компактные строки — название, −, число, +1 и сколько нужно; РКО — отдельной парой строк рядом */
   function dayBox(st){
-    var k=selD,v=dayV(k),isT=k===TODAY,need=isT?todayNeed(viewM,st):null,d=dOf(k);
-    function ctr(f,lab,sub){
-      if(f==='ra'||f==='rk'){var g2=chain(goalN()),mt=st[f],gt=g2[f],okm=mt>=gt;
-        return '<div class="sl-ctr'+(okm?' ok':'')+'"><div class="sl-cl">'+lab+'<small>'+sub+'</small></div>'+
-          '<div class="sl-cn"><button type="button" class="sl-m" data-dc="'+f+'" data-v="-1" aria-label="'+lab+': минус один"'+(v[f]?'':' disabled')+'>−</button>'+
-          '<input class="inp num" id="dc-'+f+'" inputmode="numeric" data-dset="'+f+'" value="'+v[f]+'" aria-label="'+lab+'">'+
-          '<button type="button" class="sl-p" data-dc="'+f+'" data-v="1" aria-label="'+lab+': плюс один">+1</button></div>'+
-          '<div class="sl-need">'+mName(selD.slice(0,7)).split(' ')[0].toLowerCase()+': '+mt+' из '+gt+(okm?' — есть':' · осталось '+(gt-mt))+'</div></div>'}
-      var nd=need?need[f]:0,ok=need&&nd>0&&v[f]>=nd;
-      return '<div class="sl-ctr'+(ok?' ok':'')+'"><div class="sl-cl">'+lab+'<small>'+sub+'</small></div>'+
-        '<div class="sl-cn"><button type="button" class="sl-m" data-dc="'+f+'" data-v="-1" aria-label="'+lab+': минус один"'+(v[f]?'':' disabled')+'>−</button>'+
+    var k=selD,v=dayV(k),isT=k===TODAY,need=isT?todayNeed(viewM,st):null,d=dOf(k),g2=chain(goalN()),mn=MN[+k.slice(5,7)-1];
+    function row(f,lab){
+      var gl,ok;
+      if(f==='ra'||f==='rk'){var mt=st[f],gt=g2[f];ok=mt>=gt;gl='<b>'+mt+'</b> из '+gt+' <small>за '+mn+'</small>'}
+      else{var nd=need?need[f]:0;ok=!!need&&nd>0&&v[f]>=nd;gl=need?(nd?'<b>'+v[f]+'</b> из '+nd+' <small>сегодня</small>':'<small>на цель хватает</small>'):''}
+      return '<div class="sl-row'+(ok?' ok':'')+'"><span class="sl-rl">'+lab+'</span>'+
+        '<span class="sl-stp"><button type="button" class="sl-m" data-dc="'+f+'" data-v="-1" aria-label="'+lab+': минус один"'+(v[f]?'':' disabled')+'>−</button>'+
         '<input class="inp num" id="dc-'+f+'" inputmode="numeric" data-dset="'+f+'" value="'+v[f]+'" aria-label="'+lab+'">'+
-        '<button type="button" class="sl-p" data-dc="'+f+'" data-v="1" aria-label="'+lab+': плюс один">+1</button></div>'+
-        (need?'<div class="sl-need">'+(nd?(ok?'норма дня есть: '+v[f]+' из '+nd:'нужно сегодня: '+nd+(v[f]?', осталось '+(nd-v[f]):'')):'на цель уже хватает')+'</div>':'')+'</div>';
+        '<button type="button" class="sl-p" data-dc="'+f+'" data-v="1" aria-label="'+lab+': плюс один">+1</button></span>'+
+        '<span class="sl-rg">'+gl+'</span></div>';
     }
     return '<div class="box sl-day"><div class="box-h"><span class="sl-dn"><button type="button" class="ib" data-dnav="-1" aria-label="Предыдущий день">‹</button>'+(isT?'Сегодня, ':'')+d.getDate()+' '+MG[d.getMonth()]+'<button type="button" class="ib" data-dnav="1" aria-label="Следующий день"'+(isT?' disabled':'')+'>›</button></span>'+
       '<button type="button" class="btn" data-sale-new>+ Продажа</button></div>'+
-      '<div class="sl-ctrs">'+ctr('c','Звонки','от 40 секунд')+ctr('s','Назначено встреч','на любую дату')+ctr('h','Проведено встреч','состоялись')+'</div>'+
-      '<div class="sl-rko"><div class="sl-rh">РКО<small>если на встречу у клиента нет денег — предложи РКО; звонки те же</small></div><div class="sl-ctrs sl-ctrs2">'+ctr('ra','Заявки РКО','оставил заявку')+ctr('rk','РКО открыто','счёт открыт')+'</div></div>'+
+      '<div class="sl-dg"><div class="sl-rows">'+row('c','Звонки от 40 с')+row('s','Назначено встреч')+row('h','Проведено встреч')+'</div>'+
+      '<div class="sl-rows sl-rows2"><div class="sl-rh" title="Если на встречу у клиента нет денег — предложи РКО. Звонки те же">РКО <small>— если на встречу нет денег</small></div>'+row('ra','Заявки РКО')+row('rk','РКО открыто')+'</div></div>'+
       (isT&&!isWD(TODAY)?'<p class="note">Сегодня выходной по настройкам: норма дня считается по рабочим дням.</p>':'')+'</div>';
   }
   /* воронка месяца: факт против цели, конверсии против норм, узкое место */
@@ -1507,7 +1524,7 @@ button.sl-hr:hover{background:var(--soft)}
     /* на пустом устройстве окно входа открывается само, если пароль уже задан */
     var u=syUser();if(fsCanLogin()&&!seenX&&fsBlank()&&!!u&&location.protocol==='https:')syVhFind(u).then(function(){if(fsCanLogin()&&(!syDlg||syDlg.hidden))syDlgOpen(true)},function(){});
   }
-  var UPD_NAME='prodazhi',UPD_BUILD='cf2531a8d3';
+  var UPD_NAME='prodazhi',UPD_BUILD='9b6ce638af';
   function updBusy(){return fsBusy||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
