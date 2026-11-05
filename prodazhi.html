@@ -690,6 +690,75 @@ button.sl-hr:hover{background:var(--soft)}
   .sl-hr>span:nth-child(4),.sl-hr>span:nth-child(5){display:none}
   .sl-big b{font-size:calc(46px*var(--fz))}
 }
+/* ---------- продления: база подписок ---------- */
+.top .tabs{margin-right:auto}
+.sl-hs .sl-hb{border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:4px;min-width:0;text-align:left;background:var(--surface);color:var(--ink)}
+.sl-hs .sl-hb:hover{background:var(--soft)}
+.sl-hs:has(.sl-hb){grid-template-columns:repeat(2,minmax(0,1fr))}
+.sl-ml0 b{min-width:0;text-align:left;font-weight:600}
+.sl-bad{color:var(--danger)}
+.sl-st b{color:var(--ink);font-weight:600}
+.sl-tag{font-style:normal;font-size:calc(10.5px*var(--fz));font-weight:500;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 6px;margin-left:4px;vertical-align:1px;white-space:nowrap}
+.lg{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 10px;vertical-align:-1px}
+.lg.b{background:var(--s-save)}
+.lg.p{background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--s-save) 45%,transparent) 0 3px,transparent 3px 6px);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--s-save) 60%,transparent)}
+.lg.r{background:var(--danger)}
+.lg.g{height:0;border-top:1.5px dashed var(--ink);border-radius:0;vertical-align:3px}
+.sl-bars{position:relative;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;height:230px;padding-top:18px}
+.sl-bcol{display:grid;grid-template-rows:18px minmax(0,1fr) 16px 14px;gap:2px;min-width:0;text-align:center}
+.sl-bv{font-size:calc(10.5px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;align-self:end}
+.sl-bw{position:relative;display:flex;flex-direction:column-reverse;justify-content:flex-start;border-radius:8px 8px 3px 3px;background:var(--soft);overflow:hidden}
+.sl-bw i{display:block;width:100%;flex:none}
+.sl-bw i.b{background:var(--s-save)}
+.sl-bw u{position:absolute;left:0;right:0;border-top:1.5px dashed var(--ink);opacity:.6}
+.sl-bw i.p{background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--s-save) 45%,transparent) 0 3px,transparent 3px 6px)}
+.sl-bm{font-size:calc(11px*var(--fz));color:var(--muted);white-space:nowrap}
+.sl-bm em,.sl-br em{font-style:normal}
+.sl-bcol.now .sl-bm{color:var(--ink);font-weight:700}
+.sl-bcol.dl .sl-bw{box-shadow:inset 0 0 0 2px var(--ink)}
+.sl-br{font-size:calc(10px*var(--fz));color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.sl-bcol.risk .sl-br{color:var(--danger);font-weight:600}
+.sl-bcol.risk .sl-bw{box-shadow:inset 0 -3px 0 var(--danger)}
+.sl-bcol.risk.dl .sl-bw{box-shadow:inset 0 0 0 2px var(--ink),inset 0 -4px 0 var(--danger)}
+.sl-tr{display:grid;grid-template-columns:minmax(0,1.2fr) repeat(4,minmax(0,1fr)) 70px;gap:8px;align-items:center;padding:8px 2px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.sl-tr>span:nth-child(n+2){text-align:right}
+.sl-tr.hd{border-top:0;color:var(--muted);font-size:calc(11px*var(--fz));padding-top:0}
+.sl-tr.risk{background:color-mix(in srgb,var(--danger) 9%,transparent);border-radius:8px}
+.sl-tr.risk>span:last-child{color:var(--danger);font-weight:600}
+.sl-tr.now>span:first-child{font-weight:600}
+.sl-rr{display:grid;grid-template-columns:minmax(0,1.5fr) 140px 120px auto;gap:6px 12px;align-items:center;padding:10px 2px;border-top:1px solid var(--line)}
+.sl-rr.late{background:color-mix(in srgb,var(--danger) 7%,transparent);border-radius:10px;padding:10px 8px}
+.sl-rc b{font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sl-rc small,.sl-rm small{display:block;color:var(--muted);font-size:calc(11.5px*var(--fz))}
+.sl-rd{font-variant-numeric:tabular-nums}
+.sl-rd.bad{color:var(--danger);font-weight:500}
+.sl-rm{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.sl-ra{display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.sl-ra .btn{padding:7px 12px}
+.sl-ok{color:var(--ok-fg);font-size:calc(12.5px*var(--fz));font-weight:500}
+.sl-lost{color:var(--danger);font-size:calc(12.5px*var(--fz));font-weight:500}
+.sl-rf{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end;background:var(--soft);border-radius:14px;padding:10px 12px}
+.sl-rf label{display:grid;gap:3px}
+.sl-rf small{color:var(--muted);font-size:calc(11px*var(--fz))}
+.sl-rf .inp{width:140px}
+.sl-rf .inp.num{width:110px}
+.sl-rsub{margin-top:8px;font-size:calc(11px*var(--fz));letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:720px){
+  .top .tabs{order:3;margin:0;width:100%}
+  .top .tabs button{flex:1}
+  .sl-bars{gap:3px;height:200px}
+  .sl-bv{font-size:calc(9px*var(--fz))}
+  .sl-bm,.sl-br{font-size:calc(8.5px*var(--fz));letter-spacing:-.02em}
+  .sl-bm em,.sl-br em{display:none}
+  .sl-bc .box-h{flex-wrap:wrap}
+  .sl-tr{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr) 54px}
+  .sl-tr>span:nth-child(3),.sl-tr>span:nth-child(4){display:none}
+  .sl-rr{grid-template-columns:minmax(0,1fr) auto}
+  .sl-rd{grid-column:1;grid-row:2;font-size:calc(12.5px*var(--fz))}
+  .sl-rm{grid-column:2;grid-row:1}
+  .sl-ra{grid-column:1/-1;justify-content:flex-start}
+  .sl-rf .inp,.sl-rf .inp.num{width:120px}
+}
 </style>
 </head>
 <body>
@@ -706,6 +775,7 @@ button.sl-hr:hover{background:var(--soft)}
         <a href="prodazhi.html" aria-current="page">Продажи<small>воронка: звонки, встречи, продажи</small></a>
       </div>
     </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Подстраницы"></nav>
     <div class="top-r"><button type="button" class="fact" id="st-pill"></button><button type="button" class="btn ghost" id="sy-in" hidden>Войти</button><button type="button" class="pill" id="set-btn" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Настройки</button></div>
   </header>
   <main id="view"></main>
@@ -720,6 +790,10 @@ button.sl-hr:hover{background:var(--soft)}
              F.sales[id] = {d: дата продажи, co: компания, sum: общая сумма, mon: объём в месяц, n: платежей};
              F.plan = {sales: продаж для плана (4), key: для ключевого менеджера (8), cps: звонков на 1 назначенную (20),
                        sph: назначенных на 1 проведённую (2), hps: проведённых на 1 продажу (4), goal: 'plan' | 'key', wd: рабочие дни 1–7}.
+     База подписок (вкладка «Продления»): каждая продажа — подписка с ежемесячным платежом mon на n месяцев с месяца продажи.
+             F.base = {goal: база в месяц (400 000), months: за сколько месяцев (5), start: с какого месяца, len: срок подписки (6), risk: % (25)}.
+             Продление — отдельная запись {ren:1, prev: id прежней}, у прежней rn: id продления; «не продлил» — lost:1.
+             Рисковый месяц: подписок, у которых в этом месяце кончается срок, больше 25% базы прошлого месяца.
      Цель месяца: 4 продажи = 16 проведённых = 32 назначенных = 640 звонков (для ключевого вдвое больше). Нужное на сегодня —
      сколько осталось до цели, делённое на оставшиеся рабочие дни месяца вместе с сегодняшним. */
   var $=function(id){return document.getElementById(id)},view=$('view');
@@ -736,6 +810,8 @@ button.sl-hr:hover{background:var(--soft)}
   var MP=['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
   var MG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   var DW=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  var MD=['январю','февралю','марту','апрелю','маю','июню','июлю','августу','сентябрю','октябрю','ноябрю','декабрю'];
+  function mTo(k){return MD[+k.slice(5)-1]+' '+k.slice(0,4)}
   function wdn(d){return(d.getDay()+6)%7+1}
   function mName(k){var m=+k.slice(5)-1;return MN[m].charAt(0).toUpperCase()+MN[m].slice(1)+' '+k.slice(0,4)}
   function mIn(k){return 'в '+MP[+k.slice(5)-1]}
@@ -751,16 +827,20 @@ button.sl-hr:hover{background:var(--soft)}
   function hm(t){var d=new Date(t);return p2(d.getHours())+':'+p2(d.getMinutes())}
 
   var PLAN0={sales:4,key:8,cps:20,sph:2,hps:4,goal:'plan',wd:[1,2,3,4,5]};
-  function blank(){return{v:1,cur:'₽',plan:JSON.parse(JSON.stringify(PLAN0)),sales:{},days:{}}}
+  /* начало цели — месяц, когда страница впервые открылась (ноябрь 2026 → цель к марту 2027); меняется в настройках */
+  var BASE0={goal:400000,months:5,start:'',len:6,risk:25};
+  function blank(){return{v:1,cur:'₽',plan:JSON.parse(JSON.stringify(PLAN0)),base:JSON.parse(JSON.stringify(BASE0)),sales:{},days:{}}}
   function norm(f){
     f=isO(f)?f:{};var b=blank();
     if(!isO(f.sales))f.sales={};if(!isO(f.days))f.days={};
     var p=isO(f.plan)?f.plan:{};
     Object.keys(PLAN0).forEach(function(k){if(k==='wd'){if(!Array.isArray(p.wd)||!p.wd.length)p.wd=b.plan.wd.slice()}else if(k==='goal'){if(p.goal!=='key')p.goal='plan'}else if(!(num(p[k])>0))p[k]=PLAN0[k]});
-    f.plan=p;if(typeof f.cur!=='string'||!f.cur)f.cur='₽';f.v=1;return f;
+    f.plan=p;
+    var bs=isO(f.base)?f.base:{};Object.keys(BASE0).forEach(function(k){if(k==='start'){if(!/^\d{4}-\d\d$/.test(bs.start||''))bs.start=mKey()}else if(!(num(bs[k])>0))bs[k]=BASE0[k]});f.base=bs;
+    if(typeof f.cur!=='string'||!f.cur)f.cur='₽';f.v=1;return f;
   }
   var F=norm((function(){try{return JSON.parse(localStorage.getItem(LSK)||'null')}catch(_){return null}})());
-  var savedAt=0,saveErr=false,tab='main',NOW=mKey(),TODAY=dKey(),viewM=NOW,selD=TODAY,draft={d:TODAY},editId='',askDel='';
+  var renOpen='',renDraft={},savedAt=0,saveErr=false,tab='main',NOW=mKey(),TODAY=dKey(),viewM=NOW,selD=TODAY,draft={d:TODAY},editId='',askDel='';
   function save(){try{localStorage.setItem(LSK,JSON.stringify(F));savedAt=Date.now();saveErr=false}catch(_){saveErr=true}fsTouch();pill()}
 
   /* ---------- расчёты ---------- */
@@ -771,7 +851,7 @@ button.sl-hr:hover{background:var(--soft)}
   function mStat(M){
     var r={c:0,s:0,h:0,n:0,sum:0,mon:0,wd:0,wdPast:0,wdLeft:0,list:salesOf(M)};
     daysOf(M).forEach(function(k){var v=dayV(k);r.c+=v.c;r.s+=v.s;r.h+=v.h;if(isWD(k)){r.wd++;if(k<TODAY)r.wdPast++;else r.wdLeft++}});
-    r.list.forEach(function(x){r.n++;r.sum+=num(x.sum);r.mon+=num(x.mon)});
+    r.rn=0;r.rmon=0;r.list.forEach(function(x){if(x.ren){r.rn++;r.rmon+=num(x.mon);return}r.n++;r.sum+=num(x.sum);r.mon+=num(x.mon)});
     return r;
   }
   /* цель воронки на месяц: продажи → проведённые → назначенные → звонки */
@@ -785,11 +865,38 @@ button.sl-hr:hover{background:var(--soft)}
   }
   function stage(a,b){return b>0?a/b:0}
 
+  /* ---------- база подписок и продления ---------- */
+  function mDiff(a,b){return(+b.slice(0,4)-+a.slice(0,4))*12+(+b.slice(5,7)-+a.slice(5,7))}
+  function firstM(){var m=NOW;Object.keys(F.sales).forEach(function(id){var x=F.sales[id];if(isO(x)&&/^\d{4}-\d\d/.test(x.d||'')&&x.d.slice(0,7)<m)m=x.d.slice(0,7)});return m}
+  function subs(){return Object.keys(F.sales).map(function(id){var x=F.sales[id];if(isO(x))x.id=id;return x}).filter(function(x){return isO(x)&&/^\d{4}-\d\d-\d\d$/.test(x.d||'')&&num(x.mon)>0})}
+  function sLen(x){return Math.round(num(x.n))||F.base.len}
+  function sM(x){return x.d.slice(0,7)}
+  function sEndM(x){return mAdd(sM(x),sLen(x))}
+  /* срок кончается в тот же день через n месяцев (31 января + 1 месяц = 28 февраля) */
+  function sEnd(x){var d=dOf(x.d),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+sLen(x));d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return dKey(d)}
+  function sOn(x,M){return sM(x)<=M&&M<sEndM(x)}
+  function baseAt(M,L){var t=0;(L||subs()).forEach(function(x){if(sOn(x,M))t+=num(x.mon)});return t}
+  function sState(x){return x.rn&&F.sales[x.rn]?'done':x.lost?'lost':sEnd(x)<TODAY?'late':'wait'}
+  /* месяц базы: сколько платят, сколько добавилось новыми и продлениями, у скольких кончается срок и доля этого от базы */
+  function bRow(M,L){
+    var r={M:M,base:0,nw:0,nwN:0,rn:0,rnN:0,due:0,dueN:0,ok:0,lost:0};
+    L.forEach(function(x){var m=num(x.mon);if(sOn(x,M))r.base+=m;if(sM(x)===M){if(x.ren){r.rn+=m;r.rnN++}else{r.nw+=m;r.nwN++}}
+      if(sEndM(x)===M){r.due+=m;r.dueN++;var st=sState(x);if(st==='done')r.ok+=m;else if(st==='lost')r.lost+=m}});
+    r.prev=baseAt(mAdd(M,-1),L);r.share=r.prev?r.due/r.prev:0;r.risk=r.due>0&&r.share>F.base.risk/100;
+    return r;
+  }
+  /* сколько добавится, если продлят все, кто ещё не решил */
+  function potAt(M,L){var t=0;L.forEach(function(x){var st=sState(x);if(st!=='wait'&&st!=='late')return;var a=sEndM(x);if(a<=M&&M<mAdd(a,sLen(x)))t+=num(x.mon)});return t}
+  function shortR(n){n=Math.round(num(n));var a=Math.abs(n);return a>=1e6?(Math.round(n/1e5)/10).toLocaleString('ru-RU')+' млн':a>=1e3?Math.round(n/1e3)+'к':String(n)}
+
   /* ---------- экран ---------- */
+  /* две подстраницы: воронка и продления; настройки — справа сверху */
+  var TABS=[['main','Воронка','voronka'],['ren','Продления','prodleniya']],backTab='main';
   function render(){
     var a=document.activeElement,id=a&&a.id,ss=null,se=null;try{ss=a.selectionStart;se=a.selectionEnd}catch(_){}
+    $('tabs').innerHTML=TABS.map(function(t){return '<button type="button" role="tab" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0])+'">'+t[1]+'</button>'}).join('');
     $('set-btn').setAttribute('aria-pressed',tab==='set');
-    view.innerHTML=tab==='set'?renderSet():renderMain();
+    view.innerHTML=tab==='set'?renderSet():tab==='ren'?renderRen():renderMain();
     if(id){var n=$(id);if(n&&n!==document.activeElement){n.focus();try{if(ss!=null)n.setSelectionRange(ss,se)}catch(_){}}}
   }
   function renderMain(){
@@ -801,7 +908,7 @@ button.sl-hr:hover{background:var(--soft)}
       '<div class="sl-prog" role="img" aria-label="Продаж '+st.n+': план '+P.sales+', ключевой '+P.key+'"><i style="width:'+Math.min(100,st.n/mx*100)+'%"></i><em style="left:'+(P.sales/mx*100)+'%"><small>план '+P.sales+'</small></em><em class="k" style="left:'+(P.key/mx*100)+'%"><small>ключевой '+P.key+'</small></em></div>'+
       '<p class="sl-st">'+(st.n>=P.key?'Уровень ключевого менеджера взят 🔥':st.n>=P.sales?'План закрыт. До ключевого: '+(P.key-st.n)+' '+plural(P.key-st.n,'продажа','продажи','продаж'):'До плана: '+(P.sales-st.n)+' '+plural(P.sales-st.n,'продажа','продажи','продаж')+', до ключевого: '+(P.key-st.n))+
         (fc!=null&&st.n?' · в этом темпе к концу месяца ≈ '+fc:'')+'</p></div>'+
-      '<div class="sl-hs"><div><small>Сумма продаж '+mIn(M)+'</small><b>'+money(st.sum)+'</b></div><div><small>Объём в месяц</small><b>'+money(st.mon)+'</b></div><div><small>Рабочих дней '+(cur?'осталось':'в месяце')+'</small><b>'+(cur?st.wdLeft:st.wd)+'</b></div></div></div>';
+      '<div class="sl-hs"><div><small>Сумма продаж '+mIn(M)+'</small><b>'+money(st.sum)+'</b></div><div><small>Объём в месяц</small><b>'+money(st.mon)+'</b></div><div><small>Рабочих дней '+(cur?'осталось':'в месяце')+'</small><b>'+(cur?st.wdLeft:st.wd)+'</b></div><button type="button" class="sl-hb" data-go="ren"><small>База подписок →</small><b>'+shortR(baseAt(M))+' из '+shortR(F.base.goal)+'</b></button></div></div>';
     /* выбор цели */
     var goal='<div class="sl-goal"><span>Считать воронку под</span><div class="seg" role="group" aria-label="Цель месяца"><button type="button" data-goal="plan" aria-pressed="'+(P.goal!=='key')+'">план: '+P.sales+' '+plural(P.sales,'продажа','продажи','продаж')+'</button><button type="button" data-goal="key" aria-pressed="'+(P.goal==='key')+'">ключевого: '+P.key+'</button></div></div>';
     return hero+goal+(cur||selD.slice(0,7)===M?dayBox(st):'')+'<div class="sl-two">'+funnelBox(M,st,g)+calBox(M,g,st)+'</div>'+salesBox(M,st)+histBox();
@@ -867,24 +974,27 @@ button.sl-hr:hover{background:var(--soft)}
       '<label class="w2"><small>Компания</small><input class="inp" id="sf-co" maxlength="80" placeholder="ООО «Ромашка»" value="'+esc(d.co||'')+'" autocomplete="off"></label>'+
       '<label><small>Общая сумма</small><input class="inp num" id="sf-sum" inputmode="decimal" placeholder="'+(auto.f==='sum'?sp(auto.v):'0')+'" value="'+(d.sum?sp(d.sum):'')+'"></label>'+
       '<label><small>Объём в месяц</small><input class="inp num" id="sf-mon" inputmode="decimal" placeholder="'+(auto.f==='mon'?sp(auto.v):'0')+'" value="'+(d.mon?sp(d.mon):'')+'"></label>'+
-      '<label><small>Платежей</small><input class="inp num" id="sf-n" inputmode="numeric" placeholder="'+(auto.f==='n'?auto.v:'0')+'" value="'+(d.n||'')+'"></label>'+
+      '<label><small>Платежей</small><input class="inp num" id="sf-n" inputmode="numeric" placeholder="'+(auto.f==='n'?auto.v:F.base.len)+'" value="'+(d.n||'')+'"></label>'+
       '</div><div class="row"><button type="button" class="btn" data-sale-save>'+(e?'Сохранить':'Добавить продажу')+'</button>'+(e?'<button type="button" class="btn ghost" data-sale-cancel>Отмена</button>':'')+
-      '<small class="sl-auto" id="sf-auto">'+(auto.f?autoTxt(auto):'Впиши любые два из трёх чисел — третье посчитается само.')+'</small></div></div>';
+      '<small class="sl-auto" id="sf-auto">'+(auto.f?autoTxt(auto):'Впиши платёж в месяц — сумма посчитается на '+F.base.len+' месяцев. Или любые два из трёх чисел.')+'</small></div></div>';
     var list=st.list.length?'<div class="sl-sl"><div class="sl-sr hd"><span>Дата</span><span>Компания</span><span>Сумма</span><span>В месяц</span><span>Платежей</span><span></span></div>'+
-      st.list.map(function(x){var del=askDel===x.id;return '<div class="sl-sr'+(x.id===editId?' ed':'')+'"><span>'+dTxt(x.d)+'</span><span class="co">'+esc(x.co||'—')+'</span><span>'+money(x.sum)+'</span><span>'+money(x.mon)+'</span><span>'+(num(x.n)||'—')+'</span>'+
+      st.list.map(function(x){var del=askDel===x.id;return '<div class="sl-sr'+(x.id===editId?' ed':'')+'"><span>'+dTxt(x.d)+'</span><span class="co">'+esc(x.co||'—')+(x.ren?' <i class="sl-tag">продление</i>':'')+'</span><span>'+money(x.sum)+'</span><span>'+money(x.mon)+'</span><span>'+(num(x.n)||'—')+'</span>'+
         '<span class="act"><button type="button" class="g-x" data-sale-ed="'+x.id+'">изменить</button><button type="button" class="g-x'+(del?' red':'')+'" data-sale-del="'+x.id+'">'+(del?'точно удалить?':'×')+'</button></span></div>'}).join('')+
-      '<div class="sl-sr tot"><span>Итого</span><span>'+st.n+' '+plural(st.n,'продажа','продажи','продаж')+'</span><span>'+money(st.sum)+'</span><span>'+money(st.mon)+'</span><span></span><span></span></div></div>':'<p class="note">'+(M===NOW?'Продаж в этом месяце пока нет. Первая — через форму выше или кнопку «+ Продажа».':'Продаж '+mIn(M)+' нет.')+'</p>';
+      '<div class="sl-sr tot"><span>Итого</span><span>'+st.n+' '+plural(st.n,'продажа','продажи','продаж')+(st.rn?' + '+st.rn+' '+plural(st.rn,'продление','продления','продлений'):'')+'</span><span>'+money(st.sum)+'</span><span>'+money(st.mon)+'</span><span></span><span></span></div></div>':'<p class="note">'+(M===NOW?'Продаж в этом месяце пока нет. Первая — через форму выше или кнопку «+ Продажа».':'Продаж '+mIn(M)+' нет.')+'</p>';
     return '<div class="box sl-sales"><div class="box-h"><span>Продажи '+mIn(M)+'</span><small>'+st.n+' из '+F.plan.sales+' по плану</small></div>'+form+list+'</div>';
   }
   /* два числа из трёх: общая сумма = объём в месяц × число платежей */
   function saleAuto(d){
-    var s=num(d.sum),m=num(d.mon),n=num(d.n);
+    var s=num(d.sum),m=num(d.mon),n=num(d.n),L=F.base.len;
     if(s&&m&&!n)return{f:'n',v:Math.max(1,Math.round(s/m))};
     if(s&&n&&!m)return{f:'mon',v:Math.round(s/n)};
     if(m&&n&&!s)return{f:'sum',v:Math.round(m*n)};
+    /* одно число: подписка на обычный срок (6 месяцев) */
+    if(m&&!s&&!n)return{f:'sum',v:Math.round(m*L),n:L};
+    if(s&&!m&&!n)return{f:'mon',v:Math.round(s/L),n:L};
     return{f:''};
   }
-  function autoTxt(a){return a.f==='sum'?'Общая сумма посчитается: '+money(a.v):a.f==='mon'?'Объём в месяц посчитается: '+money(a.v):'Платежей посчитается: '+a.v}
+  function autoTxt(a){return(a.f==='sum'?'Общая сумма посчитается: '+money(a.v):a.f==='mon'?'Объём в месяц посчитается: '+money(a.v):'Платежей посчитается: '+a.v)+(a.n?' ('+a.n+' '+plural(a.n,'платёж','платежа','платежей')+' — обычный срок подписки)':'')}
   /* по месяцам: видно, как часто закрывается план и уровень ключевого */
   function histBox(){
     var ms=[],m=NOW;for(var i=0;i<6;i++){ms.push(m);m=mAdd(m,-1)}
@@ -895,6 +1005,55 @@ button.sl-hr:hover{background:var(--soft)}
       ms.map(function(k){var s=mStat(k),lv=s.n>=P.key?'key':s.n>=P.sales?'plan':'';
         return '<button type="button" class="sl-hr" data-mgo="'+k+'"><span>'+mName(k)+'</span><span class="sl-hn"><i class="'+lv+'" style="width:'+Math.min(100,s.n/mx*100)+'%"></i><b>'+s.n+'</b>'+(lv==='key'?'<small>ключевой</small>':lv==='plan'?'<small>план</small>':'')+'</span><span>'+sp(s.c)+'</span><span>'+s.s+'</span><span>'+s.h+'</span><span>'+money(s.sum)+'</span></button>'}).join('')+'</div>';
   }
+  /* ---------- подстраница «Продления»: база подписок, цель, рисковые месяцы, кому продлевать ---------- */
+  function renderRen(){
+    var B=F.base,L=subs(),st=B.start,dl=mAdd(st,B.months-1),cur=baseAt(NOW,L),atDl=baseAt(dl,L),left=Math.max(0,B.goal-atDl);
+    var mLeft=NOW>dl?0:mDiff(NOW,dl)+1,nw=L.filter(function(x){return !x.ren}),avg=nw.length?nw.reduce(function(a,x){return a+num(x.mon)},0)/nw.length:0;
+    var perM=mLeft?left/mLeft:0,chk=avg||B.goal/B.months/F.plan.sales,perN=perM?Math.ceil(perM/chk):0;
+    var el=NOW<st?0:Math.min(B.months,mDiff(st,NOW)+1),exp=B.goal*el/B.months,behind=el&&cur<exp*.9&&NOW<=dl;
+    var mx=Math.max(B.goal,cur,1),now=bRow(NOW,L);
+    var hero='<div class="sl-hero"><div class="sl-hm"><div class="sl-ml sl-ml0"><b>База подписок '+mIn(NOW)+'</b></div>'+
+      '<div class="sl-big"><b>'+shortR(cur)+'</b><span>₽ в месяц из '+shortR(B.goal)+'</span></div>'+
+      '<div class="sl-prog" role="img" aria-label="База '+money(cur)+' из '+money(B.goal)+'"><i style="width:'+Math.min(100,cur/mx*100)+'%"></i>'+(el&&el<B.months?'<em style="left:'+(exp/mx*100)+'%"><small>по графику '+shortR(exp)+'</small></em>':'')+'<em class="k" style="left:'+(B.goal/mx*100)+'%"><small>цель к '+MD[+dl.slice(5)-1]+'</small></em></div>'+
+      '<p class="sl-st">'+(atDl>=B.goal?'Цель обеспечена: к '+mTo(dl)+' база '+money(atDl)+' 🔥':NOW>dl?'Срок цели прошёл: к '+mTo(dl)+' было '+money(atDl)+'.':
+        'К '+mTo(dl)+' уже обеспечено '+money(atDl)+'. Осталось '+money(left)+' за '+mLeft+' '+plural(mLeft,'месяц','месяца','месяцев')+': ≈ <b>'+money(perM)+'</b> новой базы в месяц — это ≈ '+perN+' '+plural(perN,'продажа','продажи','продаж')+' по '+money(chk)+(avg?' (твой средний чек)':' (если по '+F.plan.sales+' в месяц)')+'.')+
+        (behind?' <span class="sl-bad">Отстаёшь от графика: к концу '+MG[+NOW.slice(5)-1]+' нужно '+money(exp)+'.</span>':'')+'</p></div>'+
+      '<div class="sl-hs"><div><small>Новая база '+mIn(NOW)+'</small><b>+'+money(now.nw)+'</b></div><div><small>Кончается срок '+mIn(NOW)+'</small><b>'+money(now.due)+'</b></div><div><small>Средний чек в месяц</small><b>'+(avg?money(avg):'—')+'</b></div></div></div>';
+    /* окно на год: от начала цели (или полгода назад) */
+    var w0=st<mAdd(NOW,-5)?mAdd(NOW,-5):st,ms=[];for(var i=0;i<12;i++)ms.push(mAdd(w0,i));
+    var rows=ms.map(function(M){var r=bRow(M,L);r.pot=potAt(M,L);return r});
+    var top=Math.max(B.goal,1);rows.forEach(function(r){top=Math.max(top,r.base+r.pot)});top*=1.08;
+    var chart='<div class="box sl-bc"><div class="box-h"><span>База по месяцам</span><small><i class="lg b"></i>платят <i class="lg p"></i>если продлят <i class="lg g"></i>цель '+shortR(B.goal)+' <i class="lg r"></i>риск</small></div>'+
+      '<div class="sl-bars">'+rows.map(function(r){
+        return '<div class="sl-bcol'+(r.risk?' risk':'')+(r.M===dl?' dl':'')+(r.M===NOW?' now':'')+'" title="'+mName(r.M)+': платят '+money(r.base)+(r.pot?', если продлят ещё +'+money(r.pot):'')+(r.due?'; кончается срок у '+r.dueN+' на '+money(r.due)+' ('+pct(r.share)+' базы)':'')+'">'+
+          '<div class="sl-bv">'+(r.base?shortR(r.base):'')+'</div><div class="sl-bw"><i class="b" style="height:'+(r.base/top*100)+'%"></i><i class="p" style="height:'+(r.pot/top*100)+'%"></i><u style="bottom:'+(B.goal/top*100)+'%"></u></div>'+
+          '<div class="sl-bm">'+MN[+r.M.slice(5)-1].slice(0,3)+(r.M.slice(5)==='01'?'<em> '+r.M.slice(2,4)+'</em>':'')+'</div><div class="sl-br">'+(r.risk?'<em>⚠ </em>'+pct(r.share):r.due?pct(r.share):'')+'</div></div>'}).join('')+'</div>'+
+      '<p class="note">Рисковый месяц — когда у подписок кончается срок больше чем на '+B.risk+'% базы прошлого месяца: если не продлят, база просядет сильнее чем на четверть. Под столбцом — доля продлений. Пунктир — цель '+money(B.goal)+' к '+mTo(dl)+'.</p></div>';
+    var risky=rows.filter(function(r){return r.risk&&r.M>=NOW});
+    var warn=risky.length?'<div class="banner">Рисковые месяцы: '+risky.map(function(r){return '<b>'+mName(r.M).toLowerCase()+'</b> — продлений на '+money(r.due)+', '+pct(r.share)+' базы'}).join('; ')+'. Начни разговор о продлении за месяц до срока и старайся, чтобы новые продажи не скапливались в одном месяце.</div>':'';
+    var tbl='<div class="box sl-bt"><div class="box-h"><span>По месяцам</span><small>риск — продлений больше '+B.risk+'% базы</small></div><div class="sl-tr hd"><span>Месяц</span><span>Платят</span><span>+ Новые</span><span>+ Продлили</span><span>Кончается срок</span><span>Доля</span></div>'+
+      rows.map(function(r){return '<div class="sl-tr'+(r.risk?' risk':'')+(r.M===NOW?' now':'')+'"><span>'+mName(r.M)+(r.M===dl?' <i class="sl-tag">цель</i>':'')+'</span><span>'+money(r.base)+'</span><span>'+(r.nw?'+'+money(r.nw,1)+' · '+r.nwN:'')+'</span><span>'+(r.rn?'+'+money(r.rn,1)+' · '+r.rnN:'')+'</span><span>'+(r.due?money(r.due,1)+' · '+r.dueN:'')+'</span><span>'+(r.due?(r.risk?'⚠ ':'')+pct(r.share):'')+'</span></div>'}).join('')+'</div>';
+    return hero+warn+chart+renList(L)+tbl;
+  }
+  /* кому продлевать: просроченные и ближайшие три месяца, ниже — недавно решённые */
+  function renList(L){
+    var lim=mAdd(NOW,3),pend=[],done=[];
+    L.forEach(function(x){var st=sState(x),e=sEnd(x);if((st==='wait'||st==='late')&&e.slice(0,7)<=lim)pend.push(x);else if((st==='done'||st==='lost')&&e>=dKey(new Date(dOf(TODAY).getTime()-75*864e5)))done.push(x)});
+    pend.sort(function(a,b){return sEnd(a)<sEnd(b)?-1:1});done.sort(function(a,b){return sEnd(a)<sEnd(b)?1:-1});
+    function row(x){
+      var st=sState(x),e=sEnd(x),r=st==='done'?F.sales[x.rn]:null,open=renOpen===x.id;
+      var act=st==='done'?'<span class="sl-ok">продлил до '+dTxt(sEnd(r))+'</span><button type="button" class="g-x" data-ren-undo="'+x.id+'">отменить</button>':
+        st==='lost'?'<span class="sl-lost">не продлил</span><button type="button" class="g-x" data-ren-undo="'+x.id+'">вернуть</button>':
+        '<button type="button" class="btn" data-ren-open="'+x.id+'">Продлил</button><button type="button" class="btn ghost" data-ren-lost="'+x.id+'">Не продлил</button>';
+      var form=open?'<div class="sl-rf"><label><small>С какого числа</small><input class="inp" type="date" id="rn-d" value="'+esc(renDraft.d)+'"></label><label><small>В месяц</small><input class="inp num" id="rn-mon" inputmode="decimal" value="'+sp(renDraft.mon)+'"></label><label><small>Месяцев</small><input class="inp num" id="rn-n" inputmode="numeric" value="'+renDraft.n+'"></label>'+
+        '<div class="row"><button type="button" class="btn" data-ren-save="'+x.id+'">Сохранить продление</button><button type="button" class="btn ghost" data-ren-x>Отмена</button></div></div>':'';
+      return '<div class="sl-rr'+(st==='late'?' late':'')+(open?' open':'')+'"><div class="sl-rc"><b>'+esc(x.co||'—')+'</b><small>'+(x.ren?'продление · ':'')+'с '+dTxt(x.d)+' на '+sLen(x)+' '+plural(sLen(x),'месяц','месяца','месяцев')+'</small></div>'+
+        '<div class="sl-rd'+(st==='late'?' bad':'')+'">'+(st==='late'?'срок прошёл ':'до ')+dTxt(e)+'</div><div class="sl-rm">'+money(x.mon)+'<small>в месяц</small></div><div class="sl-ra">'+act+'</div>'+form+'</div>';
+    }
+    var h='<div class="box sl-ren"><div class="box-h"><span>Продления</span><small>'+(pend.length?'ждут решения: '+pend.length+' на '+money(pend.reduce(function(a,x){return a+num(x.mon)},0))+' в месяц':'ближайшие три месяца')+'</small></div>';
+    if(!pend.length&&!done.length)return h+'<p class="note">'+(L.length?'В ближайшие три месяца сроки не кончаются.':'Пока нет подписок. Впиши продажи на вкладке «Воронка»: дату, компанию, платёж в месяц и число месяцев (по умолчанию '+F.base.len+').')+'</p></div>';
+    return h+pend.map(row).join('')+(done.length?'<div class="sl-rsub">Недавно решённые</div>'+done.map(row).join(''):'')+'</div>';
+  }
   /* настройки */
   function renderSet(){
     var P=F.plan,gp=chain(P.sales),gk=chain(P.key);
@@ -903,12 +1062,21 @@ button.sl-hr:hover{background:var(--soft)}
       '<div class="box"><div class="box-h"><span>План месяца</span></div>'+f('sales','Продаж для плана','закрыть план месяца')+f('key','Продаж для ключевого менеджера','уровень, к которому растёшь')+'</div>'+
       '<div class="box"><div class="box-h"><span>Нормы воронки</span></div>'+f('cps','Звонков от 40 с на 1 назначенную встречу','')+f('sph','Назначенных на 1 проведённую','половина назначенных доходит до встречи — это 2')+f('hps','Проведённых на 1 продажу','')+
         '<p class="note">План: '+gp.n+' '+plural(gp.n,'продажа','продажи','продаж')+' = '+gp.h+' проведённых = '+gp.s+' назначенных = '+sp(gp.c)+' звонков. Ключевой: '+gk.n+' = '+gk.h+' = '+gk.s+' = '+sp(gk.c)+'.</p></div>'+
+      '<div class="box"><div class="box-h"><span>База подписок</span></div>'+
+        '<label class="sl-set-i"><span>Цель базы<small>сколько платят все клиенты вместе каждый месяц</small></span><input class="inp num" inputmode="numeric" data-bn="goal" value="'+sp(F.base.goal)+'"></label>'+
+        '<label class="sl-set-i"><span>За сколько месяцев</span><input class="inp num" inputmode="numeric" data-bn="months" value="'+F.base.months+'"></label>'+
+        '<label class="sl-set-i"><span>С какого месяца<small>цель к '+mTo(mAdd(F.base.start,F.base.months-1))+'</small></span><input class="inp" type="month" data-bstart value="'+F.base.start+'"></label>'+
+        '<label class="sl-set-i"><span>Обычный срок подписки, месяцев<small>подставляется, если число платежей не вписано</small></span><input class="inp num" inputmode="numeric" data-bn="len" value="'+F.base.len+'"></label>'+
+        '<label class="sl-set-i"><span>Рисковый месяц, если продлений больше, %</span><input class="inp num" inputmode="numeric" data-bn="risk" value="'+F.base.risk+'"></label></div>'+
       '<div class="box"><div class="box-h"><span>Рабочие дни</span></div><div class="chips">'+DW.map(function(x,i){return '<button type="button" class="chip" data-wd="'+(i+1)+'" aria-pressed="'+(P.wd.indexOf(i+1)>=0)+'">'+x+'</button>'}).join('')+'</div><p class="note">По ним считается норма на день и темп месяца.</p></div>'+
       '<div class="box"><div class="box-h"><span>Данные</span></div><label class="sl-set-i"><span>Валюта</span><input class="inp" data-cur value="'+esc(F.cur)+'" maxlength="4" style="max-width:80px"></label>'+
         '<p class="note">'+(fsOn()?'Записи синхронизируются через то же хранилище, что «Колесо жизни» и «Финансы», отдельным зашифрованным файлом.':'Записи хранятся в этом браузере. Войди на главном сайте или кнопкой «Войти», и они будут синхронизироваться между устройствами.')+'</p>'+
         '<div class="row"><button type="button" class="btn ghost" data-exp>Сохранить копию в файл</button><button type="button" class="btn ghost" data-imp>Загрузить из файла</button><input type="file" id="imp-file" accept=".json,application/json" hidden></div></div></div>';
   }
-  function setTab(t){tab=t==='set'?'set':'main';askDel='';render();window.scrollTo(0,0);try{history.replaceState({},'',t==='set'?'#set':'#')}catch(_){}}
+  function setTab(t){
+    if(t!=='set'&&t!=='ren')t='main';if(t!=='set')backTab=t;tab=t;askDel='';renOpen='';render();window.scrollTo(0,0);
+    try{history.replaceState({},'','#'+(t==='set'?'set':t==='ren'?'prodleniya':'voronka'))}catch(_){}
+  }
 
   /* ---------- действия ---------- */
   function dayPut(k,f,v){var o=isO(F.days[k])?F.days[k]:{};v=Math.max(0,Math.min(9999,Math.round(num(v))));if(v)o[f]=v;else delete o[f];if(Object.keys(o).length)F.days[k]=o;else delete F.days[k];save()}
@@ -916,11 +1084,20 @@ button.sl-hr:hover{background:var(--soft)}
     var g=function(id){var x=$(id);return x?x.value:''};
     draft={d:g('sf-d')||TODAY,co:g('sf-co').trim(),sum:parseNum(g('sf-sum')),mon:parseNum(g('sf-mon')),n:Math.round(parseNum(g('sf-n')))};
   }
+  /* продление: новая запись с конца прежнего срока, прежняя помечается как продлённая */
+  function renSave(id){
+    var x=F.sales[id];if(!x)return;
+    var d=($('rn-d')||{}).value||sEnd(x),m=Math.round(parseNum(($('rn-mon')||{}).value)),n=Math.round(parseNum(($('rn-n')||{}).value))||sLen(x);
+    if(!/^\d{4}-\d\d-\d\d$/.test(d)){toast('Проверь дату продления.');return}
+    if(!(m>0)){toast('Впиши платёж в месяц.');return}
+    var nid2=nid('r');F.sales[nid2]={d:d,co:x.co,sum:m*n,mon:m,n:n,ren:1,prev:id};x.rn=nid2;delete x.lost;renOpen='';save();render();
+    toast('Продлено: «'+(x.co||'клиент')+'» на '+n+' '+plural(n,'месяц','месяца','месяцев')+' по '+money(m)+', до '+dTxt(sEnd(F.sales[nid2]))+'.');
+  }
   function saleSave(){
     readForm();var d=draft;
     if(!/^\d{4}-\d\d-\d\d$/.test(d.d)||d.d>TODAY){toast('Проверь дату продажи: не позже сегодняшнего дня.');return}
     if(!d.co){toast('Впиши компанию.');var c=$('sf-co');if(c)c.focus();return}
-    var a=saleAuto(d);if(a.f)d[a.f]=a.v;
+    var a=saleAuto(d);if(a.f)d[a.f]=a.v;if(a.n)d.n=a.n;
     var o={d:d.d,co:d.co.slice(0,80),sum:Math.round(num(d.sum)),mon:Math.round(num(d.mon)),n:Math.round(num(d.n))},id=editId||nid('s'),was=!!editId;
     F.sales[id]=o;editId='';draft={d:TODAY};viewM=o.d.slice(0,7);save();render();
     var st=mStat(viewM);toast((was?'Продажа исправлена':'Продажа записана: '+o.co)+'. '+mName(viewM)+': '+st.n+' из '+F.plan.sales+(st.n>=F.plan.key?' — уровень ключевого!':st.n===F.plan.sales?' — план закрыт!':''));
@@ -937,20 +1114,28 @@ button.sl-hr:hover{background:var(--soft)}
     if(t.closest('[data-sale-save]')){saleSave();return}
     if(t.closest('[data-sale-cancel]')){editId='';draft={d:TODAY};render();return}
     if((b=t.closest('[data-sale-ed]'))){var x=F.sales[b.dataset.saleEd];if(x){editId=b.dataset.saleEd;draft={d:x.d,co:x.co,sum:x.sum,mon:x.mon,n:x.n};askDel='';render();var co=$('sf-co');if(co){try{co.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}co.focus()}}return}
-    if((b=t.closest('[data-sale-del]'))){var id=b.dataset.saleDel;if(askDel!==id){askDel=id;render();return}askDel='';delete F.sales[id];if(editId===id){editId='';draft={d:TODAY}}save();render();toast('Продажа удалена.');return}
+    if((b=t.closest('[data-sale-del]'))){var id=b.dataset.saleDel;if(askDel!==id){askDel=id;render();return}askDel='';var dx=F.sales[id];if(dx&&dx.prev&&F.sales[dx.prev]&&F.sales[dx.prev].rn===id)delete F.sales[dx.prev].rn;delete F.sales[id];if(editId===id){editId='';draft={d:TODAY}}save();render();toast('Продажа удалена.');return}
     if((b=t.closest('[data-wd]'))){var w=+b.dataset.wd,l=F.plan.wd.filter(function(x){return x!==w});if(l.length===F.plan.wd.length)l.push(w);if(!l.length){toast('Оставь хотя бы один рабочий день.');return}F.plan.wd=l.sort();save();render();return}
-    if(t.closest('[data-set-close]')){setTab('main');return}
+    if(t.closest('[data-set-close]')){setTab(backTab);return}
+    if((b=t.closest('[data-ren-open]'))){var rx=F.sales[b.dataset.renOpen];if(rx){renOpen=b.dataset.renOpen;renDraft={d:sEnd(rx),mon:num(rx.mon),n:sLen(rx)};render();var ri=$('rn-mon');if(ri)ri.focus()}return}
+    if(t.closest('[data-ren-x]')){renOpen='';render();return}
+    if((b=t.closest('[data-ren-save]'))){renSave(b.dataset.renSave);return}
+    if((b=t.closest('[data-ren-lost]'))){var lx=F.sales[b.dataset.renLost];if(lx){lx.lost=1;renOpen='';save();render();toast('Отмечено: «'+(lx.co||'клиент')+'» не продлил. База с '+dTxt(sEnd(lx))+' меньше на '+money(lx.mon)+'.')}return}
+    if((b=t.closest('[data-ren-undo]'))){var ux=F.sales[b.dataset.renUndo];if(ux){if(ux.rn){delete F.sales[ux.rn];delete ux.rn}delete ux.lost;save();render();toast('Отменено: продление снова ждёт решения.')}return}
+    if((b=t.closest('[data-go]'))){setTab(b.dataset.go);return}
     if(t.closest('[data-exp]')){try{var u=URL.createObjectURL(new Blob([JSON.stringify(F)],{type:'application/json'})),l2=document.createElement('a');l2.href=u;l2.download='prodazhi-'+NOW+'.json';document.body.appendChild(l2);l2.click();l2.remove()}catch(_){toast('Не получилось сохранить файл.')}return}
     if(t.closest('[data-imp]')){$('imp-file').click();return}
   });
   view.addEventListener('input',function(e){
     var t=e.target;
-    if(/^sf-(sum|mon|n)$/.test(t.id)){readForm();var a=saleAuto(draft),o=$('sf-auto');if(o)o.textContent=a.f?autoTxt(a):'Впиши любые два из трёх чисел — третье посчитается само.';['sum','mon','n'].forEach(function(k){var x=$('sf-'+k);if(x)x.placeholder=a.f===k?(k==='n'?a.v:sp(a.v)):'0'})}
+    if(/^sf-(sum|mon|n)$/.test(t.id)){readForm();var a=saleAuto(draft),o=$('sf-auto');if(o)o.textContent=a.f?autoTxt(a):'Впиши платёж в месяц — сумма посчитается на '+F.base.len+' месяцев. Или любые два из трёх чисел.';['sum','mon','n'].forEach(function(k){var x=$('sf-'+k);if(x)x.placeholder=a.f===k?(k==='n'?a.v:sp(a.v)):k==='n'?F.base.len:'0'})}
   });
   view.addEventListener('change',function(e){
     var t=e.target,d=t.dataset;
     if(d.dset){dayPut(selD,d.dset,parseNum(t.value));render();return}
     if(d.pn){var v=Math.round(parseNum(t.value));if(v>0&&v<=100000){F.plan[d.pn]=v;save()}render();return}
+    if(d.bn){var bv=Math.round(parseNum(t.value)),lim={goal:1e9,months:60,len:60,risk:100}[d.bn];if(bv>0&&bv<=lim){F.base[d.bn]=bv;save()}render();return}
+    if(d.bstart!=null){if(/^\d{4}-\d\d$/.test(t.value)){F.base.start=t.value;save()}render();return}
     if(d.cur!=null){var c=t.value.trim().slice(0,4);if(c){F.cur=c;save()}render();return}
     if(/^sf-(sum|mon)$/.test(t.id)){var n=parseNum(t.value);t.value=n?sp(n):''}
     if(t.id==='sf-d'||t.id==='sf-co'){readForm()}
@@ -961,7 +1146,8 @@ button.sl-hr:hover{background:var(--soft)}
     if(/^sf-/.test(t.id)){e.preventDefault();saleSave()}
     else if(t.dataset&&t.dataset.dset){e.preventDefault();t.blur()}
   });
-  $('set-btn').addEventListener('click',function(){setTab(tab==='set'?'main':'set')});
+  $('set-btn').addEventListener('click',function(){setTab(tab==='set'?backTab:'set')});
+  $('tabs').addEventListener('click',function(e){var b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab)});
   /* меню слева сверху: переход между своими сайтами */
   var menu=$('menu'),brand=$('brand');
   brand.addEventListener('click',function(){menu.hidden=!menu.hidden;brand.setAttribute('aria-expanded',!menu.hidden)});
@@ -984,7 +1170,7 @@ button.sl-hr:hover{background:var(--soft)}
   $('st-pill').onclick=function(){if(fsCanLogin())syDlgOpen(false)};
   function dayTick(){var t=dKey();if(t===TODAY)return;var wasT=selD===TODAY,wasM=viewM===NOW;TODAY=t;NOW=mKey();if(wasT)selD=t;if(wasM)viewM=NOW;if(!editId)draft.d=TODAY;render()}
   setInterval(dayTick,60000);document.addEventListener('visibilitychange',function(){if(!document.hidden)dayTick()});
-  theme();if((location.hash||'')==='#set')tab='set';
+  theme();(function(h){if(h==='#set')tab='set';else if(h==='#prodleniya'){tab='ren';backTab='ren'}})(location.hash||'');
   /* ---- общее с главным сайтом ---- */
   function syStr(v){
     if(v===undefined)return 'undefined';
@@ -1262,7 +1448,7 @@ button.sl-hr:hover{background:var(--soft)}
     /* на пустом устройстве окно входа открывается само, если пароль уже задан */
     var u=syUser();if(fsCanLogin()&&!seenX&&fsBlank()&&!!u&&location.protocol==='https:')syVhFind(u).then(function(){if(fsCanLogin()&&(!syDlg||syDlg.hidden))syDlgOpen(true)},function(){});
   }
-  var UPD_NAME='prodazhi',UPD_BUILD='3f56118dcb';
+  var UPD_NAME='prodazhi',UPD_BUILD='48c3aa90d9';
   function updBusy(){return fsBusy||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
