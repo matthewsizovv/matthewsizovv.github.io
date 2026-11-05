@@ -763,6 +763,9 @@ button.sl-hr:hover{background:var(--soft)}
 /* запуск 1-го числа */
 .sl-hs.sl-hs4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .sl-ln{display:block;color:var(--muted);font-size:calc(11px*var(--fz))}
+.sl-fl small span{display:block}
+.sl-fr.bh .sl-fl small span:not(.lgt){color:var(--muted)}
+.sl-fl.ah small .lgt{color:var(--ok-fg)}
 </style>
 </head>
 <body>
@@ -944,7 +947,7 @@ button.sl-hr:hover{background:var(--soft)}
   }
   /* воронка месяца: факт против цели, конверсии против норм, узкое место */
   function funnelBox(M,st,g){
-    var P=F.plan,cur=M===NOW,el=cur?(st.wdPast+(isWD(TODAY)?1:0))/Math.max(1,st.wd):1;
+    var P=F.plan,cur=M===NOW,el=cur?st.wdPast/Math.max(1,st.wd):1; /* где нужно быть к началу сегодняшнего дня: сегодняшнее идёт в плюс */
     var rows=[['c','Звонки от 40 с',st.c,g.c],['s','Назначено встреч',st.s,g.s],['h','Проведено встреч',st.h,g.h],['n','Продажи',st.n,g.n]];
     var W=[100,80,60,42];
     var conv=[
@@ -952,16 +955,20 @@ button.sl-hr:hover{background:var(--soft)}
       {a:stage(st.h,st.s),ok:st.s?st.h/st.s>=1/P.sph:null,t:st.s?'проведено '+pct(Math.min(9.99,st.h/st.s))+' назначенных':'—',nt:'норма '+pct(1/P.sph),eff:st.s?(st.h/st.s)*P.sph:null,need:st.s>=3,lab:'назначенные → проведённые'},
       {a:stage(st.n,st.h),ok:st.h?st.n/st.h>=1/P.hps:null,t:st.h?'продажа с '+pct(st.n/st.h)+' встреч':'—',nt:'норма '+pct(1/P.hps),eff:st.h?(st.n/st.h)*P.hps:null,need:st.h>=4,lab:'проведённые → продажи'}];
     var h='';
+    /* отставание — числом: сколько штук не хватает до места, где нужно быть к сегодняшнему дню (считаются только целые) */
+    var WF={c:['звонок','звонка','звонков'],s:['встречу','встречи','встреч'],h:['встречу','встречи','встреч'],n:['продажу','продажи','продаж']};
+    function wf(k,n){var w=WF[k];return sp(n)+' '+plural(n,w[0],w[1],w[2])}
     rows.forEach(function(r,i){
-      var q=r[3]?r[2]/r[3]:0,behind=cur&&r[3]&&q<el-.08;
-      h+='<div class="sl-fr'+(behind?' bh':'')+'"><div class="sl-fb" style="width:'+W[i]+'%"><i style="width:'+Math.min(100,q*100)+'%"></i>'+(cur&&el<1?'<u style="left:'+(el*100)+'%" title="где нужно быть к сегодняшнему дню"></u>':'')+
-        '<span><b>'+sp(r[2])+'</b> из '+sp(r[3])+'</span></div><div class="sl-fl">'+r[1]+'<small>'+pct(q)+(behind?' · отстаёшь от темпа':'')+'</small></div></div>';
+      var q=r[3]?r[2]/r[3]:0,lag=cur&&r[3]?Math.floor(r[3]*el-r[2]):0,behind=lag>0,ahead=cur&&r[3]&&el<1&&Math.floor(r[2]-r[3]*el)>=1,rest=Math.max(0,r[3]-r[2]);
+      var sub=!r[3]?'':cur?'<span class="lgt">'+(behind?'отстаёшь на '+wf(r[0],lag):ahead?'впереди графика на '+wf(r[0],Math.floor(r[2]-r[3]*el)):'идёшь по графику')+'</span><span>'+(rest?'до цели '+sp(rest):'цель выполнена')+'</span>':'<span class="lgt">'+(rest?'не хватило '+wf(r[0],rest):'цель выполнена')+'</span>';
+      h+='<div class="sl-fr'+(behind?' bh':'')+'"><div class="sl-fb" style="width:'+W[i]+'%"><i style="width:'+Math.min(100,q*100)+'%"></i>'+(cur&&el>0&&el<1?'<u style="left:'+(el*100)+'%" title="где нужно быть к началу сегодняшнего дня"></u>':'')+
+        '<span><b>'+sp(r[2])+'</b> из '+sp(r[3])+'</span></div><div class="sl-fl'+(ahead?' ah':'')+'">'+r[1]+'<small>'+sub+'</small></div></div>';
       if(i<3){var c=conv[i];h+='<div class="sl-cv'+(c.need&&c.eff!=null?(c.eff<.9?' bad':c.eff>=1?' good':''):'')+'"><span>↓ '+c.t+'</span><small>'+c.nt+'</small></div>'}
     });
     /* узкое место: самая слабая конверсия против нормы, когда данных уже достаточно; иначе — отставание по активности */
     var weak=conv.filter(function(c){return c.need&&c.eff!=null&&c.eff<.85}).sort(function(a,b){return a.eff-b.eff})[0],tip='';
     if(weak)tip='Узкое место: <b>'+weak.lab+'</b> — '+weak.t+' при '+weak.nt.replace('норма ','норме ')+'.';
-    else if(cur&&g.c&&st.c/g.c<el-.08)tip='Конверсии в норме, не хватает объёма: звонков '+sp(st.c)+' из '+sp(g.c)+', к сегодняшнему дню нужно было ≈ '+sp(Math.round(g.c*el))+'.';
+    else if(cur&&g.c&&Math.floor(g.c*el-st.c)>0)tip=(conv.every(function(c){return c.need})?'Конверсии в норме, не хватает объёма':'Не хватает объёма')+': отстаёшь на <b>'+wf('c',Math.floor(g.c*el-st.c))+'</b> — сделано '+sp(st.c)+', к началу сегодняшнего дня нужно было ≈ '+sp(Math.round(g.c*el))+'.';
     else if(st.c||st.s||st.h)tip='Идёшь в темпе: конверсии не хуже норм.';
     return '<div class="box sl-fun"><div class="box-h"><span>Воронка '+mIn(M)+'</span><small>'+goalN()+' '+plural(goalN(),'продажа','продажи','продаж')+' = '+g.h+' проведённых = '+g.s+' назначенных = '+sp(g.c)+' звонков</small></div>'+h+
       (tip?'<p class="sl-tip">'+tip+'</p>':'')+'</div>';
@@ -1464,7 +1471,7 @@ button.sl-hr:hover{background:var(--soft)}
     /* на пустом устройстве окно входа открывается само, если пароль уже задан */
     var u=syUser();if(fsCanLogin()&&!seenX&&fsBlank()&&!!u&&location.protocol==='https:')syVhFind(u).then(function(){if(fsCanLogin()&&(!syDlg||syDlg.hidden))syDlgOpen(true)},function(){});
   }
-  var UPD_NAME='prodazhi',UPD_BUILD='746b04d08e';
+  var UPD_NAME='prodazhi',UPD_BUILD='f5e1fe93cb';
   function updBusy(){return fsBusy||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
