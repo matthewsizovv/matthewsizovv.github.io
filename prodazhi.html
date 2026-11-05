@@ -644,7 +644,7 @@ button.pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-widt
 .sl-sr.tot{font-weight:600}
 .sl-sr.ed{background:var(--soft);border-radius:10px}
 /* по месяцам */
-.sl-hr{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.4fr) repeat(3,minmax(0,.7fr)) minmax(0,1fr);gap:8px;align-items:center;padding:8px 2px;border:0;border-top:1px solid var(--line);background:none;width:100%;text-align:left;color:var(--ink);font-variant-numeric:tabular-nums}
+.sl-hr{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.4fr) repeat(3,minmax(0,.7fr)) minmax(0,.9fr) minmax(0,1fr);gap:8px;align-items:center;padding:8px 2px;border:0;border-top:1px solid var(--line);background:none;width:100%;text-align:left;color:var(--ink);font-variant-numeric:tabular-nums}
 button.sl-hr:hover{background:var(--soft)}
 .sl-hr>span:nth-child(n+3){text-align:right}
 .sl-hr.hd{color:var(--muted);font-size:calc(11px*var(--fz));border-top:0;padding-top:0}
@@ -687,7 +687,7 @@ button.sl-hr:hover{background:var(--soft)}
   .sl-sr>.act{grid-column:2;grid-row:1}
   .sl-sr.tot>span:nth-child(n+5){display:none}
   .sl-hr{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr)}
-  .sl-hr>span:nth-child(4),.sl-hr>span:nth-child(5){display:none}
+  .sl-hr>span:nth-child(4),.sl-hr>span:nth-child(5),.sl-hr>span:nth-child(6){display:none}
   .sl-big b{font-size:calc(46px*var(--fz))}
 }
 /* ---------- продления: база подписок ---------- */
@@ -766,6 +766,15 @@ button.sl-hr:hover{background:var(--soft)}
 .sl-fl small span{display:block}
 .sl-fr.bh .sl-fl small span:not(.lgt){color:var(--muted)}
 .sl-fl.ah small .lgt{color:var(--ok-fg)}
+
+/* РКО: из тех же звонков */
+.sl-rko{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.sl-rh{font-weight:600}
+.sl-rh small{display:inline;margin-left:8px;font-weight:400;color:var(--muted);font-size:calc(12px*var(--fz))}
+.sl-ctrs.sl-ctrs2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sl-fsep{margin:10px 0 2px;padding-top:10px;border-top:1px dashed var(--line);font-size:calc(12px*var(--fz));color:var(--muted)}
+.sl-fsep b{color:var(--ink);font-weight:600}
+@media (max-width:720px){.sl-ctrs.sl-ctrs2{grid-template-columns:minmax(0,1fr)}.sl-rh small{display:block;margin:2px 0 0}}
 </style>
 </head>
 <body>
@@ -833,7 +842,8 @@ button.sl-hr:hover{background:var(--soft)}
   var toastT;function toast(m){var t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},4200)}
   function hm(t){var d=new Date(t);return p2(d.getHours())+':'+p2(d.getMinutes())}
 
-  var PLAN0={sales:4,key:8,cps:20,sph:2,hps:4,goal:'plan',wd:[1,2,3,4,5]};
+  /* РКО: ещё 2 в месяц по плану, конверсия 1 к 3 → 6 заявок. Заявки идут из тех же звонков: если на встречу у клиента нет денег, предлагается РКО */
+  var PLAN0={sales:4,key:8,cps:20,sph:2,hps:4,rko:2,rpa:3,goal:'plan',wd:[1,2,3,4,5]};
   /* начало цели — месяц, когда страница впервые открылась (ноябрь 2026 → цель к марту 2027); меняется в настройках */
   var BASE0={goal:400000,months:5,start:'',len:6,risk:25};
   function blank(){return{v:1,cur:'₽',plan:JSON.parse(JSON.stringify(PLAN0)),base:JSON.parse(JSON.stringify(BASE0)),sales:{},days:{}}}
@@ -842,6 +852,7 @@ button.sl-hr:hover{background:var(--soft)}
     if(!isO(f.sales))f.sales={};if(!isO(f.days))f.days={};
     var p=isO(f.plan)?f.plan:{};
     Object.keys(PLAN0).forEach(function(k){if(k==='wd'){if(!Array.isArray(p.wd)||!p.wd.length)p.wd=b.plan.wd.slice()}else if(k==='goal'){if(p.goal!=='key')p.goal='plan'}else if(!(num(p[k])>0))p[k]=PLAN0[k]});
+    if(!/^\d{4}-\d\d$/.test(p.rkoFrom||''))p.rkoFrom=mKey();
     f.plan=p;
     var bs=isO(f.base)?f.base:{};Object.keys(BASE0).forEach(function(k){if(k==='start'){if(!/^\d{4}-\d\d$/.test(bs.start||''))bs.start=mKey()}else if(!(num(bs[k])>0))bs[k]=BASE0[k]});f.base=bs;
     if(typeof f.cur!=='string'||!f.cur)f.cur='₽';f.v=1;return f;
@@ -853,17 +864,19 @@ button.sl-hr:hover{background:var(--soft)}
   /* ---------- расчёты ---------- */
   function isWD(k){return F.plan.wd.indexOf(wdn(dOf(k)))>=0}
   function daysOf(M){var r=[],n=dim(M);for(var i=1;i<=n;i++)r.push(M+'-'+p2(i));return r}
-  function dayV(k){var o=F.days[k]||{};return{c:num(o.c),s:num(o.s),h:num(o.h)}}
+  function dayV(k){var o=F.days[k]||{};return{c:num(o.c),s:num(o.s),h:num(o.h),ra:num(o.ra),rk:num(o.rk)}}
   function salesOf(M){return Object.keys(F.sales).map(function(id){var x=F.sales[id];x.id=id;return x}).filter(function(x){return isO(x)&&String(x.d||'').slice(0,7)===M}).sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0})}
   function mStat(M){
-    var r={c:0,s:0,h:0,n:0,sum:0,mon:0,wd:0,wdPast:0,wdLeft:0,list:salesOf(M)};
-    daysOf(M).forEach(function(k){var v=dayV(k);r.c+=v.c;r.s+=v.s;r.h+=v.h;if(isWD(k)){r.wd++;if(k<TODAY)r.wdPast++;else r.wdLeft++}});
-    r.rn=0;r.rmon=0;r.list.forEach(function(x){if(x.ren){r.rn++;r.rmon+=num(x.mon);return}r.n++;r.sum+=num(x.sum);r.mon+=num(x.mon)});
+    var r={c:0,s:0,h:0,ra:0,rk:0,n:0,sum:0,mon:0,wd:0,wdPast:0,wdLeft:0,list:salesOf(M)};
+    daysOf(M).forEach(function(k){var v=dayV(k);r.c+=v.c;r.s+=v.s;r.h+=v.h;r.ra+=v.ra;r.rk+=v.rk;if(isWD(k)){r.wd++;if(k<TODAY)r.wdPast++;else r.wdLeft++}});
+    r.rn=0;r.rmon=0;r.list.forEach(function(x){if(x.ren){r.rn++;r.rmon+=num(x.mon);return}r.n++;r.sum+=num(x.sum)||num(x.mon)*(Math.round(num(x.n))||F.base.len);r.mon+=num(x.mon)});
     return r;
   }
   /* цель воронки на месяц: продажи → проведённые → назначенные → звонки */
   function goalN(){return F.plan.goal==='key'?F.plan.key:F.plan.sales}
-  function chain(n){var h=n*F.plan.hps,s=h*F.plan.sph;return{n:n,h:h,s:s,c:s*F.plan.cps}}
+  function chain(n){var h=n*F.plan.hps,s=h*F.plan.sph;return{n:n,h:h,s:s,c:s*F.plan.cps,rk:F.plan.rko,ra:F.plan.rko*F.plan.rpa}}
+  /* план месяца закрыт, когда есть и продажи, и РКО (РКО считается с месяца, когда его начали вести) */
+  function planOk(M,st){return st.n>=F.plan.sales&&(M<F.plan.rkoFrom||st.rk>=F.plan.rko)}
   /* сколько нужно сделать сегодня: остаток до цели (без сегодняшнего) на оставшиеся рабочие дни вместе с сегодняшним */
   function todayNeed(M,st){
     var g=chain(goalN()),t=dayV(TODAY),left=Math.max(1,st.wdLeft),out={};
@@ -922,17 +935,32 @@ button.sl-hr:hover{background:var(--soft)}
     var hero='<div class="sl-hero"><div class="sl-hm"><div class="sl-ml"><button type="button" class="ib" data-mnav="-1" aria-label="Прошлый месяц">‹</button><b>'+mName(M)+'</b><button type="button" class="ib" data-mnav="1" aria-label="Следующий месяц"'+(cur?' disabled':'')+'>›</button></div>'+
       '<div class="sl-big"><b>'+st.n+'</b><span>'+plural(st.n,'продажа','продажи','продаж')+'</span></div>'+
       '<div class="sl-prog" role="img" aria-label="Продаж '+st.n+': план '+P.sales+', ключевой '+P.key+'"><i style="width:'+Math.min(100,st.n/mx*100)+'%"></i><em style="left:'+(P.sales/mx*100)+'%"><small>план '+P.sales+'</small></em><em class="k" style="left:'+(P.key/mx*100)+'%"><small>ключевой '+P.key+'</small></em></div>'+
-      '<p class="sl-st">'+(st.n>=P.key?'Уровень ключевого менеджера взят 🔥':st.n>=P.sales?'План закрыт. До ключевого: '+(P.key-st.n)+' '+plural(P.key-st.n,'продажа','продажи','продаж'):'До плана: '+(P.sales-st.n)+' '+plural(P.sales-st.n,'продажа','продажи','продаж')+', до ключевого: '+(P.key-st.n))+
+      '<p class="sl-st">'+heroSt(M,st)+
         (fc!=null&&st.n?' · в этом темпе к концу месяца ≈ '+fc:'')+'</p></div>'+
       '<div class="sl-hs"><div><small>Сумма продаж '+mIn(M)+'</small><b>'+money(st.sum)+'</b></div><div><small>Объём в месяц</small><b>'+money(st.mon)+'</b></div><div><small>Рабочих дней '+(cur?'осталось':'в месяце')+'</small><b>'+(cur?st.wdLeft:st.wd)+'</b></div><button type="button" class="sl-hb" data-go="ren"><small>База к '+d1(bTarget()).replace(/ \d{4}$/,'')+' →</small><b>'+shortR(baseAt(bTarget()))+' из '+shortR(F.base.goal)+'</b></button></div></div>';
     /* выбор цели */
     var goal='<div class="sl-goal"><span>Считать воронку под</span><div class="seg" role="group" aria-label="Цель месяца"><button type="button" data-goal="plan" aria-pressed="'+(P.goal!=='key')+'">план: '+P.sales+' '+plural(P.sales,'продажа','продажи','продаж')+'</button><button type="button" data-goal="key" aria-pressed="'+(P.goal==='key')+'">ключевого: '+P.key+'</button></div></div>';
     return hero+goal+(cur||selD.slice(0,7)===M?dayBox(st):'')+'<div class="sl-two">'+funnelBox(M,st,g)+calBox(M,g,st)+'</div>'+salesBox(M,st)+histBox();
   }
+  function heroSt(M,st){
+    var P=F.plan,rkOn=M>=P.rkoFrom,rkLeft=rkOn?Math.max(0,P.rko-st.rk):0,ns=Math.max(0,P.sales-st.n);
+    function pr(n){return n+' '+plural(n,'продажа','продажи','продаж')}
+    var a=st.n>=P.key?'Уровень ключевого менеджера взят 🔥'+(rkLeft?' Для плана ещё '+rkLeft+' РКО.':''):
+      planOk(M,st)?'План закрыт. До ключевого: '+pr(P.key-st.n):
+      !ns?'Продажи по плану есть, осталось '+rkLeft+' РКО. До ключевого: '+pr(P.key-st.n):
+      'До плана: '+pr(ns)+(rkLeft?' и '+rkLeft+' РКО':'')+', до ключевого: '+(P.key-st.n);
+    return a+(rkOn?' · РКО: '+st.rk+' из '+P.rko+', заявок '+st.ra+' из '+P.rko*P.rpa:'');
+  }
   /* день: три счётчика и продажа */
   function dayBox(st){
     var k=selD,v=dayV(k),isT=k===TODAY,need=isT?todayNeed(viewM,st):null,d=dOf(k);
     function ctr(f,lab,sub){
+      if(f==='ra'||f==='rk'){var g2=chain(goalN()),mt=st[f],gt=g2[f],okm=mt>=gt;
+        return '<div class="sl-ctr'+(okm?' ok':'')+'"><div class="sl-cl">'+lab+'<small>'+sub+'</small></div>'+
+          '<div class="sl-cn"><button type="button" class="sl-m" data-dc="'+f+'" data-v="-1" aria-label="'+lab+': минус один"'+(v[f]?'':' disabled')+'>−</button>'+
+          '<input class="inp num" id="dc-'+f+'" inputmode="numeric" data-dset="'+f+'" value="'+v[f]+'" aria-label="'+lab+'">'+
+          '<button type="button" class="sl-p" data-dc="'+f+'" data-v="1" aria-label="'+lab+': плюс один">+1</button></div>'+
+          '<div class="sl-need">'+mName(selD.slice(0,7)).split(' ')[0].toLowerCase()+': '+mt+' из '+gt+(okm?' — есть':' · осталось '+(gt-mt))+'</div></div>'}
       var nd=need?need[f]:0,ok=need&&nd>0&&v[f]>=nd;
       return '<div class="sl-ctr'+(ok?' ok':'')+'"><div class="sl-cl">'+lab+'<small>'+sub+'</small></div>'+
         '<div class="sl-cn"><button type="button" class="sl-m" data-dc="'+f+'" data-v="-1" aria-label="'+lab+': минус один"'+(v[f]?'':' disabled')+'>−</button>'+
@@ -943,6 +971,7 @@ button.sl-hr:hover{background:var(--soft)}
     return '<div class="box sl-day"><div class="box-h"><span class="sl-dn"><button type="button" class="ib" data-dnav="-1" aria-label="Предыдущий день">‹</button>'+(isT?'Сегодня, ':'')+d.getDate()+' '+MG[d.getMonth()]+'<button type="button" class="ib" data-dnav="1" aria-label="Следующий день"'+(isT?' disabled':'')+'>›</button></span>'+
       '<button type="button" class="btn" data-sale-new>+ Продажа</button></div>'+
       '<div class="sl-ctrs">'+ctr('c','Звонки','от 40 секунд')+ctr('s','Назначено встреч','на любую дату')+ctr('h','Проведено встреч','состоялись')+'</div>'+
+      '<div class="sl-rko"><div class="sl-rh">РКО<small>если на встречу у клиента нет денег — предложи РКО; звонки те же</small></div><div class="sl-ctrs sl-ctrs2">'+ctr('ra','Заявки РКО','оставил заявку')+ctr('rk','РКО открыто','счёт открыт')+'</div></div>'+
       (isT&&!isWD(TODAY)?'<p class="note">Сегодня выходной по настройкам: норма дня считается по рабочим дням.</p>':'')+'</div>';
   }
   /* воронка месяца: факт против цели, конверсии против норм, узкое место */
@@ -956,21 +985,28 @@ button.sl-hr:hover{background:var(--soft)}
       {a:stage(st.n,st.h),ok:st.h?st.n/st.h>=1/P.hps:null,t:st.h?'продажа с '+pct(st.n/st.h)+' встреч':'—',nt:'норма '+pct(1/P.hps),eff:st.h?(st.n/st.h)*P.hps:null,need:st.h>=4,lab:'проведённые → продажи'}];
     var h='';
     /* отставание — числом: сколько штук не хватает до места, где нужно быть к сегодняшнему дню (считаются только целые) */
-    var WF={c:['звонок','звонка','звонков'],s:['встречу','встречи','встреч'],h:['встречу','встречи','встреч'],n:['продажу','продажи','продаж']};
+    var WF={c:['звонок','звонка','звонков'],s:['встречу','встречи','встреч'],h:['встречу','встречи','встреч'],n:['продажу','продажи','продаж'],ra:['заявку','заявки','заявок'],rk:['РКО','РКО','РКО']};
     function wf(k,n){var w=WF[k];return sp(n)+' '+plural(n,w[0],w[1],w[2])}
-    rows.forEach(function(r,i){
+    function rowH(r,wd){
       var q=r[3]?r[2]/r[3]:0,lag=cur&&r[3]?Math.floor(r[3]*el-r[2]):0,behind=lag>0,ahead=cur&&r[3]&&el<1&&Math.floor(r[2]-r[3]*el)>=1,rest=Math.max(0,r[3]-r[2]);
       var sub=!r[3]?'':cur?'<span class="lgt">'+(behind?'отстаёшь на '+wf(r[0],lag):ahead?'впереди графика на '+wf(r[0],Math.floor(r[2]-r[3]*el)):'идёшь по графику')+'</span><span>'+(rest?'до цели '+sp(rest):'цель выполнена')+'</span>':'<span class="lgt">'+(rest?'не хватило '+wf(r[0],rest):'цель выполнена')+'</span>';
-      h+='<div class="sl-fr'+(behind?' bh':'')+'"><div class="sl-fb" style="width:'+W[i]+'%"><i style="width:'+Math.min(100,q*100)+'%"></i>'+(cur&&el>0&&el<1?'<u style="left:'+(el*100)+'%" title="где нужно быть к началу сегодняшнего дня"></u>':'')+
+      return '<div class="sl-fr'+(behind?' bh':'')+'"><div class="sl-fb" style="width:'+wd+'%"><i style="width:'+Math.min(100,q*100)+'%"></i>'+(cur&&el>0&&el<1?'<u style="left:'+(el*100)+'%" title="где нужно быть к началу сегодняшнего дня"></u>':'')+
         '<span><b>'+sp(r[2])+'</b> из '+sp(r[3])+'</span></div><div class="sl-fl'+(ahead?' ah':'')+'">'+r[1]+'<small>'+sub+'</small></div></div>';
+    }
+    rows.forEach(function(r,i){
+      h+=rowH(r,W[i]);
       if(i<3){var c=conv[i];h+='<div class="sl-cv'+(c.need&&c.eff!=null?(c.eff<.9?' bad':c.eff>=1?' good':''):'')+'"><span>↓ '+c.t+'</span><small>'+c.nt+'</small></div>'}
     });
+    /* ветка РКО: из тех же звонков — когда на встречу нет денег, предлагается РКО; 3 заявки → 1 РКО */
+    var rkEff=st.ra>=P.rpa?(st.rk/st.ra)*P.rpa:null;
+    h+='<div class="sl-fsep"><b>РКО</b> — из тех же звонков: нет денег на встречу → заявка на РКО</div>'+rowH(['ra','Заявки РКО',st.ra,g.ra],70)+
+      '<div class="sl-cv'+(rkEff!=null?(rkEff<.9?' bad':rkEff>=1?' good':''):'')+'"><span>↓ '+(st.ra?'открыто '+st.rk+' из '+st.ra+' заявок':'заявок пока нет')+'</span><small>норма 1 из '+P.rpa+'</small></div>'+rowH(['rk','РКО открыто',st.rk,g.rk],48);
     /* узкое место: самая слабая конверсия против нормы, когда данных уже достаточно; иначе — отставание по активности */
     var weak=conv.filter(function(c){return c.need&&c.eff!=null&&c.eff<.85}).sort(function(a,b){return a.eff-b.eff})[0],tip='';
     if(weak)tip='Узкое место: <b>'+weak.lab+'</b> — '+weak.t+' при '+weak.nt.replace('норма ','норме ')+'.';
     else if(cur&&g.c&&Math.floor(g.c*el-st.c)>0)tip=(conv.every(function(c){return c.need})?'Конверсии в норме, не хватает объёма':'Не хватает объёма')+': отстаёшь на <b>'+wf('c',Math.floor(g.c*el-st.c))+'</b> — сделано '+sp(st.c)+', к началу сегодняшнего дня нужно было ≈ '+sp(Math.round(g.c*el))+'.';
     else if(st.c||st.s||st.h)tip='Идёшь в темпе: конверсии не хуже норм.';
-    return '<div class="box sl-fun"><div class="box-h"><span>Воронка '+mIn(M)+'</span><small>'+goalN()+' '+plural(goalN(),'продажа','продажи','продаж')+' = '+g.h+' проведённых = '+g.s+' назначенных = '+sp(g.c)+' звонков</small></div>'+h+
+    return '<div class="box sl-fun"><div class="box-h"><span>Воронка '+mIn(M)+'</span><small>'+goalN()+' '+plural(goalN(),'продажа','продажи','продаж')+' = '+g.h+' проведённых = '+g.s+' назначенных = '+sp(g.c)+' звонков · '+g.rk+' РКО = '+g.ra+' '+plural(g.ra,'заявка','заявки','заявок')+'</small></div>'+h+
       (tip?'<p class="sl-tip">'+tip+'</p>':'')+'</div>';
   }
   /* календарь месяца: число звонков, оттенок — доля дневной нормы звонков; точки — встречи, звезда — продажа */
@@ -980,8 +1016,8 @@ button.sl-hr:hover{background:var(--soft)}
     for(var i=1;i<first;i++)h+='<span></span>';
     ds.forEach(function(k){
       var v=dayV(k),fut=k>TODAY,wd=isWD(k),q=norm1?Math.min(1,v.c/norm1):0,d=+k.slice(8);
-      h+='<button type="button" class="sl-cd'+(k===selD?' sel':'')+(k===TODAY?' tdy':'')+(wd?'':' we')+(q>.55?' dk':'')+'" data-day="'+k+'"'+(fut?' disabled':'')+' style="--q:'+Math.round(q*100)+'%" title="'+dTxt(k)+(v.c||v.s||v.h?': звонков '+v.c+', назначено '+v.s+', проведено '+v.h:'')+(sold[k]?', продаж '+sold[k]:'')+'">'+
-        '<span class="sl-cn1">'+d+'</span>'+(v.c?'<b>'+v.c+'</b>':'')+'<span class="sl-cm">'+(sold[k]?'★':'')+(v.h?'<i>'+Array(Math.min(v.h,3)+1).join('•')+'</i>':'')+'</span></button>';
+      h+='<button type="button" class="sl-cd'+(k===selD?' sel':'')+(k===TODAY?' tdy':'')+(wd?'':' we')+(q>.55?' dk':'')+'" data-day="'+k+'"'+(fut?' disabled':'')+' style="--q:'+Math.round(q*100)+'%" title="'+dTxt(k)+(v.c||v.s||v.h||v.ra||v.rk?': звонков '+v.c+', назначено '+v.s+', проведено '+v.h+(v.ra||v.rk?', заявок РКО '+v.ra+', РКО '+v.rk:''):'')+(sold[k]?', продаж '+sold[k]:'')+'">'+
+        '<span class="sl-cn1">'+d+'</span>'+(v.c?'<b>'+v.c+'</b>':'')+'<span class="sl-cm">'+(sold[k]?'★':'')+(v.rk?'Р':'')+(v.h?'<i>'+Array(Math.min(v.h,3)+1).join('•')+'</i>':'')+'</span></button>';
     });
     return '<div class="box sl-cal"><div class="box-h"><span>По дням</span><small>норма ≈ '+Math.ceil(norm1)+' звонков в рабочий день</small></div><div class="sl-cg">'+DW.map(function(x){return '<span class="sl-cw">'+x+'</span>'}).join('')+h+'</div>'+
       '<p class="note">Число — звонки от 40 с, чем темнее, тем ближе к норме дня. Точки — проведённые встречи, ★ — продажа. Нажми на день, чтобы поправить его счётчики.</p></div>';
@@ -1020,11 +1056,11 @@ button.sl-hr:hover{background:var(--soft)}
   function histBox(){
     var ms=[],m=NOW;for(var i=0;i<6;i++){ms.push(m);m=mAdd(m,-1)}
     /* месяцы до первых записей не показываются */
-    var has=function(k){var s=mStat(k);return s.n||s.c||s.s||s.h};while(ms.length&&!has(ms[ms.length-1]))ms.pop();if(!ms.length||(ms.length===1&&!has(ms[0])))return '';
+    var has=function(k){var s=mStat(k);return s.n||s.c||s.s||s.h||s.ra||s.rk};while(ms.length&&!has(ms[ms.length-1]))ms.pop();if(!ms.length||(ms.length===1&&!has(ms[0])))return '';
     var P=F.plan,mx=Math.max(P.key,1);
-    return '<div class="box sl-hist"><div class="box-h"><span>По месяцам</span><small>план '+P.sales+' · ключевой '+P.key+'</small></div><div class="sl-hr hd"><span>Месяц</span><span>Продажи</span><span>Звонки</span><span>Назначено</span><span>Проведено</span><span>Сумма</span></div>'+
-      ms.map(function(k){var s=mStat(k),lv=s.n>=P.key?'key':s.n>=P.sales?'plan':'';
-        return '<button type="button" class="sl-hr" data-mgo="'+k+'"><span>'+mName(k)+'</span><span class="sl-hn"><i class="'+lv+'" style="width:'+Math.min(100,s.n/mx*100)+'%"></i><b>'+s.n+'</b>'+(lv==='key'?'<small>ключевой</small>':lv==='plan'?'<small>план</small>':'')+'</span><span>'+sp(s.c)+'</span><span>'+s.s+'</span><span>'+s.h+'</span><span>'+money(s.sum)+'</span></button>'}).join('')+'</div>';
+    return '<div class="box sl-hist"><div class="box-h"><span>По месяцам</span><small>план '+P.sales+' · ключевой '+P.key+'</small></div><div class="sl-hr hd"><span>Месяц</span><span>Продажи</span><span>Звонки</span><span>Назначено</span><span>Проведено</span><span>РКО</span><span>Сумма</span></div>'+
+      ms.map(function(k){var s=mStat(k),lv=s.n>=P.key?'key':planOk(k,s)?'plan':'';
+        return '<button type="button" class="sl-hr" data-mgo="'+k+'"><span>'+mName(k)+'</span><span class="sl-hn"><i class="'+lv+'" style="width:'+Math.min(100,s.n/mx*100)+'%"></i><b>'+s.n+'</b>'+(lv==='key'?'<small>ключевой</small>':lv==='plan'?'<small>план</small>':'')+'</span><span>'+sp(s.c)+'</span><span>'+s.s+'</span><span>'+s.h+'</span><span>'+(s.rk||s.ra?s.rk+' · '+s.ra+' заяв.':'—')+'</span><span>'+money(s.sum)+'</span></button>'}).join('')+'</div>';
   }
   /* ---------- подстраница «Продления»: база подписок, цель, рисковые месяцы, кому продлевать ---------- */
   function renderRen(){
@@ -1082,9 +1118,9 @@ button.sl-hr:hover{background:var(--soft)}
     var P=F.plan,gp=chain(P.sales),gk=chain(P.key);
     function f(k,lab,sub){return '<label class="sl-set-i"><span>'+lab+(sub?'<small>'+sub+'</small>':'')+'</span><input class="inp num" inputmode="numeric" data-pn="'+k+'" value="'+P[k]+'"></label>'}
     return '<div class="sec"><div class="set-h"><h2>Настройки</h2><button type="button" class="btn ghost" data-set-close>Готово</button></div>'+
-      '<div class="box"><div class="box-h"><span>План месяца</span></div>'+f('sales','Продаж для плана','закрыть план месяца')+f('key','Продаж для ключевого менеджера','уровень, к которому растёшь')+'</div>'+
-      '<div class="box"><div class="box-h"><span>Нормы воронки</span></div>'+f('cps','Звонков от 40 с на 1 назначенную встречу','')+f('sph','Назначенных на 1 проведённую','половина назначенных доходит до встречи — это 2')+f('hps','Проведённых на 1 продажу','')+
-        '<p class="note">План: '+gp.n+' '+plural(gp.n,'продажа','продажи','продаж')+' = '+gp.h+' проведённых = '+gp.s+' назначенных = '+sp(gp.c)+' звонков. Ключевой: '+gk.n+' = '+gk.h+' = '+gk.s+' = '+sp(gk.c)+'.</p></div>'+
+      '<div class="box"><div class="box-h"><span>План месяца</span></div>'+f('sales','Продаж для плана','закрыть план месяца')+f('key','Продаж для ключевого менеджера','уровень, к которому растёшь')+f('rko','РКО в месяц','открытые счета по плану')+'</div>'+
+      '<div class="box"><div class="box-h"><span>Нормы воронки</span></div>'+f('cps','Звонков от 40 с на 1 назначенную встречу','')+f('sph','Назначенных на 1 проведённую','половина назначенных доходит до встречи — это 2')+f('hps','Проведённых на 1 продажу','')+f('rpa','Заявок РКО на 1 открытый РКО','конверсия 1 к 3 — это 3')+
+        '<p class="note">План: '+gp.n+' '+plural(gp.n,'продажа','продажи','продаж')+' = '+gp.h+' проведённых = '+gp.s+' назначенных = '+sp(gp.c)+' звонков, плюс '+gp.rk+' РКО = '+gp.ra+' заявок из тех же звонков. Ключевой: '+gk.n+' = '+gk.h+' = '+gk.s+' = '+sp(gk.c)+'.</p></div>'+
       '<div class="box"><div class="box-h"><span>База подписок</span></div>'+
         '<label class="sl-set-i"><span>Цель базы<small>сколько платят все клиенты вместе каждый месяц</small></span><input class="inp num" inputmode="numeric" data-bn="goal" value="'+sp(F.base.goal)+'"></label>'+
         '<label class="sl-set-i"><span>За сколько месяцев продаж</span><input class="inp num" inputmode="numeric" data-bn="months" value="'+F.base.months+'"></label>'+
@@ -1471,7 +1507,7 @@ button.sl-hr:hover{background:var(--soft)}
     /* на пустом устройстве окно входа открывается само, если пароль уже задан */
     var u=syUser();if(fsCanLogin()&&!seenX&&fsBlank()&&!!u&&location.protocol==='https:')syVhFind(u).then(function(){if(fsCanLogin()&&(!syDlg||syDlg.hidden))syDlgOpen(true)},function(){});
   }
-  var UPD_NAME='prodazhi',UPD_BUILD='f5e1fe93cb';
+  var UPD_NAME='prodazhi',UPD_BUILD='cf2531a8d3';
   function updBusy(){return fsBusy||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
