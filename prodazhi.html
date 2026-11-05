@@ -759,6 +759,10 @@ button.sl-hr:hover{background:var(--soft)}
   .sl-ra{grid-column:1/-1;justify-content:flex-start}
   .sl-rf .inp,.sl-rf .inp.num{width:120px}
 }
+
+/* запуск 1-го числа */
+.sl-hs.sl-hs4{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sl-ln{display:block;color:var(--muted);font-size:calc(11px*var(--fz))}
 </style>
 </head>
 <body>
@@ -870,10 +874,19 @@ button.sl-hr:hover{background:var(--soft)}
   function firstM(){var m=NOW;Object.keys(F.sales).forEach(function(id){var x=F.sales[id];if(isO(x)&&/^\d{4}-\d\d/.test(x.d||'')&&x.d.slice(0,7)<m)m=x.d.slice(0,7)});return m}
   function subs(){return Object.keys(F.sales).map(function(id){var x=F.sales[id];if(isO(x))x.id=id;return x}).filter(function(x){return isO(x)&&/^\d{4}-\d\d-\d\d$/.test(x.d||'')&&num(x.mon)>0})}
   function sLen(x){return Math.round(num(x.n))||F.base.len}
-  function sM(x){return x.d.slice(0,7)}
+  /* запуск подписок — 1-го числа каждого месяца: продажа запускается с 1-го числа следующего месяца
+     (продажа 5 ноября → запуск 1 декабря → 6 месяцев: декабрь–май → продление к 1 июня).
+     Продление начинается с даты, которую вписали, если это 1-е число (по умолчанию — конец прежнего срока), иначе тоже с 1-го следующего */
+  function sM(x){var m=x.d.slice(0,7);return x.ren&&x.d.slice(8)==='01'?m:mAdd(m,1)}
+  function sStart(x){return sM(x)+'-01'}
   function sEndM(x){return mAdd(sM(x),sLen(x))}
-  /* срок кончается в тот же день через n месяцев (31 января + 1 месяц = 28 февраля) */
-  function sEnd(x){var d=dOf(x.d),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+sLen(x));d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return dKey(d)}
+  function sEnd(x){return sEndM(x)+'-01'}
+  function launchOf(d){return /^\d{4}-\d\d-\d\d$/.test(d||'')?mAdd(d.slice(0,7),1)+'-01':''}
+  /* цель: продажи за months месяцев с start; база считается в месяц запуска после последнего месяца продаж (ноябрь–март → 1 апреля) */
+  function bLast(){return mAdd(F.base.start,F.base.months-1)}
+  function bTarget(){return mAdd(F.base.start,F.base.months)}
+  function d1(M){return '1 '+MG[+M.slice(5)-1]+' '+M.slice(0,4)}
+  function mShort(M){return MN[+M.slice(5)-1]}
   function sOn(x,M){return sM(x)<=M&&M<sEndM(x)}
   function baseAt(M,L){var t=0;(L||subs()).forEach(function(x){if(sOn(x,M))t+=num(x.mon)});return t}
   function sState(x){return x.rn&&F.sales[x.rn]?'done':x.lost?'lost':sEnd(x)<TODAY?'late':'wait'}
@@ -908,7 +921,7 @@ button.sl-hr:hover{background:var(--soft)}
       '<div class="sl-prog" role="img" aria-label="Продаж '+st.n+': план '+P.sales+', ключевой '+P.key+'"><i style="width:'+Math.min(100,st.n/mx*100)+'%"></i><em style="left:'+(P.sales/mx*100)+'%"><small>план '+P.sales+'</small></em><em class="k" style="left:'+(P.key/mx*100)+'%"><small>ключевой '+P.key+'</small></em></div>'+
       '<p class="sl-st">'+(st.n>=P.key?'Уровень ключевого менеджера взят 🔥':st.n>=P.sales?'План закрыт. До ключевого: '+(P.key-st.n)+' '+plural(P.key-st.n,'продажа','продажи','продаж'):'До плана: '+(P.sales-st.n)+' '+plural(P.sales-st.n,'продажа','продажи','продаж')+', до ключевого: '+(P.key-st.n))+
         (fc!=null&&st.n?' · в этом темпе к концу месяца ≈ '+fc:'')+'</p></div>'+
-      '<div class="sl-hs"><div><small>Сумма продаж '+mIn(M)+'</small><b>'+money(st.sum)+'</b></div><div><small>Объём в месяц</small><b>'+money(st.mon)+'</b></div><div><small>Рабочих дней '+(cur?'осталось':'в месяце')+'</small><b>'+(cur?st.wdLeft:st.wd)+'</b></div><button type="button" class="sl-hb" data-go="ren"><small>База подписок →</small><b>'+shortR(baseAt(M))+' из '+shortR(F.base.goal)+'</b></button></div></div>';
+      '<div class="sl-hs"><div><small>Сумма продаж '+mIn(M)+'</small><b>'+money(st.sum)+'</b></div><div><small>Объём в месяц</small><b>'+money(st.mon)+'</b></div><div><small>Рабочих дней '+(cur?'осталось':'в месяце')+'</small><b>'+(cur?st.wdLeft:st.wd)+'</b></div><button type="button" class="sl-hb" data-go="ren"><small>База к '+d1(bTarget()).replace(/ \d{4}$/,'')+' →</small><b>'+shortR(baseAt(bTarget()))+' из '+shortR(F.base.goal)+'</b></button></div></div>';
     /* выбор цели */
     var goal='<div class="sl-goal"><span>Считать воронку под</span><div class="seg" role="group" aria-label="Цель месяца"><button type="button" data-goal="plan" aria-pressed="'+(P.goal!=='key')+'">план: '+P.sales+' '+plural(P.sales,'продажа','продажи','продаж')+'</button><button type="button" data-goal="key" aria-pressed="'+(P.goal==='key')+'">ключевого: '+P.key+'</button></div></div>';
     return hero+goal+(cur||selD.slice(0,7)===M?dayBox(st):'')+'<div class="sl-two">'+funnelBox(M,st,g)+calBox(M,g,st)+'</div>'+salesBox(M,st)+histBox();
@@ -976,9 +989,9 @@ button.sl-hr:hover{background:var(--soft)}
       '<label><small>Объём в месяц</small><input class="inp num" id="sf-mon" inputmode="decimal" placeholder="'+(auto.f==='mon'?sp(auto.v):'0')+'" value="'+(d.mon?sp(d.mon):'')+'"></label>'+
       '<label><small>Платежей</small><input class="inp num" id="sf-n" inputmode="numeric" placeholder="'+(auto.f==='n'?auto.v:F.base.len)+'" value="'+(d.n||'')+'"></label>'+
       '</div><div class="row"><button type="button" class="btn" data-sale-save>'+(e?'Сохранить':'Добавить продажу')+'</button>'+(e?'<button type="button" class="btn ghost" data-sale-cancel>Отмена</button>':'')+
-      '<small class="sl-auto" id="sf-auto">'+(auto.f?autoTxt(auto):'Впиши платёж в месяц — сумма посчитается на '+F.base.len+' месяцев. Или любые два из трёх чисел.')+'</small></div></div>';
+      '<small class="sl-auto" id="sf-auto">'+fHint(d.d||TODAY,auto)+'</small></div></div>';
     var list=st.list.length?'<div class="sl-sl"><div class="sl-sr hd"><span>Дата</span><span>Компания</span><span>Сумма</span><span>В месяц</span><span>Платежей</span><span></span></div>'+
-      st.list.map(function(x){var del=askDel===x.id;return '<div class="sl-sr'+(x.id===editId?' ed':'')+'"><span>'+dTxt(x.d)+'</span><span class="co">'+esc(x.co||'—')+(x.ren?' <i class="sl-tag">продление</i>':'')+'</span><span>'+money(x.sum)+'</span><span>'+money(x.mon)+'</span><span>'+(num(x.n)||'—')+'</span>'+
+      st.list.map(function(x){var del=askDel===x.id;return '<div class="sl-sr'+(x.id===editId?' ed':'')+'"><span>'+dTxt(x.d)+'<small class="sl-ln">запуск '+dTxt(sStart(x))+'</small></span><span class="co">'+esc(x.co||'—')+(x.ren?' <i class="sl-tag">продление</i>':'')+'</span><span>'+money(x.sum)+'</span><span>'+money(x.mon)+'</span><span>'+(num(x.n)||'—')+'</span>'+
         '<span class="act"><button type="button" class="g-x" data-sale-ed="'+x.id+'">изменить</button><button type="button" class="g-x'+(del?' red':'')+'" data-sale-del="'+x.id+'">'+(del?'точно удалить?':'×')+'</button></span></div>'}).join('')+
       '<div class="sl-sr tot"><span>Итого</span><span>'+st.n+' '+plural(st.n,'продажа','продажи','продаж')+(st.rn?' + '+st.rn+' '+plural(st.rn,'продление','продления','продлений'):'')+'</span><span>'+money(st.sum)+'</span><span>'+money(st.mon)+'</span><span></span><span></span></div></div>':'<p class="note">'+(M===NOW?'Продаж в этом месяце пока нет. Первая — через форму выше или кнопку «+ Продажа».':'Продаж '+mIn(M)+' нет.')+'</p>';
     return '<div class="box sl-sales"><div class="box-h"><span>Продажи '+mIn(M)+'</span><small>'+st.n+' из '+F.plan.sales+' по плану</small></div>'+form+list+'</div>';
@@ -994,6 +1007,7 @@ button.sl-hr:hover{background:var(--soft)}
     if(s&&!m&&!n)return{f:'mon',v:Math.round(s/L),n:L};
     return{f:''};
   }
+  function fHint(d,a){var l=launchOf(d);return(l?'Запуск подписки — '+dTxt(l)+'. ':'')+(a.f?autoTxt(a):'Впиши платёж в месяц — сумма посчитается на '+F.base.len+' месяцев. Или любые два из трёх чисел.')}
   function autoTxt(a){return(a.f==='sum'?'Общая сумма посчитается: '+money(a.v):a.f==='mon'?'Объём в месяц посчитается: '+money(a.v):'Платежей посчитается: '+a.v)+(a.n?' ('+a.n+' '+plural(a.n,'платёж','платежа','платежей')+' — обычный срок подписки)':'')}
   /* по месяцам: видно, как часто закрывается план и уровень ключевого */
   function histBox(){
@@ -1007,18 +1021,20 @@ button.sl-hr:hover{background:var(--soft)}
   }
   /* ---------- подстраница «Продления»: база подписок, цель, рисковые месяцы, кому продлевать ---------- */
   function renderRen(){
-    var B=F.base,L=subs(),st=B.start,dl=mAdd(st,B.months-1),cur=baseAt(NOW,L),atDl=baseAt(dl,L),left=Math.max(0,B.goal-atDl);
-    var mLeft=NOW>dl?0:mDiff(NOW,dl)+1,nw=L.filter(function(x){return !x.ren}),avg=nw.length?nw.reduce(function(a,x){return a+num(x.mon)},0)/nw.length:0;
+    var B=F.base,L=subs(),st=B.start,last=bLast(),dl=bTarget(),cur=baseAt(NOW,L),atDl=baseAt(dl,L),left=Math.max(0,B.goal-atDl),nx=mAdd(NOW,1);
+    var mLeft=NOW>last?0:mDiff(NOW<st?st:NOW,last)+1,nw=L.filter(function(x){return !x.ren}),avg=nw.length?nw.reduce(function(a,x){return a+num(x.mon)},0)/nw.length:0;
     var perM=mLeft?left/mLeft:0,chk=avg||B.goal/B.months/F.plan.sales,perN=perM?Math.ceil(perM/chk):0;
-    var el=NOW<st?0:Math.min(B.months,mDiff(st,NOW)+1),exp=B.goal*el/B.months,behind=el&&cur<exp*.9&&NOW<=dl;
-    var mx=Math.max(B.goal,cur,1),now=bRow(NOW,L);
-    var hero='<div class="sl-hero"><div class="sl-hm"><div class="sl-ml sl-ml0"><b>База подписок '+mIn(NOW)+'</b></div>'+
-      '<div class="sl-big"><b>'+shortR(cur)+'</b><span>₽ в месяц из '+shortR(B.goal)+'</span></div>'+
-      '<div class="sl-prog" role="img" aria-label="База '+money(cur)+' из '+money(B.goal)+'"><i style="width:'+Math.min(100,cur/mx*100)+'%"></i>'+(el&&el<B.months?'<em style="left:'+(exp/mx*100)+'%"><small>по графику '+shortR(exp)+'</small></em>':'')+'<em class="k" style="left:'+(B.goal/mx*100)+'%"><small>цель к '+MD[+dl.slice(5)-1]+'</small></em></div>'+
-      '<p class="sl-st">'+(atDl>=B.goal?'Цель обеспечена: к '+mTo(dl)+' база '+money(atDl)+' 🔥':NOW>dl?'Срок цели прошёл: к '+mTo(dl)+' было '+money(atDl)+'.':
-        'К '+mTo(dl)+' уже обеспечено '+money(atDl)+'. Осталось '+money(left)+' за '+mLeft+' '+plural(mLeft,'месяц','месяца','месяцев')+': ≈ <b>'+money(perM)+'</b> новой базы в месяц — это ≈ '+perN+' '+plural(perN,'продажа','продажи','продаж')+' по '+money(chk)+(avg?' (твой средний чек)':' (если по '+F.plan.sales+' в месяц)')+'.')+
-        (behind?' <span class="sl-bad">Отстаёшь от графика: к концу '+MG[+NOW.slice(5)-1]+' нужно '+money(exp)+'.</span>':'')+'</p></div>'+
-      '<div class="sl-hs"><div><small>Новая база '+mIn(NOW)+'</small><b>+'+money(now.nw)+'</b></div><div><small>Кончается срок '+mIn(NOW)+'</small><b>'+money(now.due)+'</b></div><div><small>Средний чек в месяц</small><b>'+(avg?money(avg):'—')+'</b></div></div></div>';
+    /* график: к концу каждого месяца продаж обеспечена своя доля цели; красным — если не дотянул даже до прошлого месяца */
+    var el=NOW<st?0:Math.min(B.months,mDiff(st,NOW)+1),exp=B.goal*el/B.months,prevExp=B.goal*(el-1)/B.months,behind=el>1&&atDl<prevExp*.9&&NOW<=last;
+    var mx=Math.max(B.goal,atDl,1),launchNx=0,dueNx=bRow(nx,L).due;L.forEach(function(x){if(sM(x)===nx)launchNx+=num(x.mon)});
+    var hero='<div class="sl-hero"><div class="sl-hm"><div class="sl-ml sl-ml0"><b>База к '+d1(dl)+'</b></div>'+
+      '<div class="sl-big"><b>'+shortR(atDl)+'</b><span>₽ в месяц из '+shortR(B.goal)+'</span></div>'+
+      '<div class="sl-prog" role="img" aria-label="Обеспечено '+money(atDl)+' из '+money(B.goal)+'"><i style="width:'+Math.min(100,atDl/mx*100)+'%"></i>'+(el&&el<B.months?'<em style="left:'+(exp/mx*100)+'%"><small>к концу '+MG[+NOW.slice(5)-1]+' '+shortR(exp)+'</small></em>':'')+'<em class="k" style="left:'+(B.goal/mx*100)+'%"><small>цель</small></em></div>'+
+      '<p class="sl-st">Продажи '+MG[+st.slice(5)-1]+'–'+MG[+last.slice(5)-1]+' запускаются 1-го числа следующего месяца и все платят в '+MP[+dl.slice(5)-1]+'. '+
+        (atDl>=B.goal?'Цель обеспечена: '+money(atDl)+' в месяц 🔥':NOW>last?'Месяцы продаж под цель закончились: обеспечено '+money(atDl)+'.':
+        'Обеспечено '+money(atDl)+', осталось '+money(left)+' за '+mLeft+' '+plural(mLeft,'месяц','месяца','месяцев')+' продаж: ≈ <b>'+money(perM)+'</b> новой базы в месяц — это ≈ '+perN+' '+plural(perN,'продажа','продажи','продаж')+' по '+money(chk)+(avg?' (твой средний чек)':' (если по '+F.plan.sales+' в месяц)')+'.')+
+        (behind?' <span class="sl-bad">Отстаёшь от графика: к концу '+MG[+mAdd(NOW,-1).slice(5)-1]+' нужно было '+money(prevExp)+'.</span>':'')+'</p></div>'+
+      '<div class="sl-hs sl-hs4"><div><small>Платят '+mIn(NOW)+'</small><b>'+money(cur)+'</b></div><div><small>Запуск '+d1(nx).replace(/ \d{4}$/,'')+'</small><b>+'+money(launchNx)+'</b></div><div><small>Продлить к '+d1(nx).replace(/ \d{4}$/,'')+'</small><b>'+money(dueNx)+'</b></div><div><small>Средний чек в месяц</small><b>'+(avg?money(avg):'—')+'</b></div></div></div>';
     /* окно на год: от начала цели (или полгода назад) */
     var w0=st<mAdd(NOW,-5)?mAdd(NOW,-5):st,ms=[];for(var i=0;i<12;i++)ms.push(mAdd(w0,i));
     var rows=ms.map(function(M){var r=bRow(M,L);r.pot=potAt(M,L);return r});
@@ -1028,10 +1044,10 @@ button.sl-hr:hover{background:var(--soft)}
         return '<div class="sl-bcol'+(r.risk?' risk':'')+(r.M===dl?' dl':'')+(r.M===NOW?' now':'')+'" title="'+mName(r.M)+': платят '+money(r.base)+(r.pot?', если продлят ещё +'+money(r.pot):'')+(r.due?'; кончается срок у '+r.dueN+' на '+money(r.due)+' ('+pct(r.share)+' базы)':'')+'">'+
           '<div class="sl-bv">'+(r.base?shortR(r.base):'')+'</div><div class="sl-bw"><i class="b" style="height:'+(r.base/top*100)+'%"></i><i class="p" style="height:'+(r.pot/top*100)+'%"></i><u style="bottom:'+(B.goal/top*100)+'%"></u></div>'+
           '<div class="sl-bm">'+MN[+r.M.slice(5)-1].slice(0,3)+(r.M.slice(5)==='01'?'<em> '+r.M.slice(2,4)+'</em>':'')+'</div><div class="sl-br">'+(r.risk?'<em>⚠ </em>'+pct(r.share):r.due?pct(r.share):'')+'</div></div>'}).join('')+'</div>'+
-      '<p class="note">Рисковый месяц — когда у подписок кончается срок больше чем на '+B.risk+'% базы прошлого месяца: если не продлят, база просядет сильнее чем на четверть. Под столбцом — доля продлений. Пунктир — цель '+money(B.goal)+' к '+mTo(dl)+'.</p></div>';
+      '<p class="note">Подписки запускаются 1-го числа: продажа этого месяца начинает платить со следующего. Рисковый месяц — когда к его 1-му числу кончается срок у подписок больше чем на '+B.risk+'% базы прошлого месяца: если не продлят, база просядет сильнее чем на четверть. Под столбцом — доля продлений. Пунктир — цель '+money(B.goal)+', месяц цели в рамке.</p></div>';
     var risky=rows.filter(function(r){return r.risk&&r.M>=NOW});
     var warn=risky.length?'<div class="banner">Рисковые месяцы: '+risky.map(function(r){return '<b>'+mName(r.M).toLowerCase()+'</b> — продлений на '+money(r.due)+', '+pct(r.share)+' базы'}).join('; ')+'. Начни разговор о продлении за месяц до срока и старайся, чтобы новые продажи не скапливались в одном месяце.</div>':'';
-    var tbl='<div class="box sl-bt"><div class="box-h"><span>По месяцам</span><small>риск — продлений больше '+B.risk+'% базы</small></div><div class="sl-tr hd"><span>Месяц</span><span>Платят</span><span>+ Новые</span><span>+ Продлили</span><span>Кончается срок</span><span>Доля</span></div>'+
+    var tbl='<div class="box sl-bt"><div class="box-h"><span>По месяцам</span><small>риск — продлений больше '+B.risk+'% базы</small></div><div class="sl-tr hd"><span>Месяц</span><span>Платят</span><span>+ Запуск новых</span><span>+ Продлили</span><span>Кончается срок</span><span>Доля</span></div>'+
       rows.map(function(r){return '<div class="sl-tr'+(r.risk?' risk':'')+(r.M===NOW?' now':'')+'"><span>'+mName(r.M)+(r.M===dl?' <i class="sl-tag">цель</i>':'')+'</span><span>'+money(r.base)+'</span><span>'+(r.nw?'+'+money(r.nw,1)+' · '+r.nwN:'')+'</span><span>'+(r.rn?'+'+money(r.rn,1)+' · '+r.rnN:'')+'</span><span>'+(r.due?money(r.due,1)+' · '+r.dueN:'')+'</span><span>'+(r.due?(r.risk?'⚠ ':'')+pct(r.share):'')+'</span></div>'}).join('')+'</div>';
     return hero+warn+chart+renList(L)+tbl;
   }
@@ -1042,13 +1058,13 @@ button.sl-hr:hover{background:var(--soft)}
     pend.sort(function(a,b){return sEnd(a)<sEnd(b)?-1:1});done.sort(function(a,b){return sEnd(a)<sEnd(b)?1:-1});
     function row(x){
       var st=sState(x),e=sEnd(x),r=st==='done'?F.sales[x.rn]:null,open=renOpen===x.id;
-      var act=st==='done'?'<span class="sl-ok">продлил до '+dTxt(sEnd(r))+'</span><button type="button" class="g-x" data-ren-undo="'+x.id+'">отменить</button>':
+      var act=st==='done'?'<span class="sl-ok">продлил: до '+dTxt(sEnd(r))+'</span><button type="button" class="g-x" data-ren-undo="'+x.id+'">отменить</button>':
         st==='lost'?'<span class="sl-lost">не продлил</span><button type="button" class="g-x" data-ren-undo="'+x.id+'">вернуть</button>':
         '<button type="button" class="btn" data-ren-open="'+x.id+'">Продлил</button><button type="button" class="btn ghost" data-ren-lost="'+x.id+'">Не продлил</button>';
-      var form=open?'<div class="sl-rf"><label><small>С какого числа</small><input class="inp" type="date" id="rn-d" value="'+esc(renDraft.d)+'"></label><label><small>В месяц</small><input class="inp num" id="rn-mon" inputmode="decimal" value="'+sp(renDraft.mon)+'"></label><label><small>Месяцев</small><input class="inp num" id="rn-n" inputmode="numeric" value="'+renDraft.n+'"></label>'+
+      var form=open?'<div class="sl-rf"><label><small>Запуск продления</small><input class="inp" type="date" id="rn-d" value="'+esc(renDraft.d)+'"></label><label><small>В месяц</small><input class="inp num" id="rn-mon" inputmode="decimal" value="'+sp(renDraft.mon)+'"></label><label><small>Месяцев</small><input class="inp num" id="rn-n" inputmode="numeric" value="'+renDraft.n+'"></label>'+
         '<div class="row"><button type="button" class="btn" data-ren-save="'+x.id+'">Сохранить продление</button><button type="button" class="btn ghost" data-ren-x>Отмена</button></div></div>':'';
-      return '<div class="sl-rr'+(st==='late'?' late':'')+(open?' open':'')+'"><div class="sl-rc"><b>'+esc(x.co||'—')+'</b><small>'+(x.ren?'продление · ':'')+'с '+dTxt(x.d)+' на '+sLen(x)+' '+plural(sLen(x),'месяц','месяца','месяцев')+'</small></div>'+
-        '<div class="sl-rd'+(st==='late'?' bad':'')+'">'+(st==='late'?'срок прошёл ':'до ')+dTxt(e)+'</div><div class="sl-rm">'+money(x.mon)+'<small>в месяц</small></div><div class="sl-ra">'+act+'</div>'+form+'</div>';
+      return '<div class="sl-rr'+(st==='late'?' late':'')+(open?' open':'')+'"><div class="sl-rc"><b>'+esc(x.co||'—')+'</b><small>'+(x.ren?'продление':'продажа '+dTxt(x.d))+' · запуск '+dTxt(sStart(x))+' на '+sLen(x)+' '+plural(sLen(x),'месяц','месяца','месяцев')+'</small></div>'+
+        '<div class="sl-rd'+(st==='late'?' bad':'')+'">'+(st==='late'?'срок кончился ':st==='wait'?'продлить к ':'срок был ')+dTxt(e)+'</div><div class="sl-rm">'+money(x.mon)+'<small>в месяц</small></div><div class="sl-ra">'+act+'</div>'+form+'</div>';
     }
     var h='<div class="box sl-ren"><div class="box-h"><span>Продления</span><small>'+(pend.length?'ждут решения: '+pend.length+' на '+money(pend.reduce(function(a,x){return a+num(x.mon)},0))+' в месяц':'ближайшие три месяца')+'</small></div>';
     if(!pend.length&&!done.length)return h+'<p class="note">'+(L.length?'В ближайшие три месяца сроки не кончаются.':'Пока нет подписок. Впиши продажи на вкладке «Воронка»: дату, компанию, платёж в месяц и число месяцев (по умолчанию '+F.base.len+').')+'</p></div>';
@@ -1064,8 +1080,8 @@ button.sl-hr:hover{background:var(--soft)}
         '<p class="note">План: '+gp.n+' '+plural(gp.n,'продажа','продажи','продаж')+' = '+gp.h+' проведённых = '+gp.s+' назначенных = '+sp(gp.c)+' звонков. Ключевой: '+gk.n+' = '+gk.h+' = '+gk.s+' = '+sp(gk.c)+'.</p></div>'+
       '<div class="box"><div class="box-h"><span>База подписок</span></div>'+
         '<label class="sl-set-i"><span>Цель базы<small>сколько платят все клиенты вместе каждый месяц</small></span><input class="inp num" inputmode="numeric" data-bn="goal" value="'+sp(F.base.goal)+'"></label>'+
-        '<label class="sl-set-i"><span>За сколько месяцев</span><input class="inp num" inputmode="numeric" data-bn="months" value="'+F.base.months+'"></label>'+
-        '<label class="sl-set-i"><span>С какого месяца<small>цель к '+mTo(mAdd(F.base.start,F.base.months-1))+'</small></span><input class="inp" type="month" data-bstart value="'+F.base.start+'"></label>'+
+        '<label class="sl-set-i"><span>За сколько месяцев продаж</span><input class="inp num" inputmode="numeric" data-bn="months" value="'+F.base.months+'"></label>'+
+        '<label class="sl-set-i"><span>С какого месяца продаж<small>продажи '+mName(F.base.start).toLowerCase()+' – '+mName(bLast()).toLowerCase()+', цель — база к '+d1(bTarget())+'</small></span><input class="inp" type="month" data-bstart value="'+F.base.start+'"></label>'+
         '<label class="sl-set-i"><span>Обычный срок подписки, месяцев<small>подставляется, если число платежей не вписано</small></span><input class="inp num" inputmode="numeric" data-bn="len" value="'+F.base.len+'"></label>'+
         '<label class="sl-set-i"><span>Рисковый месяц, если продлений больше, %</span><input class="inp num" inputmode="numeric" data-bn="risk" value="'+F.base.risk+'"></label></div>'+
       '<div class="box"><div class="box-h"><span>Рабочие дни</span></div><div class="chips">'+DW.map(function(x,i){return '<button type="button" class="chip" data-wd="'+(i+1)+'" aria-pressed="'+(P.wd.indexOf(i+1)>=0)+'">'+x+'</button>'}).join('')+'</div><p class="note">По ним считается норма на день и темп месяца.</p></div>'+
@@ -1100,7 +1116,7 @@ button.sl-hr:hover{background:var(--soft)}
     var a=saleAuto(d);if(a.f)d[a.f]=a.v;if(a.n)d.n=a.n;
     var o={d:d.d,co:d.co.slice(0,80),sum:Math.round(num(d.sum)),mon:Math.round(num(d.mon)),n:Math.round(num(d.n))},id=editId||nid('s'),was=!!editId;
     F.sales[id]=o;editId='';draft={d:TODAY};viewM=o.d.slice(0,7);save();render();
-    var st=mStat(viewM);toast((was?'Продажа исправлена':'Продажа записана: '+o.co)+'. '+mName(viewM)+': '+st.n+' из '+F.plan.sales+(st.n>=F.plan.key?' — уровень ключевого!':st.n===F.plan.sales?' — план закрыт!':''));
+    var st=mStat(viewM);toast((was?'Продажа исправлена':'Продажа записана: '+o.co+', запуск '+dTxt(launchOf(o.d)))+'. '+mName(viewM)+': '+st.n+' из '+F.plan.sales+(st.n>=F.plan.key?' — уровень ключевого!':st.n===F.plan.sales?' — план закрыт!':''));
   }
   view.addEventListener('click',function(e){
     var t=e.target,b;
@@ -1128,7 +1144,7 @@ button.sl-hr:hover{background:var(--soft)}
   });
   view.addEventListener('input',function(e){
     var t=e.target;
-    if(/^sf-(sum|mon|n)$/.test(t.id)){readForm();var a=saleAuto(draft),o=$('sf-auto');if(o)o.textContent=a.f?autoTxt(a):'Впиши платёж в месяц — сумма посчитается на '+F.base.len+' месяцев. Или любые два из трёх чисел.';['sum','mon','n'].forEach(function(k){var x=$('sf-'+k);if(x)x.placeholder=a.f===k?(k==='n'?a.v:sp(a.v)):k==='n'?F.base.len:'0'})}
+    if(/^sf-(sum|mon|n)$/.test(t.id)){readForm();var a=saleAuto(draft),o=$('sf-auto');if(o)o.textContent=fHint(draft.d,a);['sum','mon','n'].forEach(function(k){var x=$('sf-'+k);if(x)x.placeholder=a.f===k?(k==='n'?a.v:sp(a.v)):k==='n'?F.base.len:'0'})}
   });
   view.addEventListener('change',function(e){
     var t=e.target,d=t.dataset;
@@ -1138,7 +1154,7 @@ button.sl-hr:hover{background:var(--soft)}
     if(d.bstart!=null){if(/^\d{4}-\d\d$/.test(t.value)){F.base.start=t.value;save()}render();return}
     if(d.cur!=null){var c=t.value.trim().slice(0,4);if(c){F.cur=c;save()}render();return}
     if(/^sf-(sum|mon)$/.test(t.id)){var n=parseNum(t.value);t.value=n?sp(n):''}
-    if(t.id==='sf-d'||t.id==='sf-co'){readForm()}
+    if(t.id==='sf-d'||t.id==='sf-co'){readForm();var ho=$('sf-auto');if(ho)ho.textContent=fHint(draft.d,saleAuto(draft))}
     if(t.id==='imp-file'&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var o=JSON.parse(String(fr.result));if(!isO(o)||o.v!==1||!isO(o.sales))throw 0;F=norm(o);save();render();toast('Записи загружены из файла.')}catch(_){toast('Это не файл продаж.')}};fr.readAsText(t.files[0])}
   });
   view.addEventListener('keydown',function(e){
@@ -1448,7 +1464,7 @@ button.sl-hr:hover{background:var(--soft)}
     /* на пустом устройстве окно входа открывается само, если пароль уже задан */
     var u=syUser();if(fsCanLogin()&&!seenX&&fsBlank()&&!!u&&location.protocol==='https:')syVhFind(u).then(function(){if(fsCanLogin()&&(!syDlg||syDlg.hidden))syDlgOpen(true)},function(){});
   }
-  var UPD_NAME='prodazhi',UPD_BUILD='48c3aa90d9';
+  var UPD_NAME='prodazhi',UPD_BUILD='746b04d08e';
   function updBusy(){return fsBusy||(!!syDlg&&!syDlg.hidden)}
   function updFlush(){try{localStorage.setItem(LSK,JSON.stringify(F))}catch(_){}}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
