@@ -358,6 +358,23 @@ h1{margin:10px 0 0;font-family:var(--display);font-weight:300;font-size:clamp(28
 .sug li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sug li small{color:var(--muted)}
 
+/* ---------- Книги ---------- */
+#view-books{grid-template-rows:auto minmax(0,1fr);gap:14px}
+.g-t.b-t{grid-template-columns:44px minmax(220px,1.25fr) minmax(220px,1.3fr) minmax(190px,1fr) 150px minmax(210px,1.2fr);min-width:1120px}
+.b-t>*{align-items:flex-start;padding-block:8px}
+.b-t>.g-h{align-items:center}
+.b-hl{font-size:calc(12px*var(--fz));letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:2px 4px}
+.b-t .b-n{color:var(--muted);font-variant-numeric:tabular-nums;padding-top:14px;justify-content:center}
+.b-c{flex:1;min-width:0;display:grid;gap:3px;padding:6px 0;line-height:1.4}
+.b-c small{color:var(--muted);font-size:calc(12px*var(--fz))}
+.b-c a{color:inherit}
+.b-t .tag{margin-top:4px}
+.bk-lock{max-width:460px;width:100%;margin:6vh auto 0;align-self:start}
+.bk-lock h2{margin:0;font-size:calc(18px*var(--fz))}
+.bk-lock p{margin:0;color:var(--muted);line-height:1.5}
+.bk-lock .row{display:flex;gap:8px}
+.bk-lock .row .inp{flex:1}
+
 /* ---------- Отчёт ---------- */
 #view-report{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:22px clamp(20px,3vw,48px);overflow:auto;align-content:start}
 .sum{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;align-items:start;border-bottom:1px solid var(--line)}
@@ -863,6 +880,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   <main class="view" id="view-food" hidden></main>
   <main class="view" id="view-goals" hidden></main>
   <main class="view" id="view-diary" hidden></main>
+  <main class="view" id="view-books" hidden></main>
   <main class="view" id="view-report" hidden></main>
   <main class="view" id="view-settings" hidden>
     <nav class="s-nav" id="s-nav" aria-label="Разделы настроек"></nav>
@@ -1062,14 +1080,14 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 
   /* ---------- state ---------- */
   var now=new Date(),nowM=mk(now);
-  var months={},series={},goals={},diary={},plans={},sites=[],seen={},snap={},budget=120,hideDemo=true,loaded=false,db=null,dishes={};
+  var months={},series={},goals={},diary={},plans={},sites=[],seen={},snap={},bk={},bkKey='',budget=120,hideDemo=true,loaded=false,db=null,dishes={};
   var SLEEP_H={id:'hs',n:'Сон, часы',s:'sleep',type:'hours'};
   var habits=[{id:'en',n:'Энергия',s:'other',type:'score'},SLEEP_H,{id:'h1',n:'Лёг до 00:00',s:'sleep',type:'time',lim:1440},{id:'hback',n:'Экстензия / растяжка',s:'fitness',type:'check',en:'b'},{id:'huse',n:'Полезные дела',s:'other',type:'check',en:'u'},{id:'h2',n:'Заполнил КБЖУ',s:'other',type:'check'},{id:'h3',n:'Откладывал дела',s:'other',type:'count'}];
   /* настройки по умолчанию; всё, что меняется в «Настройках», лежит в этих объектах и сохраняется вместе с записями */
   var UI0={theme:'light',accent:'ink',sat:1,font:'onest',dfont:'unbounded',fz:1};
   var CAL0={hh:46,start:7.5,snap:15,view:'week',dur:30,side:1,chips:1,we:1,info:1,tick:1,ding:1,dvol:2};
   var REP0={mode:'month',months:6,wheel:1,empty:1,autoW:0,autoM:1,s1:1,s2:1,s3:1,s4:1,s5:1};
-  var SEC0={habits:1,goals:1,diary:1,report:1},FEAT0={gh:'off',links:1},GS0={url:'',key:'',on:0,show:1,cals:{},hid:{},src:'',cid:''};
+  var SEC0={habits:1,goals:1,diary:1,books:1,report:1},FEAT0={gh:'off',links:1},GS0={url:'',key:'',on:0,show:1,cals:{},hid:{},src:'',cid:''};
   var FOOD0={on:1,inHabits:1,c:'#B9C45E',rk:1,rp:1,rf:1,rc:1,rm:1,nk:0,np:0,nf:0,nc:0,mfix:0,meals:['Завтрак','Обед','Перекус','Ужин']};
   /* энергия: утренний вопрос и пороги опор (еда, сон, часы полезных дел и их сферы) */
   var EN0={ask:1,kcal:2200,sleep:8,use:2,us:['crypto','growth','creative','work']};
@@ -1088,7 +1106,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function dump(){return{at:Date.now(),demo:EXAMPLE?1:0,gcid:gCid(),months:months,series:series,goals:goals,diary:diary,dishes:dishes,set:setBody()}}
   function lsSave(){try{localStorage.setItem(LSK,JSON.stringify(dump()));return true}catch(_){return false}}
   function applyAll(raw){months=raw.months||{};series=raw.series||{};goals=raw.goals||{};diary=raw.diary||{};dishes=raw.dishes||{};normDishes();applySettings(raw.set)}
-  function setBody(){return{v:8,budget:budget,plans:plans,hideDemo:hideDemo,habits:habits,sites:sites,seen:seen,snap:snap,spheres:sphBody(),ui:ui,cal:calS,gcal:gcalOn,rep:repS,sec:sec,feat:feat,food:food,gs:gs,en:enS}}
+  function setBody(){var o={v:8,budget:budget,plans:plans,hideDemo:hideDemo,habits:habits,sites:sites,seen:seen,snap:snap,spheres:sphBody(),ui:ui,cal:calS,gcal:gcalOn,rep:repS,sec:sec,feat:feat,food:food,gs:gs,en:enS,bk:bk};if(bkKey)o.bkk=bkKey;return o}
   function bodyOf(k){if(k==='@set')return setBody();if(k==='@ser')return{items:series};if(k==='@goals')return{items:goals};if(k==='@diary')return{items:diary};if(k.indexOf('dish:')===0)return dishes[k.slice(5)]||null;var m=months[k]||{};return{events:m.events||{},habits:m.habits||{},food:m.food||{}}}
   function pathOf(k){return k==='@set'?'settings/main':k==='@ser'?'settings/series':k==='@goals'?'settings/goals':k==='@diary'?'settings/diary':k.indexOf('dish:')===0?'dishes/'+k.slice(5):'months/'+k}
   /* автосохранение: каждое изменение сразу уходит в хранилище страницы или в память браузера, а оттуда в файл */
@@ -1137,6 +1155,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(Array.isArray(d.sites))sites=d.sites.filter(function(x){return x&&x.u});
     else if(d.links)sites=Object.keys(d.links).filter(function(k){return SPI[k]!=null}).map(function(k){return{n:SP[SPI[k]].n,u:d.links[k]}});
     seen=d.seen||{};snap=d.snap||{};
+    /* книги: статус, вывод и «к чему у меня», выставленные на странице, и ключ закрытого раздела; если в сохранении их нет, ничего не стираем */
+    if(d.bk&&typeof d.bk==='object'&&!Array.isArray(d.bk))bk=d.bk;
+    if(typeof d.bkk==='string'&&/^[A-Za-z0-9_-]{43}$/.test(d.bkk))bkKey=d.bkk;
   }
   function clone(o){return JSON.parse(JSON.stringify(o||{}))}
   /* ---------- заслонка: на странице в Claude пустой сайт вместо записей не показывается ----------
@@ -2260,6 +2281,111 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(b){var ev=EVM[b.dataset.sg];if(ev){addDiary(ev.t,new Date(ev.a),ev.s,ev.id);renderDiary(true)}return}
     b=t.closest('[data-dx]');
     if(b){var id=b.dataset.dx;if(dDel!==id){dDel=id;renderDiary(true);return}delete diary[id];dDel=null;if(dSpot===id)dSpot=null;persist('@diary');renderDiary(true)}
+  });
+
+  /* ---------- Книги (14.11): что прочитать и к чему это у меня ----------
+     Раздел закрытый. Список лежит в коде только зашифрованным (BK_ENC, AES-GCM, ключ 256 бит): в открытом репозитории его не прочитать.
+     Ключ хранится в настройках владельца (bkk) и приходит на его устройства вместе с остальными записями после входа по паролю.
+     Первый раз ключ вносится ссылкой вида …/#bk=ключ или вставкой в поле раздела; ссылка сразу убирается из адресной строки.
+     Без входа по паролю раздел показывает только замок, даже если ключ на устройстве уже есть.
+     Статус, вывод и «к чему в моём случае» меняются прямо на странице и лежат в bk рядом с остальными настройками.
+     У каждого поля есть время правки: на странице — sa / na / ra в bk, в списке — те же поля у книги (миллисекунды).
+     Показывается то, что поменяли позже: статус, выставленный в списке с новым sa, заменит выбранный на странице, и наоборот. */
+  var BK_ENC={iv:'ya+L7M4WrHU9m1hO',
+    ct:'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'};
+  var BOOKS=null,BOOKM={},bkFor='',bkBusy=false,bkErr='',bkDraft='';
+  var BK_RE=/[#&]bk=([A-Za-z0-9_-]{43})(?=&|$)/;
+  /* ссылка с ключом: ключ запоминается до загрузки записей, а из адреса убирается сразу */
+  var bkPend=(function(){var m=BK_RE.exec(location.hash||'');return m?m[1]:''})();
+  if(bkPend){try{history.replaceState(history.state,'',location.pathname+location.search+'#books')}catch(_){}}
+  window.addEventListener('hashchange',function(){
+    var m=BK_RE.exec(location.hash||'');if(!m)return;
+    bkPend=m[1];try{history.replaceState(history.state,'',location.pathname+location.search+'#books')}catch(_){}
+    if(sec.books)setTab('books');
+  });
+  var BST=[['todo','Не начато',260,.1],['read','Читаю',95,1],['done','Прочитано',150,1]];
+  BST.forEach(function(x){x[4]=oklchHex(.78,.135*x[3],x[2])});
+  /* поле книги → поле со временем правки */
+  var BKT={st:'sa',nt:'na',r:'ra'};
+  function bkGet(b,f){
+    var u=bk[b.id]||{},k=BKT[f],v=(u[k]||0)>(b[k]||0)&&u[f]!=null?u[f]:b[f];
+    if(f==='st')return rank(BST,v)<9?v:'todo';
+    return v==null?'':String(v);
+  }
+  /* вошёл ли владелец: внутри Claude — всегда, на своём адресе — если на устройстве есть вход по паролю */
+  function bkIn(){
+    if(EXAMPLE)return false;if(db)return true;if(!syCan())return false;if(sy)return syOn();
+    try{var o=JSON.parse(localStorage.getItem(SYK)||'null');return !!(o&&o.tok)}catch(_){return false}
+  }
+  function bkU8(s){s=String(s).replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+  function bkOpen(){
+    if(bkBusy||!bkKey||bkFor===bkKey)return;
+    var key=bkKey;bkErr='';
+    if(!(window.crypto&&crypto.subtle&&window.TextDecoder)){bkFor=key;bkErr='old';return}
+    bkBusy=true;
+    Promise.resolve().then(function(){return crypto.subtle.importKey('raw',bkU8(key),{name:'AES-GCM'},false,['decrypt'])}).then(function(k){
+      return crypto.subtle.decrypt({name:'AES-GCM',iv:bkU8(BK_ENC.iv)},k,bkU8(BK_ENC.ct));
+    }).then(function(buf){
+      var l=JSON.parse(new TextDecoder().decode(buf));if(!Array.isArray(l))throw 0;
+      BOOKS=l;BOOKM={};l.forEach(function(b){if(b&&b.id)BOOKM[b.id]=b});bkFor=key;
+    }).catch(function(){BOOKS=null;BOOKM={};bkFor=key;bkErr='key'}).then(function(){bkBusy=false;if(tab==='books')renderBooks(true)});
+  }
+  function bkKeyOf(v){v=String(v||'').trim();var m=/bk=([A-Za-z0-9_-]{43})/.exec(v);if(m)return m[1];return /^[A-Za-z0-9_-]{43}$/.test(v)?v:''}
+  function bkSetKey(){
+    var v=bkKeyOf(bkDraft);
+    if(!v){toast('Это не похоже на ключ раздела. Вставь ссылку с ключом целиком или сам ключ.');return}
+    bkKey=v;bkDraft='';persist('@set');renderBooks(true);
+  }
+  var bv=$('view-books'),bF={};
+  function renderBooks(force){
+    if(!force&&typingIn(bv))return;
+    if(!loaded){bv.innerHTML='';return}
+    if(bkPend){bkKey=bkPend;bkPend='';persist('@set')}
+    var lock='';
+    if(!bkIn())lock='<h2>Раздел закрыт</h2><p>Книги видны только после входа по паролю.</p>'+
+      (syCan()&&/^https?:$/.test(location.protocol)?'<div><button type="button" class="btn" id="bk-in">Войти по паролю</button></div>':'');
+    else if(!bkKey||(bkErr==='key'&&bkFor===bkKey))lock='<h2>'+(bkKey?'Ключ не подошёл':'Нужен ключ раздела')+'</h2>'+
+      '<p>Открой один раз ссылку с ключом раздела или вставь ключ сюда. Дальше он сам появится на всех устройствах, где ты вошёл по паролю.</p>'+
+      '<div class="row"><input class="inp" id="bk-key" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Ключ раздела" aria-label="Ключ раздела" value="'+esc(bkDraft)+'"><button type="button" class="btn" id="bk-go">Открыть</button></div>';
+    else if(bkErr==='old'&&bkFor===bkKey)lock='<h2>Раздел не открывается</h2><p>Этот браузер не умеет расшифровывать закрытые разделы. Открой сайт в свежем Chrome или Safari.</p>';
+    else if(!BOOKS||bkFor!==bkKey){bkOpen();lock='<p class="note">Открываю…</p>'}
+    if(lock){bv.innerHTML='<div class="box bk-lock">'+lock+'</div>';return}
+    bv.innerHTML='<div class="g-bar">'+mselBtn('b-st','Все статусы',lst(BST),bF,function(){renderBooks(true)})+'<span class="cnt" id="b-cnt"></span></div>'+
+      '<div class="g-wrap"><div class="g-t b-t" id="b-t"></div></div>';
+    renderBookRows();
+  }
+  function renderBookRows(){
+    var any=anySel(bF),n={todo:0,read:0,done:0};
+    BOOKS.forEach(function(b){n[bkGet(b,'st')]++});
+    var h=['№','Источник','Тема','К чему в моём случае','Статус','Вывод'].map(function(x){return '<div class="g-h"><span class="b-hl">'+x+'</span></div>'}).join(''),shown=0;
+    BOOKS.forEach(function(b,i){
+      var st=bkGet(b,'st');if(any&&!bF[st])return;shown++;
+      var q='https://scholar.google.com/scholar?q='+encodeURIComponent(b.ti||b.a||'');
+      h+='<div class="b-n">'+(i+1)+'</div>'+
+        '<div><div class="b-c"><b>'+esc(b.a||'')+'</b>'+(b.ti?'<small>'+esc(b.ti)+'</small>':'')+'<small>'+(b.j?esc(b.j)+' · ':'')+'<a href="'+q+'" target="_blank" rel="noopener">найти ↗</a></small></div></div>'+
+        '<div><div class="b-c"><b>'+esc(b.t||'')+'</b>'+(b.ab?'<small>'+esc(b.ab)+'</small>':'')+'</div></div>'+
+        '<div><textarea rows="2" data-g="'+b.id+'" data-f="r" maxlength="600" placeholder="К чему это у меня">'+esc(bkGet(b,'r'))+'</textarea></div>'+
+        '<div>'+tagSel(BST,st,b.id,'st')+'</div>'+
+        '<div><textarea rows="2" data-g="'+b.id+'" data-f="nt" maxlength="1500" placeholder="Вывод после чтения">'+esc(bkGet(b,'nt'))+'</textarea></div>';
+    });
+    if(!shown)h+='<div class="g-empty">Под фильтр ничего не попало.</div>';
+    $('b-t').innerHTML=h;
+    $('b-cnt').textContent='прочитано '+n.done+' из '+BOOKS.length+(n.read?' · читаю '+n.read:'');
+  }
+  bv.addEventListener('change',function(e){
+    var t=e.target,id=t.dataset.g,f=t.dataset.f;
+    if(!id||!BOOKM[id]||!BKT[f])return;
+    var v=f==='st'?t.value:t.value.trim();
+    if(f==='st'&&rank(BST,v)>8)return;
+    var u=bk[id]||(bk[id]={});u[f]=v;u[BKT[f]]=Date.now();
+    persist('@set');
+    if(f==='st')renderBookRows();
+  });
+  bv.addEventListener('input',function(e){if(e.target.id==='bk-key')bkDraft=e.target.value});
+  bv.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='bk-key'){e.preventDefault();bkSetKey()}});
+  bv.addEventListener('click',function(e){
+    if(e.target.id==='bk-go'){bkSetKey();return}
+    if(e.target.id==='bk-in')syDlgOpen(false);
   });
 
   /* ---------- Сфера: окно со статистикой. Открывается из отчёта и из списка сфер у календаря ---------- */
@@ -4243,7 +4369,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       srow('Считать часы','',seg('feat.gh',[['off','Не считать'],['all','У всех целей'],['some','У выбранных']],feat.gh))+
       (feat.gh==='some'?srow('У каких целей','их же можно отмечать кнопкой «+ часы» в таблице целей',items.length?mselBtn('x-gh','Выбери цели',items,gs,function(sel){Object.keys(goals).forEach(function(id){if(sel[id])goals[id].hh=1;else delete goals[id].hh});persist('@goals');renderAll()}):'<span class="sp-note">целей пока нет</span>'):'')+'</div>'+
       '<div class="s-g"><h2>Разделы сайта</h2><p>Выключенный раздел пропадает из верхней строки, записи в нём сохраняются. Календарь включён всегда.</p>'+
-      sw2([['sec.habits',sec.habits,'Привычки'],['food.on',food.on,'Питание'],['sec.goals',sec.goals,'Цели'],['sec.diary',sec.diary,'Дневник'],['sec.report',sec.report,'Отчёт']])+'</div>';
+      sw2([['sec.habits',sec.habits,'Привычки'],['food.on',food.on,'Питание'],['sec.goals',sec.goals,'Цели'],['sec.diary',sec.diary,'Дневник'],['sec.books',sec.books,'Книги'],['sec.report',sec.report,'Отчёт']])+'</div>';
   }
   function renderInt(){
     $('set-int').innerHTML=gSetHTML()+'<div class="s-g"><h2>Отправка событий в Google</h2><p>События сайта в Google сами не уходят. Отправить их можно по одному или файлом.</p>'+
@@ -4401,9 +4527,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   $('save-pill').onclick=function(){if(fhWait){fileResume();return}setSec='data';setTab('settings')};
 
   /* ---------- кнопки браузера «назад» и «вперёд»: каждый переход по сайту становится шагом истории ---------- */
-  var TABDEF=[['calendar','Календарь'],['habits','Привычки'],['food','Питание'],['goals','Цели'],['diary','Дневник'],['report','Отчёт']];
+  var TABDEF=[['calendar','Календарь'],['habits','Привычки'],['food','Питание'],['goals','Цели'],['diary','Дневник'],['books','Книги'],['report','Отчёт']];
   var TABS=TABDEF.map(function(x){return x[0]}).concat(['settings']);
-  function tabOn(t){return t==='calendar'||t==='settings'||(t==='habits'&&!!sec.habits)||(t==='food'&&foodOn()&&!foodInHabits())||(t==='goals'&&!!sec.goals)||(t==='diary'&&!!sec.diary)||(t==='report'&&!!sec.report)}
+  function tabOn(t){return t==='calendar'||t==='settings'||(t==='habits'&&!!sec.habits)||(t==='food'&&foodOn()&&!foodInHabits())||(t==='goals'&&!!sec.goals)||(t==='diary'&&!!sec.diary)||(t==='books'&&!!sec.books)||(t==='report'&&!!sec.report)}
   var navLock=false,navKey='',navDay=null;
   function navState(){return{tab:tab,sec:setSec,m:curM,v:view,n:nDays,d:navDay!=null?navDay:viewStart.getTime()}}
   function navPush(rep){
@@ -4440,7 +4566,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function renderAll(){
     if(!tabOn(tab)){setTab('calendar');return}
     renderTop();
-    if(tab==='settings')renderSettings();else if(tab==='calendar')renderCalendar();else if(tab==='habits'||tab==='food')renderHF();else if(tab==='goals')renderGoals();else if(tab==='diary')renderDiary();else renderReport();
+    if(tab==='settings')renderSettings();else if(tab==='calendar')renderCalendar();else if(tab==='habits'||tab==='food')renderHF();else if(tab==='goals')renderGoals();else if(tab==='diary')renderDiary();else if(tab==='books')renderBooks();else renderReport();
     if(hpopDay!=null)renderHpop();
     if(!sphDlg.hidden)renderPanel();
     if(!$('recap').hidden)renderRecap();
@@ -4451,7 +4577,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     tab=t;mselClose();colClose();icoClose();
     TABS.forEach(function(x){$('view-'+x).hidden=x!==t});
     renderTop();
-    if(t==='calendar')renderCalendar(true);else if(t==='goals')renderGoals(true);else if(t==='diary')renderDiary(true);else if(t==='habits'||t==='food'){renderTop();renderHF(true)}else renderAll();
+    if(t==='calendar')renderCalendar(true);else if(t==='goals')renderGoals(true);else if(t==='diary')renderDiary(true);else if(t==='books')renderBooks(true);else if(t==='habits'||t==='food'){renderTop();renderHF(true)}else renderAll();
     navPush();
   }
   document.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(b)setTab(b.dataset.tab)});
@@ -4567,7 +4693,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   setInterval(dkCheck,5000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)dkCheck()});
 
-  var UPD_NAME='index',UPD_BUILD='e9e12dd972';
+  var UPD_NAME='index',UPD_BUILD='a92afcc8c5';
   function updBusy(){return !loaded||!!cur||busy||hpopDay!=null||syBusy||syDlgShown()||!$('recap').hidden||[pop,hpop,gpop,$('dish-dlg'),$('m-dlg'),$('en-dlg')].some(function(x){return x&&!x.hidden})}
   function updFlush(){lsSave()}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
