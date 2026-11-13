@@ -360,20 +360,6 @@ h1{margin:10px 0 0;font-family:var(--display);font-weight:300;font-size:clamp(28
 
 /* ---------- Книги ---------- */
 #view-books{grid-template-rows:auto minmax(0,1fr);gap:14px}
-.g-t.b-t{grid-template-columns:44px minmax(220px,1.25fr) minmax(220px,1.3fr) minmax(190px,1fr) 150px minmax(210px,1.2fr);min-width:1120px}
-.b-t>*{align-items:flex-start;padding-block:8px}
-.b-t>.g-h{align-items:center}
-.b-hl{font-size:calc(12px*var(--fz));letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:2px 4px}
-.b-t .b-n{color:var(--muted);font-variant-numeric:tabular-nums;padding-top:14px;justify-content:center}
-.b-c{flex:1;min-width:0;display:grid;gap:3px;padding:6px 0;line-height:1.4}
-.b-c small{color:var(--muted);font-size:calc(12px*var(--fz))}
-.b-c a{color:inherit}
-.b-t .tag{margin-top:4px}
-.bk-lock{max-width:460px;width:100%;margin:6vh auto 0;align-self:start}
-.bk-lock h2{margin:0;font-size:calc(18px*var(--fz))}
-.bk-lock p{margin:0;color:var(--muted);line-height:1.5}
-.bk-lock .row{display:flex;gap:8px}
-.bk-lock .row .inp{flex:1}
 
 /* ---------- Отчёт ---------- */
 #view-report{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:22px clamp(20px,3vw,48px);overflow:auto;align-content:start}
@@ -509,7 +495,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 .cbtn:hover{box-shadow:0 0 0 2px var(--muted)}
 .ibtn{width:32px;height:32px;border-radius:10px;border:0;background:var(--fill);color:var(--of,var(--on-fill));display:grid;place-items:center;padding:0;flex:none}
 .ibtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.hb-row{display:grid;grid-template-columns:auto minmax(150px,1.2fr) minmax(220px,1.1fr) minmax(140px,.8fr) minmax(130px,.9fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.hb-row{display:grid;grid-template-columns:auto auto minmax(150px,1.2fr) minmax(220px,1.1fr) minmax(140px,.8fr) minmax(130px,.9fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .ml-list{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:12px}
 .ml-i{display:inline-flex;align-items:center;gap:2px}
 .ml-i .inp{width:150px}
@@ -822,7 +808,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   .sp-row{grid-template-columns:auto auto auto minmax(0,1fr)}
   .hb-row{grid-template-columns:auto minmax(0,1fr)}
   .hb-row>*:not(.grip){grid-column:2}
-  .hb-row .grip{grid-row:1/span 5;align-self:start}
+  .hb-row .grip{grid-row:1/span 6;align-self:start}
   .f-bar>.inp{flex:1 1 100%;width:auto}
   .f-bar .seg{flex-wrap:wrap;border-radius:18px}
   .dz-top{grid-template-columns:96px minmax(0,1fr)}
@@ -835,6 +821,111 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   .sp-f .inp{width:100%}
 }
 @media (prefers-reduced-motion:reduce){.rc-track{transition:none}}
+/* ---------- Книги: компактный список, строка раскрывается (14.11) ---------- */
+.bk-wrap{overflow:auto;border:1px solid var(--line);border-radius:20px;min-height:0}
+.bk-i{border-bottom:1px solid var(--line)}
+.bk-i:last-child{border-bottom:0}
+.bk-r{display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1.3fr) auto 32px;gap:12px;align-items:center;padding:6px 8px 6px 14px;cursor:pointer}
+.bk-r:hover,.bk-i.open>.bk-r{background:var(--soft)}
+.bk-n{color:var(--muted);font-variant-numeric:tabular-nums;font-size:calc(13px*var(--fz))}
+.bk-a{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-t{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-tg{border:0;background:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--muted);padding:0}
+.bk-tg:hover{background:var(--soft-2);color:var(--ink)}
+.bk-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.bk-i.open .bk-tg svg{transform:rotate(180deg)}
+.bk-d{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 32px;padding:8px 54px 18px 54px}
+.bk-src{display:grid;gap:5px;align-content:start;line-height:1.45}
+.bk-src small{color:var(--muted)}
+.bk-src p{margin:0}
+.bk-src .lab{margin-top:8px}
+.bk-f{display:grid;gap:12px;align-content:start}
+.bk-f label{display:grid;gap:5px}
+.bk-f textarea{width:100%;min-height:54px;max-height:220px;resize:vertical;field-sizing:content;font:inherit;line-height:1.45;padding:8px 10px}
+.bk-f textarea:focus{outline:0;border-color:var(--ink)}
+.bk-list .g-empty{margin:0}
+.bk-lock{max-width:460px;width:100%;margin:6vh auto 0;align-self:start}
+.bk-lock h2{margin:0;font-size:calc(18px*var(--fz))}
+.bk-lock p{margin:0;color:var(--muted);line-height:1.5}
+.bk-lock .row{display:flex;gap:8px}
+.bk-lock .row .inp{flex:1}
+@media (max-width:820px){
+  .bk-r{grid-template-columns:22px minmax(0,1fr) auto 30px;gap:2px 8px;padding:8px 6px 8px 10px}
+  .bk-n{grid-column:1;grid-row:1}
+  .bk-a{grid-column:2;grid-row:1}
+  .bk-t{grid-column:2;grid-row:2;font-size:calc(12px*var(--fz))}
+  .bk-r .tag{grid-column:3;grid-row:1/span 2}
+  .bk-tg{grid-column:4;grid-row:1/span 2}
+  .bk-d{grid-template-columns:minmax(0,1fr);padding:4px 12px 16px 40px}
+}
+/* ---------- календарь: перетаскивание правой кнопкой мыши, без привязки к дням (14.11) ---------- */
+.tg.free{scroll-snap-type:none}
+.tg.panning,.tg.panning *{cursor:grabbing!important}
+/* ---------- привычки: форма клеток и вид отметки (14.11); атрибуты стоят на <html> ---------- */
+.hc,.tog{line-height:1;overflow:hidden}
+:root[data-hs="s"] .hc{border-radius:2px}
+:root[data-hs="s"] .tog{border-radius:4px}
+:root[data-hs="c"] .hc,:root[data-hs="c"] .tog{border-radius:50%}
+:root[data-hl="soft"] .hc.on,:root[data-hl="soft"] .tog[aria-pressed="true"]{background:var(--tint);color:var(--deep);border-color:var(--fill);box-shadow:inset 0 0 0 1.5px var(--fill)}
+:root[data-hl="mark"] .hc.on{background:none;color:var(--deep);font-size:calc(15px*var(--fz));box-shadow:none}
+:root[data-hl="mark"] .tog[aria-pressed="true"]{background:var(--surface);border-color:var(--fill);color:var(--deep);font-size:calc(19px*var(--fz))}
+.hb-look{display:flex;align-items:center;gap:6px}
+.mkb-x{width:30px;height:30px;flex:none}
+:root[data-hl="mark"] .hc.on.mkb{box-shadow:inset 0 0 0 1px var(--line)}
+/* шесть вкладок и переключатель месяца: на экранах до 1330 px вкладки чуть плотнее, чтобы верхняя строка не переносилась */
+@media (min-width:821px) and (max-width:1330px){.tabs button{padding-inline:11px}.top{column-gap:14px}}
+.mkb{width:30px;height:30px;aspect-ratio:auto;font-size:calc(14px*var(--fz));flex:none;cursor:pointer}
+.hb-prev{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:14px 0 2px;border-top:1px solid var(--line)}
+.hb-prev .hc{display:grid;place-items:center;font-style:normal;width:28px;height:28px}
+.hb-prev span{color:var(--muted);font-size:calc(12px*var(--fz));margin-right:10px}
+#mkpop{width:min(330px,calc(100vw - 16px))}
+.mk-g{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+.mk-g .hc{font-size:calc(15px*var(--fz));cursor:pointer}
+.mk-g .hc:hover{box-shadow:inset 0 0 0 1.5px var(--fill)}
+#mkpop .mk-g .hc[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink)}
+.mk-own{display:flex;align-items:center;gap:8px;font-size:calc(13px*var(--fz));font-weight:500}
+.mk-own .inp{flex:1;min-width:0}
+.mk-row{display:flex;gap:6px;flex-wrap:wrap}
+/* ---------- инструкция: красная точка «новое» и раздел в настройках (14.11) ---------- */
+.ndot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:8px;vertical-align:middle;box-shadow:0 0 0 2px var(--surface)}
+#set-btn{position:relative}
+#set-btn.new::after{content:"";position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--surface);animation:ndot 2s ease-in-out infinite}
+@keyframes ndot{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hp-btns{display:flex;gap:8px;flex-wrap:wrap;padding-top:4px}
+.hp-pick{display:grid;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.hp-pick p{margin:0;color:var(--muted);font-size:calc(13px*var(--fz))}
+.hp-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hp-c{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:500;font-size:calc(13px*var(--fz))}
+.hp-c:hover{background:var(--soft)}
+.hp-c[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+/* ---------- экскурсия: затемнение, окно подсветки, подсказка и рука (14.11) ---------- */
+.tour{position:fixed;left:0;top:0;right:0;bottom:0;z-index:980;cursor:default}
+.tour.nohole{background:rgba(10,12,17,.6)}
+.tr-hole{position:fixed;left:50%;top:50%;width:0;height:0;border-radius:16px;box-shadow:0 0 0 2px rgba(255,255,255,.9),0 0 0 200vmax rgba(10,12,17,.6);pointer-events:none;transition:left .32s ease,top .32s ease,width .32s ease,height .32s ease,opacity .2s}
+.tour.nohole .tr-hole{opacity:0}
+.tr-tip{position:fixed;left:12px;top:12px;width:min(360px,calc(100vw - 24px));background:var(--surface);color:var(--ink);border-radius:20px;padding:16px 18px 14px;box-shadow:0 24px 70px -16px rgba(0,0,0,.55);display:grid;gap:9px;z-index:3}
+.tr-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-6px -10px -2px 0}
+.tr-tip h3{margin:0;font-family:var(--display);font-weight:400;font-size:calc(18px*var(--fz));letter-spacing:-.02em;line-height:1.2}
+.tr-tip p{margin:0;line-height:1.5}
+.tr-tip p b{font-weight:600}
+.tr-bar{height:4px;border-radius:99px;background:var(--soft-2);overflow:hidden}
+.tr-bar i{display:block;height:100%;background:var(--red);border-radius:99px;transition:width .3s}
+.tr-f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.tr-f .lab{white-space:nowrap}
+.tr-f>span:last-child{display:flex;gap:6px}
+.tr-hand{position:fixed;left:0;top:0;width:30px;height:30px;pointer-events:none;z-index:2;opacity:0}
+.tr-hand svg.cur{position:absolute;left:-6px;top:-4px;width:30px;height:30px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));transition:transform .12s;transform-origin:6px 4px}
+.tr-hand.down svg.cur{transform:scale(.86)}
+.tr-badge{position:absolute;left:20px;top:24px;display:flex;align-items:center;gap:5px;background:#14171F;color:#fff;font-size:11px;font-weight:600;padding:4px 9px 4px 6px;border-radius:99px;white-space:nowrap;opacity:0;transition:opacity .15s;box-shadow:0 0 0 1.5px rgba(255,255,255,.85)}
+.tr-badge svg{width:12px;height:15px;flex:none}
+.tr-hand.down .tr-badge{opacity:1}
+.tr-rip{position:fixed;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid var(--red);opacity:0;pointer-events:none;z-index:1}
+.tr-rip.go{animation:trRip .65s ease-out}
+@keyframes trRip{0%{transform:scale(.25);opacity:1}100%{transform:scale(1.35);opacity:0}}
+.tr-ghost{position:fixed;border-radius:8px;background:rgba(20,23,31,.12);box-shadow:inset 0 0 0 2px #14171F;color:#14171F;font-size:11px;font-weight:600;padding:3px 6px;pointer-events:none;overflow:hidden;white-space:nowrap}
+:root[data-ui="dark"] .tr-ghost{background:rgba(236,238,243,.16);box-shadow:inset 0 0 0 2px #ECEEF3;color:#ECEEF3}
+@media (max-width:600px){.tr-tip{padding:14px 14px 12px}}
+@media (prefers-reduced-motion:reduce){.tr-hole{transition:none}#set-btn.new::after{animation:none}}
 </style>
 </head>
 <body>
@@ -885,6 +976,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   <main class="view" id="view-settings" hidden>
     <nav class="s-nav" id="s-nav" aria-label="Разделы настроек"></nav>
     <div class="s-body">
+      <section class="s-form" id="set-help" hidden></section>
       <section class="s-form" id="set-look" hidden></section>
       <section class="s-form" id="set-hours" hidden></section>
       <section class="s-form" id="set-cal" hidden></section>
@@ -917,6 +1009,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 <div class="mpop" id="mpop" role="listbox" aria-multiselectable="true" hidden></div>
 <div class="cpop" id="cpop" role="dialog" aria-label="Выбор цвета" hidden></div>
 <div class="cpop" id="ipop" role="dialog" aria-label="Выбор значка" hidden></div>
+<div class="cpop" id="mkpop" role="dialog" aria-label="Значок отметки" hidden></div>
 <div class="rc-scrim" id="sph-dlg" hidden>
   <div class="sph-box" role="dialog" aria-modal="true" aria-label="Сфера"><button type="button" class="ib" id="sph-x" aria-label="Закрыть">×</button><section class="panel sph" id="panel"></section></div>
 </div>
@@ -1085,13 +1178,15 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   var habits=[{id:'en',n:'Энергия',s:'other',type:'score'},SLEEP_H,{id:'h1',n:'Лёг до 00:00',s:'sleep',type:'time',lim:1440},{id:'hback',n:'Экстензия / растяжка',s:'fitness',type:'check',en:'b'},{id:'huse',n:'Полезные дела',s:'other',type:'check',en:'u'},{id:'h2',n:'Заполнил КБЖУ',s:'other',type:'check'},{id:'h3',n:'Откладывал дела',s:'other',type:'count'}];
   /* настройки по умолчанию; всё, что меняется в «Настройках», лежит в этих объектах и сохраняется вместе с записями */
   var UI0={theme:'light',accent:'ink',sat:1,font:'onest',dfont:'unbounded',fz:1};
-  var CAL0={hh:46,start:7.5,snap:15,view:'week',dur:30,side:1,chips:1,we:1,info:1,tick:1,ding:1,dvol:2};
+  var CAL0={hh:46,start:7.5,snap:15,view:'week',dur:30,side:1,chips:0,we:1,info:1,tick:1,ding:1,dvol:2};
   var REP0={mode:'month',months:6,wheel:1,empty:1,autoW:0,autoM:1,s1:1,s2:1,s3:1,s4:1,s5:1};
   var SEC0={habits:1,goals:1,diary:1,books:1,report:1},FEAT0={gh:'off',links:1},GS0={url:'',key:'',on:0,show:1,cals:{},hid:{},src:'',cid:''};
   var FOOD0={on:1,inHabits:1,c:'#B9C45E',rk:1,rp:1,rf:1,rc:1,rm:1,nk:0,np:0,nf:0,nc:0,mfix:0,meals:['Завтрак','Обед','Перекус','Ужин']};
   /* энергия: утренний вопрос и пороги опор (еда, сон, часы полезных дел и их сферы) */
   var EN0={ask:1,kcal:2200,sleep:8,use:2,us:['crypto','growth','creative','work']};
-  var ui=clone(UI0),calS=clone(CAL0),repS=clone(REP0),sec=clone(SEC0),feat=clone(FEAT0),food=clone(FOOD0),gs=clone(GS0),enS=clone(EN0),gcalOn=true,saveSt={s:'ok',t:0},saveErr=false;
+  /* привычки (14.11): форма клеток, вид отметки и значок по умолчанию; у привычки могут быть свои значок (mk) и цвет (col) */
+  var HB0={shape:'r',look:'fill',mk:'+'},HBSH=['r','s','c'],HBLK=['fill','soft','mark'];
+  var ui=clone(UI0),calS=clone(CAL0),repS=clone(REP0),sec=clone(SEC0),feat=clone(FEAT0),food=clone(FOOD0),gs=clone(GS0),enS=clone(EN0),hbS=clone(HB0),gcalOn=true,saveSt={s:'ok',t:0},saveErr=false;
   setSpheres(SP_DEF);
   var syncAt=Date.now(),nextSync=0;
   var EV=[],EVM={},AGG={},DS={},BYDAY={},GH={},GP={},isDemo=false,firstM=nowM;
@@ -1106,7 +1201,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function dump(){return{at:Date.now(),demo:EXAMPLE?1:0,gcid:gCid(),months:months,series:series,goals:goals,diary:diary,dishes:dishes,set:setBody()}}
   function lsSave(){try{localStorage.setItem(LSK,JSON.stringify(dump()));return true}catch(_){return false}}
   function applyAll(raw){months=raw.months||{};series=raw.series||{};goals=raw.goals||{};diary=raw.diary||{};dishes=raw.dishes||{};normDishes();applySettings(raw.set)}
-  function setBody(){var o={v:8,budget:budget,plans:plans,hideDemo:hideDemo,habits:habits,sites:sites,seen:seen,snap:snap,spheres:sphBody(),ui:ui,cal:calS,gcal:gcalOn,rep:repS,sec:sec,feat:feat,food:food,gs:gs,en:enS,bk:bk};if(bkKey)o.bkk=bkKey;return o}
+  function setBody(){var o={v:9,budget:budget,plans:plans,hideDemo:hideDemo,habits:habits,sites:sites,seen:seen,snap:snap,spheres:sphBody(),ui:ui,cal:calS,gcal:gcalOn,rep:repS,sec:sec,feat:feat,food:food,gs:gs,en:enS,hb:hbS,bk:bk};if(bkKey)o.bkk=bkKey;return o}
   function bodyOf(k){if(k==='@set')return setBody();if(k==='@ser')return{items:series};if(k==='@goals')return{items:goals};if(k==='@diary')return{items:diary};if(k.indexOf('dish:')===0)return dishes[k.slice(5)]||null;var m=months[k]||{};return{events:m.events||{},habits:m.habits||{},food:m.food||{}}}
   function pathOf(k){return k==='@set'?'settings/main':k==='@ser'?'settings/series':k==='@goals'?'settings/goals':k==='@diary'?'settings/diary':k.indexOf('dish:')===0?'dishes/'+k.slice(5):'months/'+k}
   /* автосохранение: каждое изменение сразу уходит в хранилище страницы или в память браузера, а оттуда в файл */
@@ -1140,6 +1235,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(!d)return;
     if(Array.isArray(d.spheres)&&d.spheres.length){var keep=SP[sel]&&SP[sel].id;setSpheres(d.spheres);sel=SPI[keep]!=null?SPI[keep]:0}
     ui=mergeS(UI0,d.ui);calS=mergeS(CAL0,d.cal);repS=mergeS(REP0,d.rep);sec=mergeS(SEC0,d.sec);feat=mergeS(FEAT0,d.feat);food=mergeS(FOOD0,d.food);gs=mergeS(GS0,d.gs);enS=mergeS(EN0,d.en);
+    hbS=mergeS(HB0,d.hb);if(HBSH.indexOf(hbS.shape)<0)hbS.shape='r';if(HBLK.indexOf(hbS.look)<0)hbS.look='fill';hbS.mk=String(hbS.mk||'+').slice(0,8)||'+';
+    /* 14.11: привычки под датами в календаре убраны (раньше были включены у всех); вернуть можно в Настройках → Календарь */
+    if(!(d.v>=9))calS.chips=0;
     if(!okHex(food.c))food.c=FOOD0.c;
     /* прежний порядок приёмов пищи по умолчанию меняется на «завтрак, обед, перекус, ужин»; старые записи корзины переставляются при чтении */
     if(!(d.v>=6)&&food.meals.join('|')==='Завтрак|Обед|Ужин|Перекус'){food.meals=clone(FOOD0.meals);food.mfix=1}
@@ -1390,7 +1488,10 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function tLim(h){return h.lim>=720?h.lim:1440}
   function tOk(h,v){return v>=720?v<tLim(h):v>0}
   /* у оценки в сфере «Другое» свой тёплый цвет, чтобы энергия не была серой */
-  var EN_C=null;function hCol(h){if(h&&h.type==='score'&&h.s==='other'){if(!EN_C)EN_C='0;'+cv(oklchHex(.8,.145,85));return EN_C}return hOf(h.s)}
+  var EN_C=null;function hCol(h){if(h&&okHex(h.col))return '0;'+cv(h.col);if(h&&h.type==='score'&&h.s==='other'){if(!EN_C)EN_C='0;'+cv(oklchHex(.8,.145,85));return EN_C}return hOf(h.s)}
+  /* свой цвет и значок привычки (14.11): цвет в h.col, значок отметки в h.mk; без них — цвет сферы и общий значок */
+  function hColHex(h){if(h&&okHex(h.col))return h.col;if(h&&h.type==='score'&&h.s==='other')return oklchHex(.8,.145,85);return h&&SP[SPI[h.s]]?SP[SPI[h.s]].c:'#9AA3B5'}
+  function hMark(h){var m=h&&typeof h.mk==='string'&&h.mk?h.mk:hbS.mk;return m||'+'}
   function sc1(v){return(Math.round(v*10)/10).toLocaleString('ru-RU')}
   function habitById(id){for(var i=0;i<habits.length;i++)if(habits[i].id===id)return habits[i];return null}
   function hGet(h,ts){
@@ -1435,11 +1536,11 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       if(h.type==='score'){var ix=enIdx(ts);return '<div class="hd-r hd-sc sph" style="--h:'+hCol(h)+'"><span>'+esc(h.n)+'<small>как прошёл день, от 1 до 10'+(ix.n?' · опор '+ix.ok+' из '+ix.n:'')+'</small></span>'+
         '<div class="sc10" role="group" aria-label="'+esc(h.n)+' от 1 до 10">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){return '<button type="button" data-hsc="'+i+'"'+at+' aria-pressed="'+(v===i)+'" style="--q:'+(i*10)+'%">'+i+'</button>'}).join('')+'</div></div>'}
       if(h.type==='time'){var tt=tTxt(v);return '<div class="hd-r sph" style="--h:'+hCol(h)+'"><span>'+esc(h.n)+'<small>'+SP[SPI[h.s]].n+hHint(h)+'</small></span>'+
-        '<span class="num t-in">'+(v?'<i class="t-st'+(tOk(h,v)?'':' late')+'" title="'+(tOk(h,v)?'до '+tTxt(tLim(h)):'позже '+tTxt(tLim(h)))+'">'+(tOk(h,v)?'+':'−')+'</i>':'')+'<input class="inp" type="time" data-ht="'+h.id+'" data-d="'+ts+'" value="'+tt+'" aria-label="'+esc(h.n)+': во сколько заснул"'+(fut?' disabled':'')+'></span></div>'}
+        '<span class="num t-in">'+(v?'<i class="t-st'+(tOk(h,v)?'':' late')+'" title="'+(tOk(h,v)?'до '+tTxt(tLim(h)):'позже '+tTxt(tLim(h)))+'">'+(tOk(h,v)?esc(hMark(h)):'−')+'</i>':'')+'<input class="inp" type="time" data-ht="'+h.id+'" data-d="'+ts+'" value="'+tt+'" aria-label="'+esc(h.n)+': во сколько заснул"'+(fut?' disabled':'')+'></span></div>'}
       return '<div class="hd-r sph" style="--h:'+hCol(h)+'"><span>'+esc(h.n)+'<small>'+SP[SPI[h.s]].n+hHint(h)+'</small></span>'+
         (h.type==='num'?'<span class="num"><input class="inp" type="number" step="any" data-hn="'+h.id+'" data-d="'+ts+'" value="'+(v==null?'':v)+'" placeholder="—" aria-label="'+esc(h.n)+'"'+(fut?' disabled':'')+'>'+hUnit(h)+'</span>'
         :h.type!=='check'?'<span class="stp"><button type="button" data-ha="m"'+at+' aria-label="Меньше">−</button><b>'+(v==null?'—':h.type==='hours'?hrs(v)+' ч':v)+'</b><button type="button" data-ha="p"'+at+' aria-label="Больше">+</button></span>'
-          :'<button type="button" class="tog" data-ha="t"'+at+' aria-pressed="'+(v>0)+'" aria-label="Отметить">+</button>')+'</div>';
+          :'<button type="button" class="tog" data-ha="t"'+at+' aria-pressed="'+(v>0)+'" aria-label="Отметить">'+esc(hMark(h))+'</button>')+'</div>';
     }).join('')+'</div>';
   }
   document.addEventListener('click',function(e){
@@ -1697,9 +1798,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
         d=new Date(a.getFullYear(),a.getMonth(),i).getTime();var v=hRaw(h,d),fut=d>t0,tt=esc(h.n)+', '+i+' '+MG[a.getMonth()];
         if(h.type==='hours')g+='<button type="button" class="hc sph'+(v?(v<6?' c1':v<7.5?' c2':' c3'):'')+'" style="--h:'+hCol(h)+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v?': '+hrs(v)+' ч':'')+'">'+(v?Math.round(v):'')+'</button>';
         else if(h.type==='score'){var ix=v!=null?enIdx(d):null;g+='<button type="button" class="hc sc sph'+(v>5?' dk':'')+'" style="--h:'+hCol(h)+(v!=null?';--q:'+(v*9+6)+'%':'')+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v!=null?': '+v+' из 10'+(ix.n?' · опор '+ix.ok+' из '+ix.n:''):'')+'">'+(v!=null?v:'')+'</button>'}
-        else if(h.type==='time'){var tk=v?tOk(h,v):false;g+='<button type="button" class="hc sph'+(v?(tk?' on':' ov'):'')+'" style="--h:'+hCol(h)+'" data-hsel="'+d+'" data-tfocus="'+h.id+'"'+(fut?' disabled':'')+' title="'+tt+(v?': '+(v>=720?'заснул в '+tTxt(v):'до '+tTxt(tLim(h))+', время не записано'):'')+'">'+(v?(tk?'+':'−'):'')+'</button>'}
+        else if(h.type==='time'){var tk=v?tOk(h,v):false;g+='<button type="button" class="hc sph'+(v?(tk?' on':' ov'):'')+'" style="--h:'+hCol(h)+'" data-hsel="'+d+'" data-tfocus="'+h.id+'"'+(fut?' disabled':'')+' title="'+tt+(v?': '+(v>=720?'заснул в '+tTxt(v):'до '+tTxt(tLim(h))+', время не записано'):'')+'">'+(v?(tk?esc(hMark(h)):'−'):'')+'</button>'}
         else if(h.type==='num')g+='<button type="button" class="hc sm sph'+(v!=null?' c2':'')+'" style="--h:'+hCol(h)+'" data-hsel="'+d+'"'+(fut?' disabled':'')+' title="'+tt+(v!=null?': '+num(v)+hUnit(h):'')+'">'+(v!=null?short(v):'')+'</button>';
-        else g+='<button type="button" class="hc sph'+(h.type==='check'?(v?' on':''):more?(v?' c'+Math.min(3,v):''):(v===0?' z':v?' c'+Math.min(3,v):''))+'" style="--h:'+hCol(h)+'" data-ha="'+(h.type==='check'?'t':'p')+'" data-h="'+h.id+'" data-d="'+d+'"'+(fut?' disabled':'')+' title="'+tt+'">'+(h.type==='count'&&v!=null?v:h.type==='check'&&v?'+':'')+'</button>';
+        else g+='<button type="button" class="hc sph'+(h.type==='check'?(v?' on':''):more?(v?' c'+Math.min(3,v):''):(v===0?' z':v?' c'+Math.min(3,v):''))+'" style="--h:'+hCol(h)+'" data-ha="'+(h.type==='check'?'t':'p')+'" data-h="'+h.id+'" data-d="'+d+'"'+(fut?' disabled':'')+' title="'+tt+'">'+(h.type==='count'&&v!=null?v:h.type==='check'&&v?esc(hMark(h)):'')+'</button>';
       }
       g+='<div class="hs">'+(h.type==='time'?(r.tn?'ср. '+tTxt(r.ts/r.tn):r.ok+' из '+r.n):h.type==='score'?(r.rec?'ср. '+sc1(r.sum/r.rec):''):h.type==='check'?r.done+' из '+r.n:h.type==='hours'?hrs(r.sum)+' ч':h.type==='num'?(r.rec?'ср. '+short(r.sum/r.rec):''):'всего '+r.sum)+'</div>';
       var hr=h.type==='hours',ck=h.type==='check',nm=h.type==='num';
@@ -1818,7 +1919,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     var y=addDays(day0(new Date()),-1).getTime();
     if(hRaw(h,y)!=null||enSkipped())return;
     /* поверх другого окна или посреди ввода не открываемся: попробуем чуть позже */
-    var busy=syBusy||!$('recap').hidden||(gateEl&&!gateEl.hidden)||[$('dish-dlg'),$('m-dlg'),pop,hpop].some(function(x){return x&&!x.hidden})||typingIn(document.body);
+    var busy=!!tr||syBusy||!$('recap').hidden||(gateEl&&!gateEl.hidden)||[$('dish-dlg'),$('m-dlg'),pop,hpop].some(function(x){return x&&!x.hidden})||typingIn(document.body);
     if(busy){if($('recap').hidden)enAsk(syBusy?4000:30000);return}
     enOpen(y);
   }
@@ -2336,7 +2437,8 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     if(!v){toast('Это не похоже на ключ раздела. Вставь ссылку с ключом целиком или сам ключ.');return}
     bkKey=v;bkDraft='';persist('@set');renderBooks(true);
   }
-  var bv=$('view-books'),bF={};
+  var bv=$('view-books'),bF={},bkOp={};
+  var CHEV='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
   function renderBooks(force){
     if(!force&&typingIn(bv))return;
     if(!loaded){bv.innerHTML='';return}
@@ -2350,27 +2452,44 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else if(bkErr==='old'&&bkFor===bkKey)lock='<h2>Раздел не открывается</h2><p>Этот браузер не умеет расшифровывать закрытые разделы. Открой сайт в свежем Chrome или Safari.</p>';
     else if(!BOOKS||bkFor!==bkKey){bkOpen();lock='<p class="note">Открываю…</p>'}
     if(lock){bv.innerHTML='<div class="box bk-lock">'+lock+'</div>';return}
-    bv.innerHTML='<div class="g-bar">'+mselBtn('b-st','Все статусы',lst(BST),bF,function(){renderBooks(true)})+'<span class="cnt" id="b-cnt"></span></div>'+
-      '<div class="g-wrap"><div class="g-t b-t" id="b-t"></div></div>';
+    bv.innerHTML='<div class="g-bar">'+mselBtn('b-st','Все статусы',lst(BST),bF,function(){renderBooks(true)})+'<button type="button" class="btn ghost" id="bk-all"></button><span class="cnt" id="b-cnt"></span></div>'+
+      '<div class="bk-wrap"><div class="bk-list" id="b-t"></div></div>';
     renderBookRows();
   }
+  /* компактный список (14.11): в строке номер, источник, тема и статус; стрелка справа или щелчок по строке раскрывает
+     название, журнал, о чём книга, «к чему в моём случае» и вывод. Что раскрыто, помнится до перезагрузки страницы */
   function renderBookRows(){
-    var any=anySel(bF),n={todo:0,read:0,done:0};
+    var any=anySel(bF),n={todo:0,read:0,done:0},h='',shown=0;
     BOOKS.forEach(function(b){n[bkGet(b,'st')]++});
-    var h=['№','Источник','Тема','К чему в моём случае','Статус','Вывод'].map(function(x){return '<div class="g-h"><span class="b-hl">'+x+'</span></div>'}).join(''),shown=0;
     BOOKS.forEach(function(b,i){
       var st=bkGet(b,'st');if(any&&!bF[st])return;shown++;
-      var q='https://scholar.google.com/scholar?q='+encodeURIComponent(b.ti||b.a||'');
-      h+='<div class="b-n">'+(i+1)+'</div>'+
-        '<div><div class="b-c"><b>'+esc(b.a||'')+'</b>'+(b.ti?'<small>'+esc(b.ti)+'</small>':'')+'<small>'+(b.j?esc(b.j)+' · ':'')+'<a href="'+q+'" target="_blank" rel="noopener">найти ↗</a></small></div></div>'+
-        '<div><div class="b-c"><b>'+esc(b.t||'')+'</b>'+(b.ab?'<small>'+esc(b.ab)+'</small>':'')+'</div></div>'+
-        '<div><textarea rows="2" data-g="'+b.id+'" data-f="r" maxlength="600" placeholder="К чему это у меня">'+esc(bkGet(b,'r'))+'</textarea></div>'+
-        '<div>'+tagSel(BST,st,b.id,'st')+'</div>'+
-        '<div><textarea rows="2" data-g="'+b.id+'" data-f="nt" maxlength="1500" placeholder="Вывод после чтения">'+esc(bkGet(b,'nt'))+'</textarea></div>';
+      var op=!!bkOp[b.id],did='bkd-'+b.id,q='https://scholar.google.com/scholar?q='+encodeURIComponent(b.ti||b.a||'');
+      h+='<div class="bk-i'+(op?' open':'')+'" data-bk="'+b.id+'">'+
+        '<div class="bk-r"><span class="bk-n">'+(i+1)+'</span><b class="bk-a" title="'+esc(b.a||'')+'">'+esc(b.a||'')+'</b><span class="bk-t" title="'+esc(b.t||'')+'">'+esc(b.t||'')+'</span>'+tagSel(BST,st,b.id,'st')+
+          '<button type="button" class="bk-tg" aria-expanded="'+op+'" aria-controls="'+did+'" aria-label="Описание: '+esc(b.a||'')+'">'+CHEV+'</button></div>'+
+        '<div class="bk-d" id="'+did+'"'+(op?'':' hidden')+'>'+
+          '<div class="bk-src">'+(b.ti?'<b>'+esc(b.ti)+'</b>':'')+'<small>'+(b.j?esc(b.j)+' · ':'')+'<a href="'+q+'" target="_blank" rel="noopener">найти ↗</a></small>'+(b.ab?'<span class="lab">О чём</span><p>'+esc(b.ab)+'</p>':'')+'</div>'+
+          '<div class="bk-f"><label><span class="lab">К чему в моём случае</span><textarea class="inp" rows="2" data-g="'+b.id+'" data-f="r" maxlength="600" placeholder="К чему это у меня">'+esc(bkGet(b,'r'))+'</textarea></label>'+
+          '<label><span class="lab">Вывод после чтения</span><textarea class="inp" rows="2" data-g="'+b.id+'" data-f="nt" maxlength="1500" placeholder="Что беру себе из этой книги">'+esc(bkGet(b,'nt'))+'</textarea></label></div>'+
+        '</div></div>';
     });
-    if(!shown)h+='<div class="g-empty">Под фильтр ничего не попало.</div>';
+    if(!shown)h='<p class="g-empty">Под фильтр ничего не попало.</p>';
     $('b-t').innerHTML=h;
     $('b-cnt').textContent='прочитано '+n.done+' из '+BOOKS.length+(n.read?' · читаю '+n.read:'');
+    bkAllBtn();
+  }
+  function bkAllBtn(){
+    var b=$('bk-all');if(!b)return;
+    var it=bv.querySelectorAll('[data-bk]'),all=it.length>0;
+    for(var i=0;i<it.length;i++)if(!bkOp[it[i].dataset.bk]){all=false;break}
+    b.textContent=all?'Свернуть все':'Развернуть все';b.dataset.on=all?'0':'1';b.hidden=!it.length;
+  }
+  function bkToggle(id,on){
+    var it=bv.querySelector('[data-bk="'+id+'"]');if(!it)return;
+    if(on==null)on=!bkOp[id];
+    if(on)bkOp[id]=1;else delete bkOp[id];
+    it.classList[on?'add':'remove']('open');it.querySelector('.bk-d').hidden=!on;
+    it.querySelector('.bk-tg').setAttribute('aria-expanded',String(on));
   }
   bv.addEventListener('change',function(e){
     var t=e.target,id=t.dataset.g,f=t.dataset.f;
@@ -2384,8 +2503,12 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   bv.addEventListener('input',function(e){if(e.target.id==='bk-key')bkDraft=e.target.value});
   bv.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='bk-key'){e.preventDefault();bkSetKey()}});
   bv.addEventListener('click',function(e){
-    if(e.target.id==='bk-go'){bkSetKey();return}
-    if(e.target.id==='bk-in')syDlgOpen(false);
+    var t=e.target;
+    if(t.id==='bk-go'){bkSetKey();return}
+    if(t.id==='bk-in'){syDlgOpen(false);return}
+    if(t.id==='bk-all'){var on=t.dataset.on==='1';[].forEach.call(bv.querySelectorAll('[data-bk]'),function(x){bkToggle(x.dataset.bk,on)});bkAllBtn();return}
+    var r=t.closest('.bk-r');
+    if(r&&!t.closest('select,a,textarea,input')){bkToggle(r.parentNode.dataset.bk);bkAllBtn()}
   });
 
   /* ---------- Сфера: окно со статистикой. Открывается из отчёта и из списка сфер у календаря ---------- */
@@ -2572,19 +2695,23 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   tg.addEventListener('scroll',function(){
     if(scRaf)return;
     scRaf=requestAnimationFrame(function(){
-      scRaf=0;if(!base||view==='month')return;
+      /* скрытый календарь (открыта другая вкладка) теряет прокрутку и шлёт scroll с нулём: такое не считается переходом на другие дни */
+      scRaf=0;if(!base||view==='month'||tab!=='calendar'||!tg.clientWidth)return;
       var vs=addDays(base,Math.round(tg.scrollLeft/colW));
       if(vs.getTime()!==viewStart.getTime()){viewStart=vs;navDay=vs.getTime();miniLock=false;calTitle()}
       clearTimeout(scT);
-      scT=setTimeout(function(){
-        if(busy)return;
-        var i=diffDays(base,viewStart);
-        if(i<8||i>TOTAL-nDays-8){base=addDays(viewStart,-BUF);renderGrid();syncScroll()}
-        renderLegend();gNeed(viewStart.getTime(),rangeEnd());
-      },160);
+      scT=setTimeout(calSettle,160);
     });
   },{passive:true});
+  /* после прокрутки: подгрузка окна дней у краёв. Положение «без привязки» (после перетаскивания правой кнопкой) сохраняется */
+  function calSettle(){
+    if(busy||pan||!base||view==='month')return;
+    var i=diffDays(base,viewStart);
+    if(i<8||i>TOTAL-nDays-8){var fr=tg.scrollLeft-i*colW,fx=tg.classList.contains('free');base=addDays(viewStart,-BUF);renderGrid();syncScroll();if(fx)tg.scrollLeft+=fr}
+    renderLegend();gNeed(viewStart.getTime(),rangeEnd());
+  }
   function goTo(d,smooth,top){
+    tg.classList.remove('free');
     d=day0(d);navDay=d.getTime();setTimeout(navPush,0);
     if(view==='month'){viewStart=mStart(mk(d));renderCalendar();return}
     var i=base?diffDays(base,d):-1;
@@ -2592,6 +2719,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     else tg.scrollTo({left:i*colW,top:top!=null?top:tg.scrollTop,behavior:smooth?'smooth':'auto'});
   }
   function setView(v,n){
+    tg.classList.remove('free');
     view=v;if(n)nDays=n;
     if(v==='week'){nDays=7;viewStart=monday(viewStart)}
     base=null;navDay=null;renderCalendar(true);navPush();
@@ -2702,6 +2830,31 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   }
   tg.addEventListener('pointerup',function(e){endAct(e,false)});
   tg.addEventListener('pointercancel',function(e){endAct(e,true)});
+  /* правая кнопка мыши (14.11): календарь едет за мышью в любую сторону, в том числе по диагонали, и остаётся там, где отпустили.
+     Пока тащишь и после, привязка к дням выключена (класс free); включается снова при переходе кнопками, по датам или при смене вида */
+  var pan=null;
+  tg.addEventListener('pointerdown',function(e){
+    if(e.button!==2||e.pointerType==='touch'||view==='month')return;
+    e.preventDefault();
+    pan={x:e.clientX,y:e.clientY,l:tg.scrollLeft,t:tg.scrollTop,pid:e.pointerId};
+    tg.classList.add('free','panning');
+    try{tg.setPointerCapture(e.pointerId)}catch(_){}
+  });
+  tg.addEventListener('pointermove',function(e){
+    if(!pan||e.pointerId!==pan.pid)return;
+    if(e.buttons!=null&&!(e.buttons&2)){panEnd();return}
+    tg.scrollLeft=pan.l-(e.clientX-pan.x);tg.scrollTop=pan.t-(e.clientY-pan.y);
+  });
+  function panEnd(){
+    if(!pan)return;var p=pan;pan=null;tg.classList.remove('panning');
+    try{if(tg.hasPointerCapture&&tg.hasPointerCapture(p.pid))tg.releasePointerCapture(p.pid)}catch(_){}
+    calSettle();
+  }
+  tg.addEventListener('pointerup',function(e){if(pan&&e.pointerId===pan.pid)panEnd()});
+  tg.addEventListener('pointercancel',function(){panEnd()});
+  tg.addEventListener('lostpointercapture',function(){panEnd()});
+  /* меню правой кнопки в сетке не нужно: правая кнопка двигает календарь */
+  tg.addEventListener('contextmenu',function(e){if(view!=='month')e.preventDefault()});
   tg.addEventListener('click',function(e){
     var gb=e.target.closest('[data-gid]');
     if(gb){openGpop(gb.dataset.gid,gb.getBoundingClientRect());return}
@@ -3028,6 +3181,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function applyUI(){
     var R=document.documentElement,dark=isDark();
     R.setAttribute('data-ui',dark?'dark':'light');
+    R.setAttribute('data-hs',hbS.shape);R.setAttribute('data-hl',hbS.look);
     if(typeof ui.accent==='number')ui.accent=oklchHex(.52,.2,ui.accent);
     if(!okHex(ui.accent)){ui.accent='ink';R.style.removeProperty('--accent');R.style.removeProperty('--on-accent')}
     else{R.style.setProperty('--accent',ui.accent);R.style.setProperty('--on-accent',onCol(ui.accent))}
@@ -4204,13 +4358,14 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   /* ---------- выбор цвета: три ползунка R, G, B, код цвета и готовые образцы ---------- */
   var cpop=$('cpop'),ipop=$('ipop'),colCur=null,icoCur=null;
   function colTarget(key){
+    if(key.indexOf('hb:')===0){var hb=habitById(key.slice(3));return{get:hColHex(hb),set:function(hex,fin){if(!hb)return;hb.col=hex;if(fin)saveHab()}}}
     if(key==='accent')return{get:okHex(ui.accent)?ui.accent:isDark()?'#ECEEF3':'#14171F',set:function(hex,fin){ui.accent=hex;applyUI();if(fin){persist('@set');renderAll()}}};
     if(key==='food')return{get:food.c,set:function(hex,fin){food.c=hex;if(fin){persist('@set');renderAll()}}};
     var id=key.slice(3);
     return{get:SP[SPI[id]]?SP[SPI[id]].c:'#9AA3B5',set:function(hex,fin){var s=SP[SPI[id]];if(!s)return;s.c=hex;if(fin)saveSpheres()}};
   }
   function colOpen(btn){
-    var key=btn.dataset.col,t=colTarget(key);icoClose();
+    var key=btn.dataset.col,t=colTarget(key);icoClose();mkClose();
     colCur={key:key,hex:(okHex(t.get)?t.get:'#9AA3B5').toUpperCase(),set:t.set};
     var c=hexRGB(colCur.hex);
     cpop.innerHTML='<div class="cp-top"><span class="cp-prev" id="cp-prev"></span><input class="inp" id="cp-hex" maxlength="7" spellcheck="false" aria-label="Код цвета"></div>'+
@@ -4248,6 +4403,40 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     ipop.hidden=false;placeBelow(ipop,btn);
   }
   function icoClose(){if(icoCur){icoCur=null;ipop.hidden=true}}
+  /* выбор значка отметки привычки (14.11): готовые значки, свой символ или эмодзи; «как у всех» и «цвет как у сферы» */
+  var mkpop=$('mkpop'),mkCur=null;
+  function mkOpen(btn){
+    var id=btn.dataset.mkb,h=id==='def'?null:habitById(id);if(id!=='def'&&!h)return;
+    colClose();icoClose();mkCur=id;
+    var h0=hbFirst(),cur=h?hMark(h):hbS.mk,c=h?hCol(h):h0?hCol(h0):'0;'+cv(SP[0]?SP[0].c:'#9AA3B5'),own=MARKS.indexOf(cur)<0?cur:'';
+    mkpop.innerHTML='<div class="lab">'+(h?'Значок: '+esc(h.n):'Значок по умолчанию')+'</div>'+
+      '<div class="mk-g">'+MARKS.map(function(m){return '<button type="button" class="hc sph'+(m===cur?' on':'')+'" style="--h:'+c+'" data-mk="'+esc(m)+'" aria-pressed="'+(m===cur)+'" aria-label="Значок '+esc(m)+'">'+esc(m)+'</button>'}).join('')+'</div>'+
+      '<label class="mk-own"><span>Свой</span><input class="inp" id="mk-own" maxlength="8" autocomplete="off" placeholder="любой символ или эмодзи" value="'+esc(own)+'"><button type="button" class="btn ghost" data-mkok>Ок</button></label>'+
+      (h&&(h.mk||okHex(h.col))?'<div class="mk-row">'+(h.mk?'<button type="button" class="btn ghost" data-mkx>Значок как у всех</button>':'')+(okHex(h.col)?'<button type="button" class="btn ghost" data-mkc0>Цвет как у сферы</button>':'')+'</div>':'');
+    mkpop.hidden=false;placeBelow(mkpop,btn);
+  }
+  function mkClose(){if(mkCur!=null){mkCur=null;mkpop.hidden=true}}
+  function mkSet(v){
+    var id=mkCur;if(id==null)return;
+    v=String(v==null?'':v).replace(/[<>&"]/g,'').trim().slice(0,8);
+    var h=id==='def'?null:habitById(id);
+    if(!h){if(!v)return;hbS.mk=v}
+    else if(v&&v!==hbS.mk)h.mk=v;else delete h.mk;
+    mkClose();saveHab();
+  }
+  mkpop.addEventListener('click',function(e){
+    var b=e.target.closest('[data-mk]');if(b){mkSet(b.dataset.mk);return}
+    if(e.target.closest('[data-mkok]')){mkSet($('mk-own').value);return}
+    var h=mkCur&&mkCur!=='def'?habitById(mkCur):null;if(!h)return;
+    if(e.target.closest('[data-mkx]')){delete h.mk;mkClose();saveHab();return}
+    if(e.target.closest('[data-mkc0]')){delete h.col;mkClose();saveHab()}
+  });
+  mkpop.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='mk-own'){e.preventDefault();mkSet(e.target.value)}});
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-mkb]');
+    if(b){var was=mkCur===b.dataset.mkb;mkClose();if(!was)mkOpen(b);return}
+    if(mkCur!=null&&!mkpop.contains(e.target))mkClose();
+  });
   ipop.addEventListener('click',function(e){var b=e.target.closest('[data-ic]');if(!b||!icoCur)return;var s=SP[SPI[icoCur]];icoClose();if(s){s.ic=b.dataset.ic;saveSpheres()}});
   document.addEventListener('click',function(e){
     var t=e.target,b=t.closest('[data-col]');
@@ -4259,9 +4448,9 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   });
 
   /* ---------- Настройки: оформление, часы, календарь, привычки, питание, отчёт, больше возможностей, интеграции, данные ---------- */
-  var sv=$('view-settings'),SECS=[['more','Больше возможностей'],['look','Оформление'],['hours','Часы'],['cal','Календарь'],['habits','Привычки'],['food','Питание'],['report','Отчёт'],['int','Интеграции'],['data','Данные']];
+  var sv=$('view-settings'),SECS=[['help','Инструкция'],['more','Больше возможностей'],['look','Оформление'],['hours','Часы'],['cal','Календарь'],['habits','Привычки'],['food','Питание'],['report','Отчёт'],['int','Интеграции'],['data','Данные']];
   var askImp=false,askOld=false,impSph='other',expRange='month',hbDel=null;
-  var OBJ={ui:function(){return ui},cal:function(){return calS},rep:function(){return repS},sec:function(){return sec},feat:function(){return feat},food:function(){return food},gs:function(){return gs},en:function(){return enS}};
+  var OBJ={ui:function(){return ui},cal:function(){return calS},rep:function(){return repS},sec:function(){return sec},feat:function(){return feat},food:function(){return food},gs:function(){return gs},en:function(){return enS},hb:function(){return hbS}};
   function seg(name,list,val){return '<div class="seg" data-seg="'+name+'">'+list.map(function(x){return '<button type="button" data-v="'+x[0]+'" aria-pressed="'+(String(x[0])===String(val))+'">'+x[1]+'</button>'}).join('')+'</div>'}
   function swt(name,on,label){return '<button type="button" class="swt" role="switch" aria-checked="'+!!on+'" data-sw="'+name+'" aria-label="'+label+'"><i></i></button>'}
   function srow(t,sub,ctl){return '<div class="s-r"><span>'+t+(sub?'<small>'+sub+'</small>':'')+'</span><span class="s-c">'+ctl+'</span></div>'}
@@ -4270,10 +4459,13 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function saveUI(){applyUI();persist('@set');base=null;if(!tabOn(tab))tab='calendar';refresh()}
   function renderSettings(){
     if(!SECS.some(function(x){return x[0]===setSec}))setSec='more';
-    $('s-nav').innerHTML=SECS.map(function(x){return '<button type="button" data-sec="'+x[0]+'" aria-current="'+(x[0]===setSec)+'">'+x[1]+'</button>'}).join('');
+    /* раздел «Инструкция» открыт хоть раз: красные точки у него и у «Настроек» больше не показываются (запомнено в записях) */
+    if(setSec==='help'&&loaded&&!seen.help){seen.help=1;persist('@set')}
+    $('s-nav').innerHTML=SECS.map(function(x){return '<button type="button" data-sec="'+x[0]+'" aria-current="'+(x[0]===setSec)+'">'+x[1]+(x[0]==='help'&&helpNew()?'<i class="ndot" aria-hidden="true"></i>':'')+'</button>'}).join('');
+    $('set-btn').classList[helpNew()?'add':'remove']('new');
     SECS.forEach(function(x){$('set-'+x[0]).hidden=x[0]!==setSec});
     if(typingIn(sv))return;
-    ({look:renderLook,hours:renderHours,cal:renderCalSet,habits:renderHabSet,food:renderFoodSet,report:renderRepSet,more:renderMore,'int':renderInt,data:renderData})[setSec]();
+    ({help:renderHelp,look:renderLook,hours:renderHours,cal:renderCalSet,habits:renderHabSet,food:renderFoodSet,report:renderRepSet,more:renderMore,'int':renderInt,data:renderData})[setSec]();
   }
   function renderLook(){
     var acc=okHex(ui.accent);
@@ -4318,12 +4510,28 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       '<div class="s-g"><h2>Звук</h2>'+srow('Звук в начале события','звук капли, когда начинается запланированное событие. Звучит, пока сайт открыт на этом устройстве (можно в фоновой вкладке) и после открытия на страницу хоть раз нажали. На iPhone в режиме «Без звука» молчит',swt('cal.ding',calS.ding,'Звук в начале события'))+
       (calS.ding?srow('Громкость','',seg('cal.dvol',[[1,'Тише'],[2,'Обычно'],[3,'Громче']],calS.dvol)+'<button type="button" class="btn ghost" id="ding-test">Прослушать</button>'):'')+'</div>';
   }
+  /* оформление отметок (14.11): форма клеток, вид отметки и значок по умолчанию; у каждой привычки — свой цвет и значок */
+  var MARKS=['+','✓','✔','●','■','◆','★','♥','✦','✿','⚡','☀','☾','🔥','💪','✅','👍','💧','📖','🏃','🧘','🦷','🥗','😴'];
+  function hbFirst(){return habits.filter(function(x){return x.type==='check'})[0]||null}
+  function hbLookHTML(){
+    var h0=hbFirst(),c=h0?hCol(h0):'0;'+cv(SP[0]?SP[0].c:'#9AA3B5'),mk=h0?hMark(h0):hbS.mk,pat=[1,1,0,1,1,1,0,0,1,1,1,0,1,1];
+    return '<div class="s-g"><h2>Оформление отметок</h2><p>Как выглядят отмеченные дни в таблице привычек и в карточке дня. Каждой привычке можно задать и свои: кружок в списке ниже — цвет, квадратик рядом — значок.</p>'+
+      srow('Значок по умолчанию','для привычек, где свой значок не выбран','<button type="button" class="hc on sph mkb" style="--h:'+c+'" data-mkb="def" aria-label="Выбрать значок по умолчанию">'+esc(hbS.mk)+'</button>')+
+      srow('Форма клеток','',seg('hb.shape',[['r','Скруглённые'],['s','Квадратные'],['c','Круглые']],hbS.shape))+
+      srow('Как выглядит отметка','',seg('hb.look',[['fill','Заливка'],['soft','Мягкая'],['mark','Только значок']],hbS.look))+
+      '<div class="hb-prev" aria-hidden="true"><span>Так это выглядит</span>'+pat.map(function(x){return '<i class="hc sph'+(x?' on':'')+'" style="--h:'+c+'">'+(x?esc(mk):'')+'</i>'}).join('')+'</div></div>';
+  }
+  function hbLookBtns(h){
+    return '<span class="hb-look"><button type="button" class="cbtn" data-col="hb:'+h.id+'" style="background:'+hColHex(h)+'" aria-label="Цвет привычки «'+esc(h.n)+'»" title="Цвет"></button>'+
+      /* значок нужен только плюсику и времени: у оценки, часов, счётчика и числа в клетке стоят цифры */
+      (h.type==='check'||h.type==='time'?'<button type="button" class="hc on sph mkb" style="--h:'+hCol(h)+'" data-mkb="'+h.id+'" aria-label="Значок отметки «'+esc(h.n)+'»" title="Значок отметки">'+esc(hMark(h))+'</button>':'<span class="mkb-x" aria-hidden="true"></span>')+'</span>';
+  }
   function renderHabSet(){
-    $('set-habits').innerHTML='<div class="s-g"><h2>Привычки</h2>'+srow('Раздел «Привычки»','вкладка с отметками по дням',swt('sec.habits',sec.habits,'Раздел «Привычки»'))+'</div>'+
+    $('set-habits').innerHTML='<div class="s-g"><h2>Привычки</h2>'+srow('Раздел «Привычки»','вкладка с отметками по дням',swt('sec.habits',sec.habits,'Раздел «Привычки»'))+'</div>'+hbLookHTML()+
       '<div class="s-g wide"><h2>Мои привычки</h2><p>Порядок меняется перетаскиванием за точки слева. Плюсик отвечает «сделал или нет». Счётчик считает, сколько раз. Число хранит любое значение: вес, шаги, страницы. Часы идут в зачёт сферы, так ведётся сон. Время — во сколько заснул: в сетке плюс, если раньше границы, при наведении точное время, справа среднее. Оценка от 1 до 10 — так ведётся энергия. Вид отметки можно менять в любой момент, прежние записи останутся.</p>'+
       (habits.length?'<div class="hb-list">'+habits.map(function(h,i){
         var s=SP[SPI[h.s]];
-        return '<div class="hb-row" data-hb="'+h.id+'">'+GRIP+'<input class="inp" data-hbf="n" maxlength="60" value="'+esc(h.n)+'" aria-label="Название привычки">'+
+        return '<div class="hb-row" data-hb="'+h.id+'">'+GRIP+hbLookBtns(h)+'<input class="inp" data-hbf="n" maxlength="60" value="'+esc(h.n)+'" aria-label="Название привычки">'+
           '<select class="inp" data-hbf="type" aria-label="Вид отметки">'+HT.map(function(x){return '<option value="'+x[0]+'"'+(h.type===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select>'+
           '<select class="inp fsel sph on" style="--h:'+s.h+'" data-hbf="s" aria-label="Сфера">'+SP.filter(function(x){return !x.off||x.id===h.s}).map(function(x){return '<option value="'+x.id+'"'+oSt(x.c)+(x.id===h.s?' selected':'')+'>'+x.n+'</option>'}).join('')+'</select>'+
           (h.type==='num'?'<input class="inp" data-hbf="u" maxlength="12" placeholder="единица: кг, шаги" value="'+esc(h.u||'')+'" aria-label="Единица измерения">'
@@ -4526,6 +4734,259 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   $('sy-in').onclick=function(){syDlgOpen(false)};
   $('save-pill').onclick=function(){if(fhWait){fileResume();return}setSec='data';setTab('settings')};
 
+  /* ---------- Инструкция (14.11): раздел в настройках и экскурсия по сайту ----------
+     В разделе две кнопки: экскурсия по всем разделам и по выбранным. Экскурсия затемняет экран, подсвечивает нужное место,
+     рядом подсказка, а рука показывает действие: щелчок, протяжку левой кнопкой или перетаскивание правой. В шаге
+     «Как двигать календарь» сетка правда едет за рукой, после шага прокрутка возвращается на место.
+     Пока идёт экскурсия, нажатия по странице не проходят, клавиши листают шаги, утреннее окно и обновление сайта ждут. */
+  var TSEC=[['calendar','Календарь'],['habits','Привычки'],['food','Питание'],['goals','Цели'],['diary','Дневник'],['books','Книги'],['report','Отчёт'],['settings','Настройки']];
+  var helpPick=false,helpSel={},tr=null,trEl=null,trRaf=0,trT=0;
+  function helpNew(){return loaded&&!(seen&&seen.help)}
+  function tourSecs(){return TSEC.filter(function(x){var k=x[0];return k==='calendar'||k==='settings'||(k==='food'?foodOn():tabOn(k))})}
+  function renderHelp(){
+    var L=tourSecs(),n=L.filter(function(x){return helpSel[x[0]]}).length;
+    $('set-help').innerHTML='<div class="s-g"><h2>Инструкция</h2><p>Короткая экскурсия по сайту: экран затемняется, нужное место подсвечивается, а рука показывает, куда нажать и что потянуть. Листай кнопками «Далее» и «Назад» или стрелками на клавиатуре, выйти — Esc или крестик.</p>'+
+      '<div class="hp-btns"><button type="button" class="btn" id="tour-all">Запустить инструкцию по всем разделам</button><button type="button" class="btn ghost" id="tour-pick" aria-expanded="'+helpPick+'">Запустить по конкретным разделам</button></div>'+
+      (helpPick?'<div class="hp-pick"><p>Отметь разделы, которые хочешь пройти:</p><div class="hp-chips">'+L.map(function(x){return '<button type="button" class="hp-c" data-tsec="'+x[0]+'" aria-pressed="'+!!helpSel[x[0]]+'">'+x[1]+'</button>'}).join('')+'</div>'+
+        '<div><button type="button" class="btn" id="tour-go"'+(n?'':' disabled')+'>'+(n?'Запустить выбранные ('+n+')':'Выбери хотя бы один раздел')+'</button></div></div>':'')+'</div>';
+  }
+  sv.addEventListener('click',function(e){
+    var t=e.target;
+    if(t.closest('#tour-all')){tourStart(tourSecs().map(function(x){return x[0]}));return}
+    if(t.closest('#tour-pick')){helpPick=!helpPick;renderHelp();return}
+    var c=t.closest('[data-tsec]');if(c){var k=c.dataset.tsec;if(helpSel[k])delete helpSel[k];else helpSel[k]=1;renderHelp();return}
+    if(t.closest('#tour-go')){var ks=tourSecs().map(function(x){return x[0]}).filter(function(k){return helpSel[k]});if(ks.length)tourStart(ks)}
+  });
+
+  /* поиск элемента для подсветки: селектор, список селекторов или функция; берётся первый видимый */
+  function trQ(sel){
+    var l=[].concat(sel||[]);
+    for(var i=0;i<l.length;i++){
+      var x=l[i];
+      if(typeof x==='function'){var el=x();if(el)return el;continue}
+      var els=document.querySelectorAll(x);
+      for(var j=0;j<els.length;j++){var r=els[j].getBoundingClientRect();if(r.width>4&&r.height>4)return els[j]}
+    }
+    return null;
+  }
+  /* событие, целиком видное в сетке */
+  function trEv(){
+    var r=tg.getBoundingClientRect(),l=tgIn.querySelectorAll('.ev:not(.ghost)');
+    for(var i=0;i<l.length;i++){var b=l[i].getBoundingClientRect();if(b.left>=r.left+gw()&&b.right<=r.right-4&&b.top>=r.top+64&&b.bottom<=r.bottom-14&&b.height>=18)return l[i]}
+    return null;
+  }
+  function trToday(){var t0=day0(new Date()).getTime();return hv.querySelector('.hm [data-d="'+t0+'"],.hm [data-hsel="'+t0+'"]')}
+  function trBasket(){var v=$('view-'+(foodInHabits()?'habits':'food')),b=v&&v.querySelector('[data-fqo]');return b?b.closest('.box'):null}
+  function trDiary(){var t=$('d-text');return t?t.closest('.box'):null}
+  function trWeek(){if(view==='month')setView('week')}
+  /* шаги по разделам. d — показ действия: k click / drag / rdrag, a и b — доли от размеров подсвеченного (или on) элемента */
+  function tourSteps(k){
+    var F=foodInHabits()?'habits':'food',wide=window.innerWidth>1100,open=bkIn()&&!!bkKey;
+    var S={
+      calendar:[
+        {tab:'calendar',pre:trWeek,el:'#tg',t:'Новое событие',x:'Щёлкни один раз по свободному месту — в нужный день и час. Откроется окошко: название, время, сфера, повтор и заметка.',d:{k:'click',a:[.42,.36]}},
+        {tab:'calendar',el:'#tg',t:'Событие нужной длины',x:'Зажми левую кнопку на свободном месте и протяни вниз — событие займёт ровно это время. Готовое событие можно перетащить на другое время, а потянув за верхний или нижний край, растянуть. С зажатой клавишей Alt событие копируется.',d:{k:'drag',a:[.66,.3],b:[.66,.56],ghost:1}},
+        {tab:'calendar',el:'#tg',t:'Как двигать календарь',x:'Полоса прокрутки снизу листает дни. А ещё можно зажать <b>правую кнопку мыши</b> и тащить в любую сторону: вбок, вверх-вниз и даже по диагонали. Календарь остановится ровно там, где отпустишь, без привязки к дням. На телефоне просто листай пальцем.',d:{k:'rdrag',a:[.45,.6],b:[.25,.32],scroll:'#tg'}},
+        {tab:'calendar',el:[trEv,'#tg'],t:'Окно события',x:'Щелчок по событию открывает его: название, время, сфера, повтор, заметка, удаление. Прошедшие дела засчитываются в часы сферы при сверке, она идёт раз в 15 минут.',d:{k:'click',a:[.5,.3]}},
+        {tab:'calendar',el:'.wk-nav',t:'Вид и переходы',x:'День, неделя или месяц, «Сегодня» — к текущей дате, стрелки листают. Клавиши: <b>T</b> — сегодня, <b>D</b>, <b>W</b>, <b>M</b> — день, неделя, месяц, <b>C</b> — новое событие, <b>← →</b> — листать.',d:{k:'click',on:'#wk-today'}},
+        wide?{tab:'calendar',el:'.side',t:'Мини-календарь и сферы',x:'Слева — мини-календарь для быстрых переходов и сферы с часами на экране: зачтено / запланировано. Нажми на сферу — откроется её статистика за месяц.',d:{k:'click',on:'#leg .lg',a:[.3,.5]}}:null,
+        {tab:'calendar',el:'#set-btn',t:'Часы на цели',x:'Хочешь чему-то научиться и видеть, сколько времени на это ушло? В окне события привяжи дело к цели («+ Добавить цель»), а в Настройках → «Больше возможностей» включи «Часы у целей». Тогда время таких дел будет копиться в цели.',d:{k:'click'}}
+      ],
+      habits:[
+        {tab:'habits',el:'.hm-wrap',t:'Отметки за месяц',x:'Строка — привычка, столбец — день. Нажми на клетку, чтобы отметить день. У счётчика первое нажатие ставит 0, следующие добавляют по одному.',d:{k:'click',on:trToday}},
+        {tab:'habits',el:'.h-side .box',t:'Карточка дня',x:'Выбранный день целиком: отметки, часы сна, время засыпания, оценка дня и числа. Стрелки ‹ › листают дни, а нажатие на день в таблице открывает его здесь.'},
+        {tab:'habits',el:'#mswitch',t:'Месяц',x:'Месяц переключается здесь — таблица и итоги пересчитаются сами.',d:{k:'click',on:'#m-prev'}},
+        habits.length?{tab:'habits',el:'.hstats',t:'Итоги месяца',x:'Под таблицей — итог по каждой привычке и сравнение с прошлым месяцем.'}:null,
+        enHab()?{tab:'habits',el:'.en-sec',t:'Энергия',x:'Если ставить оценку дня от 1 до 10, сайт ищет закономерности: после чего энергия выше, а после чего ниже. Утром он сам спросит, как прошёл вчерашний день.'}:null,
+        {tab:'habits',el:'[data-toset="habits"]',t:'Свои привычки и галочки',x:'Набор привычек и вид отметки, а ещё значок, цвет и форма галочек — в Настройках → «Привычки».',d:{k:'click'}}
+      ],
+      food:[
+        {tab:F,el:trBasket,t:'Корзина дня',x:'Всё, что съедено за выбранный день: калории и БЖУ по приёмам пищи. «+ КБЖУ» — записать цифры вручную, без блюда.',d:{k:'click',on:'[data-fqo]'}},
+        {tab:F,el:'.f-lib',t:'Общая корзина блюд',x:'Выбери приём пищи и нажми на блюдо — оно попадёт в корзину дня, вес меняется там же. «+ Блюдо» — своё блюдо с КБЖУ, «Меню магазинов» и «Рестораны» — готовые блюда с весом и КБЖУ.'},
+        {tab:'settings',sec:'food',el:'#set-food .s-g',t:'Нормы и строки',x:'В Настройках → «Питание» — нормы калорий и БЖУ, приёмы пищи, цвет и строки в таблице. Там же питание можно вынести в отдельную вкладку.'}
+      ],
+      goals:[
+        {tab:'goals',el:'.g-new',t:'Новая цель',x:'Напиши название и нажми Enter — цель появится в таблице. Если в фильтрах выбраны сфера, статус или приоритет, они сразу перейдут к новой цели.',d:{k:'click',on:'#g-name',a:[.25,.5]}},
+        {tab:'goals',el:'.g-wrap',t:'Таблица целей',x:'Название, сфера, приоритет, статус и заметка меняются прямо в строке. Нажми на заголовок столбца — таблица отсортируется.',d:{k:'click',on:'.g-h [data-sort="st"]'}},
+        {tab:'goals',el:'.g-bar',t:'Поиск и фильтры',x:'Поиск по названию и заметкам, фильтры по статусу, сфере и приоритету. Справа — сколько целей выполнено.'},
+        {tab:'goals',el:'#set-btn',t:'Часы у целей',x:'Включи в Настройках → «Больше возможностей» → «Часы у целей», и у целей появится столбец «Часы»: время связанных событий календаря плюс то, что добавлено вручную.',d:{k:'click'}}
+      ],
+      diary:[
+        {tab:'diary',el:trDiary,t:'Чем горжусь',x:'Запиши, что сегодня получилось, — даже маленькое считается. Дата и сфера по желанию, потом «Записать».',d:{k:'click',on:'#d-text',a:[.3,.35]}},
+        {tab:'diary',el:'#d-rnd',t:'Напомни хорошее',x:'Достаёт случайную запись — перечитать в день, когда всё валится из рук.',d:{k:'click'}},
+        {tab:'diary',el:'.d-main',t:'Лента записей',x:'Все записи по месяцам. Фильтр по сферам — рядом с кнопкой, удалить запись — справа от неё.'}
+      ],
+      books:open?[
+        {tab:'books',el:['.bk-list','.bk-lock'],t:'Список книг',x:'Каждая книга — одна строка: источник, тема и статус. Нажми на строку или стрелку справа — раскроются описание, «к чему в моём случае» и поле для вывода.',d:{k:'click',on:'.bk-tg'}},
+        {tab:'books',el:['.bk-r .tag','.bk-lock'],t:'Статус',x:'Статус меняется прямо в строке: не начато, читаю, прочитано. Фильтр сверху оставит только нужные, а «Развернуть все» откроет все описания разом.',d:{k:'click'}}
+      ]:[
+        {tab:'books',el:['.bk-lock','.bk-list'],t:'Закрытый раздел',x:'Книги видны только после входа по паролю: в открытом коде сайта список хранится зашифрованным.'}
+      ],
+      report:[
+        {tab:'report',el:'.sum',t:'Месяц в цифрах',x:'Цель месяца по сферам свободного времени, сколько уже зачтено и насколько отстаёшь от темпа.'},
+        {tab:'report',el:'.mat',t:'Итог по месяцам',x:'Каждая клетка — сфера за месяц: зачтено из цели. Нажми на клетку — откроется статистика сферы, на название месяца — он станет текущим.',d:{k:'click',on:'.mat .cell.on'}},
+        {tab:'report',el:'#rc-open',t:'Листаемый итог',x:'Итог месяца по слайдам: сферы, где недобежал, цели, привычки и рекорды. 1-го числа он открывается сам, это меняется в Настройках → «Отчёт».',d:{k:'click'}},
+        repS.wheel?{tab:'report',el:'.bal',t:'Колесо свободного времени',x:'Чем больше сектор, тем ближе сфера к цели месяца.'}:null
+      ],
+      settings:[
+        {tab:'settings',sec:'more',el:'#s-nav',t:'Разделы настроек',x:'Оформление (тема, цвета, шрифты), часы на месяц по сферам, календарь и сферы, привычки, питание, отчёт, Google Календарь и данные. В «Больше возможностей» включаются и выключаются вкладки сайта.'},
+        {tab:'settings',sec:'more',el:'#s-nav [data-sec="data"]',t:'Данные и вход по паролю',x:'Здесь автосохранение, экспорт и вход по паролю: с ним записи общие для компьютера и телефона, а закрытые разделы открываются только после входа.',d:{k:'click'}},
+        {tab:'settings',sec:'more',el:'#s-nav [data-sec="help"]',t:'Инструкция',x:'Эту экскурсию можно запустить снова — целиком или по отдельным разделам.',d:{k:'click'}}
+      ]
+    };
+    return (S[k]||[]).filter(Boolean);
+  }
+  function tourStart(keys){
+    if(!keys||!keys.length)return;
+    var steps=[],multi=keys.length>1;
+    if(keys.indexOf('books')>=0&&bkIn()&&bkKey)bkOpen();
+    if(multi)steps.push({s:'Начало',el:'#tabs',t:'Привет! Это короткая экскурсия',x:'Сверху — разделы сайта, пройдёмся по каждому. Подсвеченное место — то, о чём речь, а рука показывает, куда нажать. Листай «Далее» и «Назад» или стрелками на клавиатуре, Esc — выйти.'});
+    keys.forEach(function(k){
+      var l=tourSteps(k),nm=(TSEC.filter(function(x){return x[0]===k})[0]||['',''])[1];
+      l.forEach(function(st,j){st.s=nm;st.n=j+1;st.m=l.length;steps.push(st)});
+    });
+    if(multi)steps.push({s:'Конец',t:'Готово!',x:'Это вся экскурсия. Если что-то забудется — Настройки → «Инструкция», там её можно пройти снова целиком или по разделам.'});
+    closePops();mselClose();colClose();icoClose();mkClose();openMenu(false);if(!sphDlg.hidden)closePanel();
+    tr={l:steps,i:-1,from:{tab:tab,sec:setSec},sc:null};navLock=true;
+    trBuild();trGo(0,1);
+  }
+  var TRCUR='<svg class="cur" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8.2-6.3 1.5-3.4 6.1z" fill="#fff" stroke="#14171F" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+  function trMouse(side){return '<svg viewBox="0 0 12 16" aria-hidden="true"><rect x=".8" y=".8" width="10.4" height="14.4" rx="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 .8v5.6M.8 6.4h10.4" stroke="currentColor" stroke-width="1.1"/><path d="'+(side==='r'?'M6 .8a5.2 5.2 0 0 1 5.2 5.2v.4H6z':'M6 .8a5.2 5.2 0 0 0 -5.2 5.2v.4H6z')+'" fill="#F0453A"/></svg>'}
+  function trBuild(){
+    if(!trEl){
+      var r=document.createElement('div');r.className='tour';r.id='tour';r.hidden=true;
+      r.innerHTML='<div class="tr-hole"></div><div class="tr-ghost" hidden>Новое событие</div><div class="tr-rip"></div><div class="tr-hand">'+TRCUR+'<span class="tr-badge"></span></div><div class="tr-tip" role="dialog" aria-modal="true" aria-label="Инструкция"></div>';
+      document.body.appendChild(r);
+      trEl={root:r,hole:r.querySelector('.tr-hole'),ghost:r.querySelector('.tr-ghost'),rip:r.querySelector('.tr-rip'),hand:r.querySelector('.tr-hand'),badge:r.querySelector('.tr-badge'),tip:r.querySelector('.tr-tip')};
+      r.addEventListener('click',function(e){
+        if(!tr)return;
+        if(e.target.closest('[data-trn]'))trGo(tr.i+1,1);
+        else if(e.target.closest('[data-trp]'))trGo(tr.i-1,-1);
+        else if(e.target.closest('[data-trx]'))tourEnd(false);
+      });
+      r.addEventListener('contextmenu',function(e){e.preventDefault()});
+    }
+    trEl.root.hidden=false;
+  }
+  function trGo(i,dir){
+    if(!tr)return;
+    if(i<0)i=0;
+    if(i>=tr.l.length){tourEnd(true);return}
+    trStop();
+    var s=tr.l[i];tr.i=i;
+    if(s.tab){if(s.tab==='settings'&&s.sec)setSec=s.sec;if(tab!==s.tab||s.tab==='settings')setTab(s.tab)}
+    if(s.pre)s.pre();
+    trEl.tip.style.visibility='hidden';
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      if(!tr||tr.i!==i)return;
+      var el=s.el?trQ(s.el):null;
+      if(el){var b=el.getBoundingClientRect();if(b.top<0||b.bottom>window.innerHeight||b.left<0||b.right>window.innerWidth){try{el.scrollIntoView({block:'center',inline:'nearest'})}catch(_){el.scrollIntoView()}}}
+      requestAnimationFrame(function(){if(tr&&tr.i===i)trPaint(s,el,i)});
+    })});
+  }
+  function trPaint(s,el,i){
+    var vw=window.innerWidth,vh=window.innerHeight,E=trEl,r=null;
+    if(el){var b=el.getBoundingClientRect(),p=s.pad==null?6:s.pad;r={l:Math.max(6,b.left-p),t:Math.max(6,b.top-p),r:Math.min(vw-6,b.right+p),b:Math.min(vh-6,b.bottom+p)};if(r.r-r.l<10||r.b-r.t<10)r=null}
+    E.root.classList[r?'remove':'add']('nohole');
+    if(r){E.hole.style.left=r.l+'px';E.hole.style.top=r.t+'px';E.hole.style.width=(r.r-r.l)+'px';E.hole.style.height=(r.b-r.t)+'px'}
+    var last=i===tr.l.length-1;
+    E.tip.innerHTML='<div class="tr-h"><span class="lab">'+esc(s.s||'')+(s.m>1?' · '+s.n+' из '+s.m:'')+'</span><button type="button" class="ib" data-trx aria-label="Закрыть инструкцию">×</button></div>'+
+      '<h3>'+s.t+'</h3><p>'+s.x+'</p><div class="tr-bar"><i style="width:'+Math.round((i+1)/tr.l.length*100)+'%"></i></div>'+
+      '<div class="tr-f"><span class="lab">'+(i+1)+' / '+tr.l.length+'</span><span><button type="button" class="btn ghost" data-trp'+(i?'':' disabled')+'>Назад</button><button type="button" class="btn" data-trn>'+(last?'Готово':'Далее')+'</button></span></div>';
+    trPlace(r,s);
+    E.tip.style.visibility='';
+    if(s.d&&el&&r)trDemo(s.d,el);
+    var nb=E.tip.querySelector('[data-trn]');try{nb.focus({preventScroll:true})}catch(_){nb.focus()}
+  }
+  /* подсказка ставится рядом с подсветкой: снизу, сверху, справа или слева; если места нет — в угол подсветки, подальше от руки */
+  function trPlace(r,s){
+    var tip=trEl.tip,vw=window.innerWidth,vh=window.innerHeight,w=tip.offsetWidth,h=tip.offsetHeight,M=12,x,y;
+    if(!r){x=(vw-w)/2;y=(vh-h)/2}
+    else if(vw<640){x=(vw-w)/2;y=(r.t+r.b)/2>vh/2?M:vh-h-M}
+    else{
+      var cx=(r.l+r.r)/2,cy=(r.t+r.b)/2,p=null;
+      if(r.b+M+h<=vh-M)p=[cx-w/2,r.b+M];
+      else if(r.t-M-h>=M)p=[cx-w/2,r.t-M-h];
+      else if(r.r+M+w<=vw-M)p=[r.r+M,cy-h/2];
+      else if(r.l-M-w>=M)p=[r.l-M-w,cy-h/2];
+      else{var dx=s.d&&s.d.a?s.d.a[0]:.5;p=[dx>.5?r.l+M+8:r.r-w-M-8,r.b-h-M-8]}
+      x=p[0];y=p[1];
+    }
+    tip.style.left=Math.round(clamp(x,M,Math.max(M,vw-w-M)))+'px';tip.style.top=Math.round(clamp(y,M,Math.max(M,vh-h-M)))+'px';
+  }
+  /* показ действия рукой: щелчок с кругом, протяжка с рамкой нового события, перетаскивание правой кнопкой (сетка едет за рукой) */
+  function trDemo(d,el){
+    var tgt=(d.on&&trQ(d.on))||el,b=tgt.getBoundingClientRect(),E=trEl;
+    if(b.width<2||b.height<2)return;
+    function P(f){return{x:b.left+b.width*f[0],y:b.top+b.height*f[1]}}
+    var A=P(d.a||[.5,.5]),B=d.b?P(d.b):A,S={x:A.x+70,y:A.y+56},k=d.k,T=k==='click'?2400:k==='drag'?3300:4800,t0=0,cyc=-1;
+    if(S.x>window.innerWidth-20)S.x=A.x-70;if(S.y>window.innerHeight-20)S.y=A.y-56;
+    var sc=k==='rdrag'&&d.scroll?trQ(d.scroll):null;
+    if(sc){tr.sc={el:sc,l:sc.scrollLeft,t:sc.scrollTop,f:sc.classList.contains('free')};sc.classList.add('free')}
+    E.badge.innerHTML=k==='rdrag'?trMouse('r')+'правая кнопка':k==='drag'?trMouse('l')+'зажми и тяни':trMouse('l')+'щелчок';
+    function ease(x){return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2}
+    function lerp(p,q,f){return{x:p.x+(q.x-p.x)*f,y:p.y+(q.y-p.y)*f}}
+    function seg(t,a,c){return clamp((t-a)/(c-a),0,1)}
+    function put(p,down,o){E.hand.style.transform='translate('+p.x.toFixed(1)+'px,'+p.y.toFixed(1)+'px)';E.hand.style.opacity=o;E.hand.classList[down?'add':'remove']('down')}
+    function rip(p){E.rip.style.left=p.x+'px';E.rip.style.top=p.y+'px';E.rip.classList.remove('go');void E.rip.offsetWidth;E.rip.classList.add('go')}
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){put(k==='click'?A:B,true,1);return}
+    function frame(now){
+      if(!tr)return;
+      if(!t0)t0=now;
+      var tt=now-t0,c=Math.floor(tt/T),t=tt%T,p,down=false,o=Math.min(1,t/200);
+      if(k==='click'){
+        p=lerp(S,A,ease(seg(t,0,750)));
+        down=t>=750&&t<950;
+        if(t>=780&&cyc!==c){cyc=c;rip(A)}
+        if(t>1950)o=1-seg(t,1950,2400);
+      }else if(k==='drag'){
+        p=t<650?lerp(S,A,ease(seg(t,0,650))):lerp(A,B,ease(seg(t,800,1900)));
+        down=t>=650&&t<2000;
+        if(d.ghost){
+          var g=E.ghost,y0=Math.min(A.y,p.y),h0=Math.abs(p.y-A.y),cw=Math.max(40,(colW||120)-8);
+          if(t>=800&&t<2900&&h0>4){g.hidden=false;g.style.left=(A.x-cw/2)+'px';g.style.width=cw+'px';g.style.top=y0+'px';g.style.height=h0+'px';g.style.opacity=t>2500?1-seg(t,2500,2900):1}else g.hidden=true;
+        }
+        if(t>2900)o=1-seg(t,2900,3300);
+      }else{
+        if(t<550)p=lerp(S,A,ease(seg(t,0,550)));
+        else if(t<2050)p=lerp(A,B,ease(seg(t,750,2050)));
+        else if(t<2350)p=B;
+        else p=lerp(B,A,ease(seg(t,2350,3650)));
+        down=t>=600&&t<3800;
+        if(t>4300)o=1-seg(t,4300,4800);
+        if(tr.sc&&down){tr.sc.el.scrollLeft=tr.sc.l-(p.x-A.x);tr.sc.el.scrollTop=tr.sc.t-(p.y-A.y)}
+      }
+      put(p,down,o);
+      trRaf=requestAnimationFrame(frame);
+    }
+    trRaf=requestAnimationFrame(frame);
+  }
+  function trStop(){
+    if(trRaf)cancelAnimationFrame(trRaf);trRaf=0;
+    if(trEl){trEl.hand.style.opacity=0;trEl.hand.classList.remove('down');trEl.ghost.hidden=true;trEl.rip.classList.remove('go')}
+    if(tr&&tr.sc){var c=tr.sc;tr.sc=null;c.el.scrollLeft=c.l;c.el.scrollTop=c.t;if(!c.f)c.el.classList.remove('free')}
+  }
+  function tourEnd(done){
+    if(!tr)return;
+    trStop();var f=tr.from;tr=null;
+    if(trEl)trEl.root.hidden=true;
+    if(f){setSec=f.sec||setSec;setTab(f.tab||'calendar')}
+    navLock=false;navPush(true);
+    if(done)toast('Готово! Инструкция всегда под рукой: Настройки → «Инструкция».');
+  }
+  /* клавиши во время экскурсии: стрелки листают, Esc выходит, Tab ходит только по кнопкам подсказки; до страницы ничего не доходит */
+  window.addEventListener('keydown',function(e){
+    if(!tr)return;
+    var k=e.key,inTip=trEl&&trEl.tip.contains(document.activeElement);
+    if(k==='Escape'){e.preventDefault();tourEnd(false)}
+    else if(k==='ArrowRight'){e.preventDefault();trGo(tr.i+1,1)}
+    else if(k==='ArrowLeft'){e.preventDefault();if(tr.i>0)trGo(tr.i-1,-1)}
+    else if(k==='Tab'){e.preventDefault();var bs=[].slice.call(trEl.tip.querySelectorAll('button:not([disabled])')),j=bs.indexOf(document.activeElement);j=j<0?0:(j+(e.shiftKey?-1:1)+bs.length)%bs.length;if(bs[j])bs[j].focus()}
+    else if(!((k==='Enter'||k===' ')&&inTip))e.preventDefault();
+    e.stopPropagation();
+  },true);
+  window.addEventListener('resize',function(){if(!tr)return;clearTimeout(trT);trT=setTimeout(function(){if(tr)trGo(tr.i,1)},180)});
+
   /* ---------- кнопки браузера «назад» и «вперёд»: каждый переход по сайту становится шагом истории ---------- */
   var TABDEF=[['calendar','Календарь'],['habits','Привычки'],['food','Питание'],['goals','Цели'],['diary','Дневник'],['books','Книги'],['report','Отчёт']];
   var TABS=TABDEF.map(function(x){return x[0]}).concat(['settings']);
@@ -4561,6 +5022,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     $('demo-pill').hidden=!EXAMPLE;
     $('sync-pill').textContent=loaded?'Сверено '+hm(syncAt)+' · след. '+hm(nextSync):'';
     $('set-btn').setAttribute('aria-pressed',tab==='settings');
+    $('set-btn').classList[helpNew()?'add':'remove']('new');
     saveShow();
   }
   function renderAll(){
@@ -4587,7 +5049,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 
   document.addEventListener('keydown',function(e){
     var tgt=e.target,typing=tgt&&/^(INPUT|SELECT|TEXTAREA)$/.test(tgt.tagName);
-    if(e.key==='Escape'){if(colCur){colClose();return}if(icoCur){icoClose();return}if(dEd){closeDish();return}if(!sphDlg.hidden){closePanel();return}}
+    if(e.key==='Escape'){if(colCur){colClose();return}if(icoCur){icoClose();return}if(mkCur!=null){mkClose();return}if(dEd){closeDish();return}if(!sphDlg.hidden){closePanel();return}}
     if(dEd||!sphDlg.hidden)return;
     if(!$('recap').hidden){
       if(e.key==='Escape')closeRecap();else if(e.key==='ArrowRight')rcSlide(rc.i+1);else if(e.key==='ArrowLeft')rcSlide(rc.i-1);
@@ -4693,8 +5155,8 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   setInterval(dkCheck,5000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)dkCheck()});
 
-  var UPD_NAME='index',UPD_BUILD='a92afcc8c5';
-  function updBusy(){return !loaded||!!cur||busy||hpopDay!=null||syBusy||syDlgShown()||!$('recap').hidden||[pop,hpop,gpop,$('dish-dlg'),$('m-dlg'),$('en-dlg')].some(function(x){return x&&!x.hidden})}
+  var UPD_NAME='index',UPD_BUILD='ec036f697c';
+  function updBusy(){return !loaded||!!tr||!!cur||busy||hpopDay!=null||syBusy||syDlgShown()||!$('recap').hidden||[pop,hpop,gpop,$('dish-dlg'),$('m-dlg'),$('en-dlg')].some(function(x){return x&&!x.hidden})}
   function updFlush(){lsSave()}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
      При выкладке рядом с сайтом кладётся version.json с номерами сборок обоих сайтов. Страница сверяется с ним через 8 секунд после
