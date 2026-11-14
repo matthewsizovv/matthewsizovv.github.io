@@ -189,7 +189,7 @@ h1{margin:10px 0 0;font-family:var(--display);font-weight:300;font-size:clamp(28
 .wk-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .wk-head h2{margin:0;font-family:var(--display);font-weight:400;font-size:calc(22px*var(--fz));letter-spacing:-.02em}
 .wk-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.tg{--gw:52px;overflow:auto;border:1px solid var(--line);border-radius:20px;min-height:0;position:relative;scroll-snap-type:x proximity;scroll-padding-left:var(--gw);overscroll-behavior:contain;user-select:none}
+.tg{--gw:52px;overflow:auto;border:1px solid var(--line);border-radius:20px;min-height:0;position:relative;background:var(--bg);scroll-snap-type:x proximity;scroll-padding-left:var(--gw);overscroll-behavior:contain;user-select:none}
 .tg-in{width:max-content;min-width:100%}
 .tg-head{position:sticky;top:0;z-index:6;background:var(--surface);border-bottom:1px solid var(--line)}
 .tg-row{display:flex}
@@ -206,7 +206,7 @@ h1{margin:10px 0 0;font-family:var(--display);font-weight:300;font-size:clamp(28
 .tg-body{display:flex;height:calc(24*var(--hh));position:relative}
 .gut{position:sticky;left:0;z-index:5;flex:0 0 var(--gw);background:var(--surface)}
 .gut span{position:absolute;right:8px;transform:translateY(-50%);font-size:calc(11px*var(--fz));color:var(--muted);font-variant-numeric:tabular-nums}
-.day{flex:0 0 var(--cw);position:relative;border-left:1px solid var(--line);scroll-snap-align:start;cursor:crosshair;
+.day{flex:0 0 var(--cw);position:relative;border-left:1px solid var(--line);scroll-snap-align:start;cursor:-webkit-grab;cursor:grab;
   background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hh) - 1px),var(--line) calc(var(--hh) - 1px),var(--line) var(--hh))}
 .day.today{background-color:var(--today)}
 .day.we{background-color:var(--we)}
@@ -858,9 +858,12 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   .bk-tg{grid-column:4;grid-row:1/span 2}
   .bk-d{grid-template-columns:minmax(0,1fr);padding:4px 12px 16px 40px}
 }
-/* ---------- календарь: перетаскивание правой кнопкой мыши, без привязки к дням (14.11) ---------- */
+/* ---------- календарь: перетаскивание мышью, без привязки к дням (14.11) ---------- */
 .tg.free{scroll-snap-type:none}
-.tg.panning,.tg.panning *{cursor:grabbing!important}
+.tg-in{cursor:-webkit-grab;cursor:grab}
+.tg-in button,.tg-in a{cursor:pointer}
+.tg-in .ev{cursor:-webkit-grab;cursor:grab}
+.tg.panning,.tg.panning *,.tg.panning .ev::before,.tg.panning .ev::after{cursor:-webkit-grabbing!important;cursor:grabbing!important}
 /* ---------- привычки: форма клеток и вид отметки (14.11); атрибуты стоят на <html> ---------- */
 .hc,.tog{line-height:1;overflow:hidden}
 :root[data-hs="s"] .hc{border-radius:2px}
@@ -2679,6 +2682,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     $('mini').innerHTML=h;
   }
   function renderCalendar(reposition){
+    if(pan){pan.dirty=true;return}
     var month=view==='month';
     tg.hidden=month;mg.hidden=!month;
     if(month){viewStart=mStart(mk(viewStart));renderMonth()}
@@ -2703,7 +2707,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       scT=setTimeout(calSettle,160);
     });
   },{passive:true});
-  /* после прокрутки: подгрузка окна дней у краёв. Положение «без привязки» (после перетаскивания правой кнопкой) сохраняется */
+  /* после прокрутки: подгрузка окна дней у краёв. Положение «без привязки» (после перетаскивания мышью) сохраняется */
   function calSettle(){
     if(busy||pan||!base||view==='month')return;
     var i=diffDays(base,viewStart);
@@ -2760,7 +2764,8 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     refresh();
   }
 
-  /* мышь: перенос, растягивание, создание протяжкой; шаг 15 минут. Касание: тап открывает или создаёт, прокрутка остаётся нативной */
+  /* мышь (14.11): щелчок по свободному месту — новое событие, протяжка — двигает календарь, Shift + протяжка — событие нужной длины;
+     события переносятся и растягиваются за края, шаг 15 минут. Касание: тап открывает или создаёт, прокрутка остаётся нативной */
   var act=null;
   function bodyEl(){return tgIn.querySelector('.tg-body')}
   function pt(e){
@@ -2783,19 +2788,24 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   tg.addEventListener('pointerdown',function(e){
     if(e.button||view==='month'||e.target.closest('.hb'))return;
     var el=e.target.closest('.ev'),day=e.target.classList&&e.target.classList.contains('day')?e.target:null;
-    if(!el&&!day)return;
-    act={x:e.clientX,y:e.clientY,on:false,pid:e.pointerId,touch:e.pointerType==='touch',p0:pt(e)};
+    /* пустые места без своего действия (часы слева, шапка с днями, линия «сейчас») — за них календарь только тянется */
+    var bare=!el&&!day&&!e.target.closest('button,a,input,select,textarea,[data-gid]')&&!!e.target.closest('.tg-in');
+    if(!el&&!day&&!bare)return;
+    act={x:e.clientX,y:e.clientY,on:false,pid:e.pointerId,touch:e.pointerType==='touch',p0:pt(e),sl:tg.scrollLeft,st:tg.scrollTop};
+    if(bare){act.mode='bare';return}
     if(el){
       var r=el.getBoundingClientRect(),ev=EVM[el.dataset.id];if(!ev){act=null;return}
       act.ev=ev;act.rect=r;
       act.mode=(e.clientY-r.top<6&&el.hasAttribute('data-s'))?'rs':(r.bottom-e.clientY<6&&el.hasAttribute('data-f'))?'rf':'mv';
       act.grab=act.p0.t-ev.a;act.a=ev.a;act.b=ev.b;
-    }else{act.mode='new';act.a=snap15(act.p0.t);act.b=act.a}
+    }else{act.mode=e.shiftKey?'new':'tap';act.a=snap15(act.p0.t);act.b=act.a}
   });
   tg.addEventListener('pointermove',function(e){
     if(!act||act.touch)return;
     if(!act.on){
       if(Math.abs(e.clientX-act.x)<4&&Math.abs(e.clientY-act.y)<4)return;
+      /* потянул пустое место — это не новое событие, а перетаскивание календаря */
+      if(act.mode==='tap'||act.mode==='bare'){var c0=act;act=null;panStart(c0,e);return}
       act.on=true;busy=true;try{tg.setPointerCapture(act.pid)}catch(_){}
       if(act.ev)[].forEach.call(tgIn.querySelectorAll('.ev[data-id="'+act.ev.id+'"]'),function(x){x.classList.add('dragging')});
     }
@@ -2823,38 +2833,46 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
       else if(a!==c.ev.a||b!==c.ev.b)moveEvent(c.ev,a,b,c.mode==='mv'&&e.altKey);
       return;
     }
-    if(cancel)return;
+    if(cancel||c.mode==='bare')return;
     if(c.touch&&(Math.abs(e.clientX-c.x)>8||Math.abs(e.clientY-c.y)>8))return;
     if(c.ev)openPop(c.ev,c.rect,false);
     else{var s=c.p0.ds+clamp(Math.floor((c.p0.t-c.p0.ds)/18e5),0,46)*18e5;newEvent(s,s+DUR(),lastSphere,{left:e.clientX-colW/2,right:e.clientX+colW/2,top:e.clientY,bottom:e.clientY})}
   }
   tg.addEventListener('pointerup',function(e){endAct(e,false)});
   tg.addEventListener('pointercancel',function(e){endAct(e,true)});
-  /* правая кнопка мыши (14.11): календарь едет за мышью в любую сторону, в том числе по диагонали, и остаётся там, где отпустили.
-     Пока тащишь и после, привязка к дням выключена (класс free); включается снова при переходе кнопками, по датам или при смене вида */
-  var pan=null;
-  tg.addEventListener('pointerdown',function(e){
-    if(e.button!==2||e.pointerType==='touch'||view==='month')return;
-    e.preventDefault();
-    pan={x:e.clientX,y:e.clientY,l:tg.scrollLeft,t:tg.scrollTop,pid:e.pointerId};
-    tg.classList.add('free','panning');
-    try{tg.setPointerCapture(e.pointerId)}catch(_){}
-  });
+  /* перетаскивание календаря (14.11): зажал левую кнопку на свободном месте и тянешь — сетка едет за мышью в любую сторону,
+     в том числе по диагонали, и остаётся там, где отпустил. Пока тянешь и после, привязка к дням выключена (класс free);
+     включается снова при переходе кнопками, по датам или при смене вида. Прокрутка меняется не чаще раза за кадр,
+     а перерисовка сетки (раз в минуту, после сверки или синхронизации) ждёт, пока отпустишь */
+  var pan=null,panRaf=0;
+  function panStart(c,e){
+    pan={x:c.x,y:c.y,l:c.sl,t:c.st,pid:c.pid,cx:e.clientX,cy:e.clientY,dirty:false};
+    busy=true;tg.classList.add('free','panning');
+    try{tg.setPointerCapture(c.pid)}catch(_){}
+    panPaint();
+  }
+  function panPaint(){
+    panRaf=0;if(!pan)return;
+    var L=Math.round(pan.l-(pan.cx-pan.x)),T=Math.round(pan.t-(pan.cy-pan.y));
+    if(tg.scrollLeft!==L)tg.scrollLeft=L;if(tg.scrollTop!==T)tg.scrollTop=T;
+  }
   tg.addEventListener('pointermove',function(e){
     if(!pan||e.pointerId!==pan.pid)return;
-    if(e.buttons!=null&&!(e.buttons&2)){panEnd();return}
-    tg.scrollLeft=pan.l-(e.clientX-pan.x);tg.scrollTop=pan.t-(e.clientY-pan.y);
+    if(e.buttons!=null&&!(e.buttons&1)){panEnd();return}
+    pan.cx=e.clientX;pan.cy=e.clientY;
+    if(!panRaf)panRaf=requestAnimationFrame(panPaint);
   });
   function panEnd(){
-    if(!pan)return;var p=pan;pan=null;tg.classList.remove('panning');
+    if(!pan)return;
+    if(panRaf){cancelAnimationFrame(panRaf);panPaint()}
+    var p=pan;pan=null;busy=false;tg.classList.remove('panning');
     try{if(tg.hasPointerCapture&&tg.hasPointerCapture(p.pid))tg.releasePointerCapture(p.pid)}catch(_){}
+    if(p.dirty)renderCalendar();
     calSettle();
   }
   tg.addEventListener('pointerup',function(e){if(pan&&e.pointerId===pan.pid)panEnd()});
   tg.addEventListener('pointercancel',function(){panEnd()});
   tg.addEventListener('lostpointercapture',function(){panEnd()});
-  /* меню правой кнопки в сетке не нужно: правая кнопка двигает календарь */
-  tg.addEventListener('contextmenu',function(e){if(view!=='month')e.preventDefault()});
   tg.addEventListener('click',function(e){
     var gb=e.target.closest('[data-gid]');
     if(gb){openGpop(gb.dataset.gid,gb.getBoundingClientRect());return}
@@ -4736,7 +4754,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
 
   /* ---------- Инструкция (14.11): раздел в настройках и экскурсия по сайту ----------
      В разделе две кнопки: экскурсия по всем разделам и по выбранным. Экскурсия затемняет экран, подсвечивает нужное место,
-     рядом подсказка, а рука показывает действие: щелчок, протяжку левой кнопкой или перетаскивание правой. В шаге
+     рядом подсказка, а курсор показывает действие: щелчок, перетаскивание календаря или протяжку с Shift. В шаге
      «Как двигать календарь» сетка правда едет за рукой, после шага прокрутка возвращается на место.
      Пока идёт экскурсия, нажатия по странице не проходят, клавиши листают шаги, утреннее окно и обновление сайта ждут. */
   var TSEC=[['calendar','Календарь'],['habits','Привычки'],['food','Питание'],['goals','Цели'],['diary','Дневник'],['books','Книги'],['report','Отчёт'],['settings','Настройки']];
@@ -4779,14 +4797,14 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   function trBasket(){var v=$('view-'+(foodInHabits()?'habits':'food')),b=v&&v.querySelector('[data-fqo]');return b?b.closest('.box'):null}
   function trDiary(){var t=$('d-text');return t?t.closest('.box'):null}
   function trWeek(){if(view==='month')setView('week')}
-  /* шаги по разделам. d — показ действия: k click / drag / rdrag, a и b — доли от размеров подсвеченного (или on) элемента */
+  /* шаги по разделам. d — показ действия: k click / pan / drag (протяжка с Shift), a и b — доли от размеров подсвеченного (или on) элемента */
   function tourSteps(k){
     var F=foodInHabits()?'habits':'food',wide=window.innerWidth>1100,open=bkIn()&&!!bkKey;
     var S={
       calendar:[
         {tab:'calendar',pre:trWeek,el:'#tg',t:'Новое событие',x:'Щёлкни один раз по свободному месту — в нужный день и час. Откроется окошко: название, время, сфера, повтор и заметка.',d:{k:'click',a:[.42,.36]}},
-        {tab:'calendar',el:'#tg',t:'Событие нужной длины',x:'Зажми левую кнопку на свободном месте и протяни вниз — событие займёт ровно это время. Готовое событие можно перетащить на другое время, а потянув за верхний или нижний край, растянуть. С зажатой клавишей Alt событие копируется.',d:{k:'drag',a:[.66,.3],b:[.66,.56],ghost:1}},
-        {tab:'calendar',el:'#tg',t:'Как двигать календарь',x:'Полоса прокрутки снизу листает дни. А ещё можно зажать <b>правую кнопку мыши</b> и тащить в любую сторону: вбок, вверх-вниз и даже по диагонали. Календарь остановится ровно там, где отпустишь, без привязки к дням. На телефоне просто листай пальцем.',d:{k:'rdrag',a:[.45,.6],b:[.25,.32],scroll:'#tg'}},
+        {tab:'calendar',el:'#tg',t:'Как двигать календарь',x:'Зажми левую кнопку мыши на свободном месте и тащи в любую сторону: вбок, вверх-вниз и даже по диагонали. Календарь остановится ровно там, где отпустишь, без привязки к дням. Полоса прокрутки снизу тоже работает, а на телефоне просто листай пальцем.',d:{k:'pan',a:[.45,.6],b:[.25,.32],scroll:'#tg'}},
+        {tab:'calendar',el:'#tg',t:'Событие нужной длины',x:'Зажми <b>Shift</b> и протяни по свободному месту вниз — событие займёт ровно это время. Готовое событие можно перетащить на другое время, а потянув за верхний или нижний край, растянуть. С зажатой клавишей Alt событие копируется.',d:{k:'drag',a:[.66,.3],b:[.66,.56],ghost:1}},
         {tab:'calendar',el:[trEv,'#tg'],t:'Окно события',x:'Щелчок по событию открывает его: название, время, сфера, повтор, заметка, удаление. Прошедшие дела засчитываются в часы сферы при сверке, она идёт раз в 15 минут.',d:{k:'click',a:[.5,.3]}},
         {tab:'calendar',el:'.wk-nav',t:'Вид и переходы',x:'День, неделя или месяц, «Сегодня» — к текущей дате, стрелки листают. Клавиши: <b>T</b> — сегодня, <b>D</b>, <b>W</b>, <b>M</b> — день, неделя, месяц, <b>C</b> — новое событие, <b>← →</b> — листать.',d:{k:'click',on:'#wk-today'}},
         wide?{tab:'calendar',el:'.side',t:'Мини-календарь и сферы',x:'Слева — мини-календарь для быстрых переходов и сферы с часами на экране: зачтено / запланировано. Нажми на сферу — откроется её статистика за месяц.',d:{k:'click',on:'#leg .lg',a:[.3,.5]}}:null,
@@ -4914,16 +4932,17 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     }
     tip.style.left=Math.round(clamp(x,M,Math.max(M,vw-w-M)))+'px';tip.style.top=Math.round(clamp(y,M,Math.max(M,vh-h-M)))+'px';
   }
-  /* показ действия рукой: щелчок с кругом, протяжка с рамкой нового события, перетаскивание правой кнопкой (сетка едет за рукой) */
+  /* показ действия курсором: щелчок с кругом, протяжка с Shift и рамкой нового события, перетаскивание календаря (сетка едет за курсором).
+     Курсор не пропадает: после действия он плавно возвращается и повторяет; появляется только в начале шага */
   function trDemo(d,el){
     var tgt=(d.on&&trQ(d.on))||el,b=tgt.getBoundingClientRect(),E=trEl;
     if(b.width<2||b.height<2)return;
     function P(f){return{x:b.left+b.width*f[0],y:b.top+b.height*f[1]}}
-    var A=P(d.a||[.5,.5]),B=d.b?P(d.b):A,S={x:A.x+70,y:A.y+56},k=d.k,T=k==='click'?2400:k==='drag'?3300:4800,t0=0,cyc=-1;
+    var A=P(d.a||[.5,.5]),B=d.b?P(d.b):A,S={x:A.x+70,y:A.y+56},k=d.k,T=k==='click'?2600:k==='drag'?3600:4400,t0=0,cyc=-1;
     if(S.x>window.innerWidth-20)S.x=A.x-70;if(S.y>window.innerHeight-20)S.y=A.y-56;
-    var sc=k==='rdrag'&&d.scroll?trQ(d.scroll):null;
+    var sc=k==='pan'&&d.scroll?trQ(d.scroll):null;
     if(sc){tr.sc={el:sc,l:sc.scrollLeft,t:sc.scrollTop,f:sc.classList.contains('free')};sc.classList.add('free')}
-    E.badge.innerHTML=k==='rdrag'?trMouse('r')+'правая кнопка':k==='drag'?trMouse('l')+'зажми и тяни':trMouse('l')+'щелчок';
+    E.badge.innerHTML=trMouse('l')+(k==='drag'?'Shift + тяни':k==='pan'?'зажми и тяни':'щелчок');
     function ease(x){return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2}
     function lerp(p,q,f){return{x:p.x+(q.x-p.x)*f,y:p.y+(q.y-p.y)*f}}
     function seg(t,a,c){return clamp((t-a)/(c-a),0,1)}
@@ -4933,28 +4952,29 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
     function frame(now){
       if(!tr)return;
       if(!t0)t0=now;
-      var tt=now-t0,c=Math.floor(tt/T),t=tt%T,p,down=false,o=Math.min(1,t/200);
+      var tt=now-t0,c=Math.floor(tt/T),t=tt%T,p,down=false,o=c?1:Math.min(1,t/250),from=c&&k==='pan'?A:S;
       if(k==='click'){
-        p=lerp(S,A,ease(seg(t,0,750)));
-        down=t>=750&&t<950;
-        if(t>=780&&cyc!==c){cyc=c;rip(A)}
-        if(t>1950)o=1-seg(t,1950,2400);
+        /* подлетел, щёлкнул, подождал и плавно отъехал назад */
+        p=t<700?lerp(from,A,ease(seg(t,0,700))):t<1800?A:lerp(A,S,ease(seg(t,1800,2600)));
+        down=t>=700&&t<900;
+        if(t>=730&&cyc!==c){cyc=c;rip(A)}
       }else if(k==='drag'){
-        p=t<650?lerp(S,A,ease(seg(t,0,650))):lerp(A,B,ease(seg(t,800,1900)));
+        /* с Shift протянул вниз — растёт рамка нового события, отпустил и вернулся */
+        p=t<650?lerp(from,A,ease(seg(t,0,650))):t<1900?lerp(A,B,ease(seg(t,800,1900))):t<2700?B:lerp(B,S,ease(seg(t,2700,3600)));
         down=t>=650&&t<2000;
         if(d.ghost){
-          var g=E.ghost,y0=Math.min(A.y,p.y),h0=Math.abs(p.y-A.y),cw=Math.max(40,(colW||120)-8);
-          if(t>=800&&t<2900&&h0>4){g.hidden=false;g.style.left=(A.x-cw/2)+'px';g.style.width=cw+'px';g.style.top=y0+'px';g.style.height=h0+'px';g.style.opacity=t>2500?1-seg(t,2500,2900):1}else g.hidden=true;
+          var g=E.ghost,y0=Math.min(A.y,p.y),h0=Math.abs((t<2700?p.y:B.y)-A.y),cw=Math.max(40,(colW||120)-8);
+          if(t>=800&&t<2700&&h0>4){g.hidden=false;g.style.left=(A.x-cw/2)+'px';g.style.width=cw+'px';g.style.top=Math.min(A.y,t<2700?p.y:B.y)+'px';g.style.height=h0+'px';g.style.opacity=t>2350?1-seg(t,2350,2700):1}else g.hidden=true;
         }
-        if(t>2900)o=1-seg(t,2900,3300);
       }else{
-        if(t<550)p=lerp(S,A,ease(seg(t,0,550)));
-        else if(t<2050)p=lerp(A,B,ease(seg(t,750,2050)));
-        else if(t<2350)p=B;
-        else p=lerp(B,A,ease(seg(t,2350,3650)));
-        down=t>=600&&t<3800;
-        if(t>4300)o=1-seg(t,4300,4800);
-        if(tr.sc&&down){tr.sc.el.scrollLeft=tr.sc.l-(p.x-A.x);tr.sc.el.scrollTop=tr.sc.t-(p.y-A.y)}
+        /* зажал, протащил по диагонали, вернул обратно; сетка правда едет за курсором */
+        if(t<550)p=lerp(from,A,ease(seg(t,0,550)));
+        else if(t<2000)p=lerp(A,B,ease(seg(t,700,2000)));
+        else if(t<2300)p=B;
+        else if(t<3600)p=lerp(B,A,ease(seg(t,2300,3600)));
+        else p=A;
+        down=t>=600&&t<3750;
+        if(tr.sc&&down){tr.sc.el.scrollLeft=Math.round(tr.sc.l-(p.x-A.x));tr.sc.el.scrollTop=Math.round(tr.sc.t-(p.y-A.y))}
       }
       put(p,down,o);
       trRaf=requestAnimationFrame(frame);
@@ -5155,7 +5175,7 @@ h1 small{font-family:var(--body);font-size:.3em;letter-spacing:0;color:var(--mut
   setInterval(dkCheck,5000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)dkCheck()});
 
-  var UPD_NAME='index',UPD_BUILD='ec036f697c';
+  var UPD_NAME='index',UPD_BUILD='a7825e5204';
   function updBusy(){return !loaded||!!tr||!!cur||busy||hpopDay!=null||syBusy||syDlgShown()||!$('recap').hidden||[pop,hpop,gpop,$('dish-dlg'),$('m-dlg'),$('en-dlg')].some(function(x){return x&&!x.hidden})}
   function updFlush(){lsSave()}
   /* ---------- сайт сам обновляется до новой версии (21.10) ----------
